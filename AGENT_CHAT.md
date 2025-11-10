@@ -40,3 +40,22 @@ This file coordinates work between multiple AI agents to prevent conflicts.
 ## Active Work
 
 <!-- Agents: Add your work sections below this line -->
+
+<pygmt-nanobind-impl>
+## Task: Implement PyGMT with nanobind
+
+### Files being modified
+- pygmt_nanobind_benchmark/ (entire directory structure)
+- justfile (add build, test, verify recipes)
+- mise.toml (may add C++ tooling if needed)
+
+### Progress
+- [x] Read README.md and AGENTS.md
+- [x] Create task plan
+- [ ] Initialize git submodules
+- [ ] Research PyGMT and GMT architecture
+- [ ] Set up development environment
+- [ ] Design nanobind interface
+- [ ] Implement core bindings
+- [ ] Create tests and benchmarks
+</pygmt-nanobind-impl>
