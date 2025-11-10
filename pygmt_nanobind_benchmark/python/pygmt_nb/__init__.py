@@ -9,5 +9,6 @@ __version__ = "0.1.0"
 
 # Re-export core classes for easy access
 from pygmt_nb.clib import Session, Grid
+from pygmt_nb.figure import Figure
 
-__all__ = ["Session", "Grid", "__version__"]
+__all__ = ["Session", "Grid", "Figure", "__version__"]
