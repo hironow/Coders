@@ -1,0 +1,16 @@
+Objective: Create a high-speed Tesseract OCR binding using `nanobind`.
+
+1. Implement: Wrap the Tesseract C++ API (libtesseract) using **only** nanobind.
+
+2. Efficiency: Prioritize high-speed, direct memory access for image data (e.g., NumPy arrays) and results (text, coordinates, confidence).
+
+3. Benchmark: Measure and compare performance (especially for batch processing) against `pytesseract` (subprocess) and `tesserocr` (CFFI).
+
+4. Validate: Ensure OCR results (text and coordinates) are identical to the native Tesseract API.
+
+5. Build: The build system must support **dynamic linking** to user-installed `libtesseract` and `leptonica` libraries, allowing path specification.
+
+nits: already cloned repositories:
+
+* gmt: ../external/gmt
+* pygmt: ../external/pygmt

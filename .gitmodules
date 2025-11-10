@@ -4,3 +4,12 @@
 [submodule "external/gmt"]
 	path = external/gmt
 	url = git@github.com:GenericMappingTools/gmt.git
+[submodule "external/pytesseract"]
+	path = external/pytesseract
+	url = git@github.com:madmaze/pytesseract.git
+[submodule "external/tesserocr"]
+	path = external/tesserocr
+	url = git@github.com:sirfz/tesserocr.git
+[submodule "external/tesseract"]
+	path = external/tesseract
+	url = git@github.com:tesseract-ocr/tesseract.git
