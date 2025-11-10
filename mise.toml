@@ -1,0 +1,6 @@
+[tools]
+go = "latest"
+uv = "latest"
+
+# cpp needs to be specified manually
+# clang, clang-format, clangd

@@ -1,0 +1,6 @@
+[submodule "external/pygmt"]
+	path = external/pygmt
+	url = git@github.com:GenericMappingTools/pygmt.git
+[submodule "external/gmt"]
+	path = external/gmt
+	url = git@github.com:GenericMappingTools/gmt.git
