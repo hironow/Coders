@@ -19,10 +19,18 @@ endif()
 
 message(STATUS "Using GMT headers from: ${GMT_INCLUDE_DIR}")
 
-# NOTE: We compile against GMT headers but DO NOT link libgmt at build time
-# The GMT library will be loaded at runtime via dlopen (similar to PyGMT's ctypes)
-# Users must have GMT installed in their system to use this package
-message(STATUS "Runtime GMT library required - will use dlopen to load libgmt.so")
+# Try to find GMT library
+find_library(GMT_LIBRARY NAMES gmt
+    PATHS /lib /usr/lib /usr/local/lib /lib/x86_64-linux-gnu /usr/lib/x86_64-linux-gnu
+)
+
+if(GMT_LIBRARY)
+    message(STATUS "Found GMT library: ${GMT_LIBRARY}")
+    set(LINK_GMT TRUE)
+else()
+    message(STATUS "GMT library not found - building header-only (runtime linking required)")
+    set(LINK_GMT FALSE)
+endif()
 
 # Fetch nanobind
 include(FetchContent)
@@ -49,9 +57,15 @@ target_compile_definitions(_pygmt_nb_core PRIVATE
     GMT_RUNTIME_LOADING=1
 )
 
-# On Linux, we need libdl for dlopen/dlsym
-if(UNIX AND NOT APPLE)
-    target_link_libraries(_pygmt_nb_core PRIVATE ${CMAKE_DL_LIBS})
+# Link against GMT library if found
+if(LINK_GMT)
+    target_link_libraries(_pygmt_nb_core PRIVATE ${GMT_LIBRARY})
+    message(STATUS "Linking against GMT library")
+else()
+    # On Linux, we need libdl for dlopen/dlsym (future dynamic loading)
+    if(UNIX AND NOT APPLE)
+        target_link_libraries(_pygmt_nb_core PRIVATE ${CMAKE_DL_LIBS})
+    endif()
 endif()
 
 # Install the extension module
