@@ -13,12 +13,16 @@
 #include <nanobind/nanobind.h>
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/map.h>
+#include <nanobind/stl/tuple.h>
+#include <nanobind/ndarray.h>
 
 #include <memory>
 #include <stdexcept>
 #include <string>
 #include <map>
 #include <sstream>
+#include <tuple>
+#include <cstring>
 
 // Include GMT headers for API declarations
 extern "C" {
@@ -194,9 +198,180 @@ public:
 };
 
 /**
+ * Grid class - wraps GMT_GRID structure
+ *
+ * This provides a Python interface to GMT grid data with NumPy integration.
+ */
+class Grid {
+private:
+    void* api_;              // GMT API pointer (borrowed from Session)
+    GMT_GRID* grid_;         // GMT grid structure
+    bool owns_grid_;         // Whether this object owns the grid data
+
+public:
+    /**
+     * Create Grid by reading from file
+     *
+     * Args:
+     *     session: Active GMT Session
+     *     filename: Path to grid file (GMT-compatible format, e.g., .nc, .grd)
+     */
+    Grid(Session& session, const std::string& filename)
+        : api_(session.session_pointer()), grid_(nullptr), owns_grid_(true) {
+
+        if (!session.is_active()) {
+            throw std::runtime_error("Cannot create Grid: Session is not active");
+        }
+
+        // Read grid from file using GMT_Read_Data
+        // GMT_IS_GRID: Data family
+        // GMT_IS_FILE: Input method (from file)
+        // GMT_IS_SURFACE: Geometry type
+        // GMT_CONTAINER_AND_DATA: Read both container and data
+        grid_ = static_cast<GMT_GRID*>(
+            GMT_Read_Data(
+                api_,
+                GMT_IS_GRID,           // family
+                GMT_IS_FILE,           // method
+                GMT_IS_SURFACE,        // geometry
+                GMT_CONTAINER_AND_DATA | GMT_GRID_IS_CARTESIAN,  // mode
+                nullptr,               // wesn (NULL = use file's region)
+                filename.c_str(),      // input file
+                nullptr                // existing data (NULL = allocate new)
+            )
+        );
+
+        if (grid_ == nullptr) {
+            throw std::runtime_error(
+                "Failed to read grid from file: " + filename + "\n"
+                "Make sure the file exists and is a valid GMT grid format."
+            );
+        }
+    }
+
+    /**
+     * Destructor - cleanup GMT grid
+     */
+    ~Grid() {
+        if (owns_grid_ && grid_ != nullptr && api_ != nullptr) {
+            // Destroy grid using GMT API
+            GMT_Destroy_Data(api_, reinterpret_cast<void**>(&grid_));
+            grid_ = nullptr;
+        }
+    }
+
+    // Disable copy (would need deep copy of GMT_GRID)
+    Grid(const Grid&) = delete;
+    Grid& operator=(const Grid&) = delete;
+
+    // Enable move
+    Grid(Grid&& other) noexcept
+        : api_(other.api_), grid_(other.grid_), owns_grid_(other.owns_grid_) {
+        other.grid_ = nullptr;
+        other.owns_grid_ = false;
+    }
+
+    /**
+     * Get grid shape (n_rows, n_columns)
+     *
+     * Returns:
+     *     tuple: (n_rows, n_columns)
+     */
+    std::tuple<size_t, size_t> shape() const {
+        if (grid_ == nullptr || grid_->header == nullptr) {
+            throw std::runtime_error("Grid not initialized");
+        }
+        return std::make_tuple(
+            grid_->header->n_rows,
+            grid_->header->n_columns
+        );
+    }
+
+    /**
+     * Get grid region (west, east, south, north)
+     *
+     * Returns:
+     *     tuple: (west, east, south, north)
+     */
+    std::tuple<double, double, double, double> region() const {
+        if (grid_ == nullptr || grid_->header == nullptr) {
+            throw std::runtime_error("Grid not initialized");
+        }
+        return std::make_tuple(
+            grid_->header->wesn[0],  // west
+            grid_->header->wesn[1],  // east
+            grid_->header->wesn[2],  // south
+            grid_->header->wesn[3]   // north
+        );
+    }
+
+    /**
+     * Get grid registration type
+     *
+     * Returns:
+     *     int: 0 for node registration, 1 for pixel registration
+     */
+    int registration() const {
+        if (grid_ == nullptr || grid_->header == nullptr) {
+            throw std::runtime_error("Grid not initialized");
+        }
+        return grid_->header->registration;
+    }
+
+    /**
+     * Get grid data as NumPy array
+     *
+     * Returns a 2D NumPy array (n_rows, n_columns) with grid data.
+     *
+     * Returns:
+     *     ndarray: 2D NumPy array of float32
+     */
+    nb::ndarray<nb::numpy, float> data() const {
+        if (grid_ == nullptr || grid_->header == nullptr || grid_->data == nullptr) {
+            throw std::runtime_error("Grid not initialized or no data");
+        }
+
+        size_t n_rows = grid_->header->n_rows;
+        size_t n_cols = grid_->header->n_columns;
+        size_t total_size = n_rows * n_cols;
+
+        // Create shape array
+        size_t shape[2] = {n_rows, n_cols};
+
+        // Allocate new numpy array and copy data
+        // This ensures memory safety and proper ownership
+        float* data_copy = new float[total_size];
+        std::memcpy(data_copy, grid_->data, total_size * sizeof(float));
+
+        // Create capsule for memory management
+        auto capsule = nb::capsule(data_copy, [](void* ptr) noexcept {
+            delete[] static_cast<float*>(ptr);
+        });
+
+        // Create ndarray with ownership transfer
+        return nb::ndarray<nb::numpy, float>(
+            data_copy,      // data pointer
+            2,              // ndim
+            shape,          // shape
+            capsule         // owner (capsule will delete data when array is destroyed)
+        );
+    }
+
+    /**
+     * Get raw GMT_GRID pointer (advanced usage)
+     *
+     * Returns:
+     *     void*: Pointer to GMT_GRID structure
+     */
+    void* grid_pointer() const {
+        return static_cast<void*>(grid_);
+    }
+};
+
+/**
  * Python module definition
  *
- * Exports the Session class to Python with all its methods.
+ * Exports the Session and Grid classes to Python with all their methods.
  */
 NB_MODULE(_pygmt_nb_core, m) {
     m.doc() = "PyGMT nanobind core module - High-performance GMT bindings\n\n"
@@ -248,4 +423,38 @@ NB_MODULE(_pygmt_nb_core, m) {
              "Get last error message.\n\n"
              "Returns:\n"
              "    str: Last error message, or empty string");
+
+    // Grid class
+    nb::class_<Grid>(m, "Grid",
+        "GMT Grid data container\n\n"
+        "This class wraps GMT grid data and provides NumPy array access.\n"
+        "Grids are automatically cleaned up when the object is destroyed.")
+        .def(nb::init<Session&, const std::string&>(),
+             "session"_a, "filename"_a,
+             "Create Grid by reading from file.\n\n"
+             "Args:\n"
+             "    session (Session): Active GMT session\n"
+             "    filename (str): Path to grid file (GMT format, e.g., .nc, .grd)\n\n"
+             "Raises:\n"
+             "    RuntimeError: If file cannot be read or is invalid")
+        .def_prop_ro("shape", &Grid::shape,
+                     "Get grid shape.\n\n"
+                     "Returns:\n"
+                     "    tuple: (n_rows, n_columns)")
+        .def_prop_ro("region", &Grid::region,
+                     "Get grid region.\n\n"
+                     "Returns:\n"
+                     "    tuple: (west, east, south, north)")
+        .def_prop_ro("registration", &Grid::registration,
+                     "Get grid registration type.\n\n"
+                     "Returns:\n"
+                     "    int: 0 for node registration, 1 for pixel registration")
+        .def("data", &Grid::data,
+             "Get grid data as NumPy array.\n\n"
+             "Returns:\n"
+             "    ndarray: 2D NumPy array of float32 with shape (n_rows, n_columns)")
+        .def_prop_ro("grid_pointer", &Grid::grid_pointer,
+                     "Get raw GMT_GRID pointer (advanced usage only).\n\n"
+                     "Returns:\n"
+                     "    int: Pointer address as integer");
 }

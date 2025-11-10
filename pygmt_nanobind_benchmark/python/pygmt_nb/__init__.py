@@ -7,7 +7,7 @@ for improved performance.
 
 __version__ = "0.1.0"
 
-# Re-export Session class for compatibility
-from pygmt_nb.clib import Session
+# Re-export core classes for easy access
+from pygmt_nb.clib import Session, Grid
 
-__all__ = ["Session", "__version__"]
+__all__ = ["Session", "Grid", "__version__"]

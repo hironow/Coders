@@ -1,10 +1,11 @@
 """
 Core library interface
 
-This module provides the Session class and low-level GMT API bindings.
+This module provides the Session class, Grid class, and low-level GMT API bindings.
 """
 
 from pygmt_nb.clib._pygmt_nb_core import Session as _CoreSession
+from pygmt_nb.clib._pygmt_nb_core import Grid
 
 
 class Session(_CoreSession):
@@ -26,4 +27,4 @@ class Session(_CoreSession):
         return None
 
 
-__all__ = ["Session"]
+__all__ = ["Session", "Grid"]
