@@ -1,0 +1,15 @@
+Objective: Create and validate a `nanobind`-based PyGMT implementation.
+
+1. Implement: Re-implement the gmt-python (PyGMT) interface using **only** `nanobind` for C++ bindings.
+   * Crucial: The build system **must** allow specifying the installation path (include/lib directories) for the external [GMT C/C++ library](https://github.com/GenericMappingTools/gmt).
+
+2. Compatibility: Ensure the new implementation is a **drop-in replacement** for `pygmt` (i.e., requires only an import change).
+
+3. Benchmark: Measure and compare the performance against the original `pygmt`.
+
+4. Validate: Confirm that all outputs from the PyGMT examples are **pixel-identical** to the originals.
+
+nits: already cloned repositories:
+
+* gmt: ../external/gmt
+* pygmt: ../external/pygmt
