@@ -21,9 +21,17 @@ test:
 test-file file:
     cd pygmt_nanobind_benchmark && uv run pytest {{file}} -v
 
-# Run benchmarks
+# Run all benchmarks
 benchmark:
-    cd pygmt_nanobind_benchmark && uv run python benchmarks/compare_with_pygmt.py
+    cd pygmt_nanobind_benchmark && python3 benchmarks/compare_with_pygmt.py
+
+# Run specific benchmark category
+benchmark-category category:
+    cd pygmt_nanobind_benchmark && python3 benchmarks/benchmark_{{category}}.py
+
+# Show benchmark results
+benchmark-results:
+    @cat pygmt_nanobind_benchmark/benchmarks/BENCHMARK_RESULTS.md
 
 # Run validation (pixel-perfect comparison)
 validate:
