@@ -13,3 +13,6 @@
 [submodule "external/tesseract"]
 	path = external/tesseract
 	url = git@github.com:tesseract-ocr/tesseract.git
+[submodule "external/mlt"]
+	path = external/mlt
+	url = git@github.com:mltframework/mlt.git

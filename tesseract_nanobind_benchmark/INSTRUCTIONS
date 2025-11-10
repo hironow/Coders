@@ -12,5 +12,6 @@ Objective: Create a high-speed Tesseract OCR binding using `nanobind`.
 
 nits: already cloned repositories:
 
-* gmt: ../external/gmt
-* pygmt: ../external/pygmt
+* tesseract: ../external/tesseract
+* pytesseract: ../external/pytesseract
+* tesserocr: ../external/tesserocr
