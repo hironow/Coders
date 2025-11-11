@@ -251,6 +251,154 @@ class TestFigureIntegration(unittest.TestCase):
         assert output_file.exists()
 
 
+class TestFigureBasemap(unittest.TestCase):
+    """Test Figure.basemap() method for drawing map frames."""
+
+    def setUp(self):
+        """Set up test fixtures."""
+        self.temp_dir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        """Clean up temporary files."""
+        import shutil
+        if os.path.exists(self.temp_dir):
+            shutil.rmtree(self.temp_dir)
+
+    def test_figure_has_basemap_method(self) -> None:
+        """Test that Figure has basemap method."""
+        from pygmt_nb import Figure
+
+        fig = Figure()
+        assert hasattr(fig, 'basemap')
+        assert callable(fig.basemap)
+
+    def test_basemap_accepts_region_and_projection(self) -> None:
+        """Test that basemap accepts region and projection parameters."""
+        from pygmt_nb import Figure
+
+        fig = Figure()
+        # Should not raise an exception
+        fig.basemap(region=[0, 10, 0, 10], projection="X10c")
+
+    def test_basemap_accepts_frame_parameter(self) -> None:
+        """Test that basemap accepts frame parameter."""
+        from pygmt_nb import Figure
+
+        fig = Figure()
+        # Should not raise an exception
+        fig.basemap(region=[0, 10, 0, 10], projection="X10c", frame=True)
+
+    def test_basemap_with_frame_as_string(self) -> None:
+        """Test that basemap accepts frame as string."""
+        from pygmt_nb import Figure
+
+        fig = Figure()
+        # Should not raise an exception
+        fig.basemap(region=[0, 10, 0, 10], projection="X10c", frame="a")
+
+    def test_basemap_creates_valid_output(self) -> None:
+        """Test that basemap creates valid PostScript output."""
+        from pygmt_nb import Figure
+
+        fig = Figure()
+        fig.basemap(region=[0, 10, 0, 10], projection="X10c", frame=True)
+
+        output_file = Path(self.temp_dir) / "basemap_test.ps"
+        fig.savefig(str(output_file))
+
+        # File should exist
+        assert output_file.exists()
+        # File should not be empty
+        assert output_file.stat().st_size > 0
+
+        # Verify it's a valid PostScript
+        with open(output_file, 'rb') as f:
+            header = f.read(4)
+            assert header == b'%!PS'
+
+
+class TestFigureCoast(unittest.TestCase):
+    """Test Figure.coast() method for drawing coastlines."""
+
+    def setUp(self):
+        """Set up test fixtures."""
+        self.temp_dir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        """Clean up temporary files."""
+        import shutil
+        if os.path.exists(self.temp_dir):
+            shutil.rmtree(self.temp_dir)
+
+    def test_figure_has_coast_method(self) -> None:
+        """Test that Figure has coast method."""
+        from pygmt_nb import Figure
+
+        fig = Figure()
+        assert hasattr(fig, 'coast')
+        assert callable(fig.coast)
+
+    def test_coast_accepts_region_and_projection(self) -> None:
+        """Test that coast accepts region and projection parameters."""
+        from pygmt_nb import Figure
+
+        fig = Figure()
+        # Should not raise an exception
+        fig.coast(region=[0, 10, 0, 10], projection="X10c")
+
+    def test_coast_accepts_land_parameter(self) -> None:
+        """Test that coast accepts land color parameter."""
+        from pygmt_nb import Figure
+
+        fig = Figure()
+        # Should not raise an exception
+        fig.coast(region=[0, 10, 0, 10], projection="X10c", land="gray")
+
+    def test_coast_accepts_water_parameter(self) -> None:
+        """Test that coast accepts water color parameter."""
+        from pygmt_nb import Figure
+
+        fig = Figure()
+        # Should not raise an exception
+        fig.coast(region=[0, 10, 0, 10], projection="X10c", water="lightblue")
+
+    def test_coast_accepts_shorelines_parameter(self) -> None:
+        """Test that coast accepts shorelines parameter."""
+        from pygmt_nb import Figure
+
+        fig = Figure()
+        # Should not raise an exception
+        fig.coast(region=[0, 10, 0, 10], projection="X10c", shorelines=True)
+
+    def test_coast_creates_valid_output(self) -> None:
+        """Test that coast creates valid PostScript output."""
+        from pygmt_nb import Figure
+
+        fig = Figure()
+        fig.coast(region=[0, 10, 0, 10], projection="X10c", land="gray")
+
+        output_file = Path(self.temp_dir) / "coast_test.ps"
+        fig.savefig(str(output_file))
+
+        # File should exist
+        assert output_file.exists()
+        # File should not be empty
+        assert output_file.stat().st_size > 0
+
+        # Verify it's a valid PostScript
+        with open(output_file, 'rb') as f:
+            header = f.read(4)
+            assert header == b'%!PS'
+
+    def test_coast_with_borders(self) -> None:
+        """Test that coast accepts borders parameter."""
+        from pygmt_nb import Figure
+
+        fig = Figure()
+        # Should not raise an exception
+        fig.coast(region=[0, 10, 0, 10], projection="X10c", borders="1")
+
+
 class TestFigureResourceManagement(unittest.TestCase):
     """Test Figure memory management and cleanup."""
 

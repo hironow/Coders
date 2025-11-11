@@ -170,6 +170,309 @@ class Figure:
                 f"GMT grdimage failed: {e.stderr}"
             ) from e
 
+    def basemap(
+        self,
+        region: Optional[List[float]] = None,
+        projection: Optional[str] = None,
+        frame: Union[bool, str, List[str], None] = None,
+        **kwargs
+    ):
+        """
+        Draw a basemap (map frame, axes, and optional grid).
+
+        This method wraps GMT's basemap module to draw map frames
+        and coordinate axes.
+
+        Parameters:
+            region: Map region as [west, east, south, north]
+                   Required parameter
+            projection: Map projection (e.g., "X10c", "M15c")
+                       Required parameter
+            frame: Frame and axis settings
+                  - True: automatic frame with annotations
+                  - False or None: no frame
+                  - str: GMT frame specification (e.g., "a", "afg", "WSen")
+                  - list: List of frame specifications
+            **kwargs: Additional GMT module options (not yet implemented)
+
+        Examples:
+            >>> fig = Figure()
+            >>> fig.basemap(region=[0, 10, 0, 10], projection="X10c", frame=True)
+            >>> fig.basemap(region=[0, 10, 0, 10], projection="X10c", frame="a")
+            >>> fig.basemap(region=[0, 10, 0, 10], projection="X10c", frame="WSen+tTitle")
+        """
+        # Validate required parameters
+        if region is None:
+            raise ValueError("region parameter is required for basemap()")
+        if projection is None:
+            raise ValueError("projection parameter is required for basemap()")
+
+        # Build GMT basemap command
+        args = []
+
+        # Region
+        if len(region) != 4:
+            raise ValueError("Region must be [west, east, south, north]")
+        west, east, south, north = region
+        args.append(f"-R{west}/{east}/{south}/{north}")
+
+        # Projection
+        args.append(f"-J{projection}")
+
+        # Frame
+        if frame is True:
+            # Automatic frame with annotations
+            args.append("-Ba")
+        elif frame is False:
+            # Minimal frame (no annotations, just border)
+            args.append("-B0")
+        elif frame is None:
+            # Default: minimal frame (required by psbasemap)
+            args.append("-B0")
+        elif isinstance(frame, str):
+            # String frame specification
+            args.append(f"-B{frame}")
+        elif isinstance(frame, list):
+            # Multiple frame specifications
+            for f in frame:
+                if f is True:
+                    args.append("-Ba")
+                elif f is False:
+                    args.append("-B0")
+                elif isinstance(f, str):
+                    args.append(f"-B{f}")
+                else:
+                    raise ValueError(
+                        f"frame list element must be bool or str, not {type(f).__name__}"
+                    )
+        else:
+            raise ValueError(
+                f"frame must be bool, str, or list, not {type(frame).__name__}"
+            )
+
+        # Output to PostScript
+        psfile = self._get_psfile_path()
+        if self._activated:
+            # Append to existing PS
+            args.append("-O")
+            args.append("-K")
+        else:
+            # Start new PS
+            args.append("-K")
+            self._activated = True
+
+        # Execute GMT psbasemap via subprocess with output redirection
+        # Note: Using psbasemap (classic mode) instead of basemap (modern mode)
+        # because we're using -K/-O flags for PostScript output
+        cmd = ["gmt", "psbasemap"] + args
+
+        try:
+            # Open file in appropriate mode
+            mode = "ab" if self._activated and os.path.exists(psfile) and os.path.getsize(psfile) > 0 else "wb"
+            with open(psfile, mode) as f:
+                result = subprocess.run(
+                    cmd,
+                    stdout=f,
+                    stderr=subprocess.PIPE,
+                    check=True,
+                    text=True
+                )
+        except subprocess.CalledProcessError as e:
+            raise RuntimeError(
+                f"GMT psbasemap failed: {e.stderr}"
+            ) from e
+
+    def coast(
+        self,
+        region: Optional[Union[str, List[float]]] = None,
+        projection: Optional[str] = None,
+        land: Optional[str] = None,
+        water: Optional[str] = None,
+        shorelines: Union[bool, str, int, None] = None,
+        resolution: Optional[str] = None,
+        borders: Union[str, List[str], None] = None,
+        frame: Union[bool, str, List[str], None] = None,
+        dcw: Union[str, List[str], None] = None,
+        **kwargs
+    ):
+        """
+        Draw coastlines, borders, and water bodies.
+
+        This method wraps GMT's pscoast module to plot coastlines,
+        land, ocean, and political boundaries.
+
+        Parameters:
+            region: Map region
+                   - str: Region code (e.g., "JP", "US", "EG")
+                   - list: [west, east, south, north]
+            projection: Map projection (e.g., "X10c", "M15c")
+                       Required parameter
+            land: Land color (e.g., "gray", "#aaaaaa", "brown")
+            water: Water/ocean color (e.g., "lightblue", "white")
+            shorelines: Shoreline settings
+                      - True: Draw shorelines with default pen
+                      - str/int: Shoreline type and pen (e.g., "1", "1/0.5p")
+            resolution: Shoreline resolution
+                      - "crude" (c): Crude resolution
+                      - "low" (l): Low resolution
+                      - "intermediate" (i): Intermediate resolution
+                      - "high" (h): High resolution
+                      - "full" (f): Full resolution
+            borders: Political boundary settings
+                   - str: Border type (e.g., "1" for national borders)
+                   - list: Multiple border types
+            frame: Frame and axis settings (same as basemap)
+            dcw: Digital Chart of the World country codes
+                - str: Single country code (e.g., "ES+gbisque+pblue")
+                - list: Multiple country codes
+            **kwargs: Additional GMT module options (not yet implemented)
+
+        Examples:
+            >>> fig = Figure()
+            >>> fig.coast(region="JP", projection="M10c", land="gray")
+            >>> fig.coast(region=[-180, 180, -80, 80], projection="M15c",
+            ...           land="#aaaaaa", water="white")
+        """
+        # Validate required parameters
+        if projection is None:
+            raise ValueError("projection parameter is required for coast()")
+
+        # Build GMT pscoast command
+        args = []
+
+        # Region
+        if region is not None:
+            if isinstance(region, str):
+                # Region code (e.g., "JP")
+                args.append(f"-R{region}")
+            elif isinstance(region, list):
+                if len(region) != 4:
+                    raise ValueError("Region must be [west, east, south, north]")
+                west, east, south, north = region
+                args.append(f"-R{west}/{east}/{south}/{north}")
+            else:
+                raise ValueError("region must be str or list")
+        else:
+            raise ValueError("region parameter is required for coast()")
+
+        # Projection
+        args.append(f"-J{projection}")
+
+        # Land color
+        if land:
+            args.append(f"-G{land}")
+
+        # Water color
+        if water:
+            args.append(f"-S{water}")
+
+        # Shorelines
+        if shorelines is not None:
+            if shorelines is True:
+                args.append("-W")
+            elif isinstance(shorelines, (str, int)):
+                args.append(f"-W{shorelines}")
+
+        # Resolution
+        if resolution:
+            # Map long form to short form
+            resolution_map = {
+                "crude": "c",
+                "low": "l",
+                "intermediate": "i",
+                "high": "h",
+                "full": "f",
+                # Also accept short forms directly
+                "c": "c",
+                "l": "l",
+                "i": "i",
+                "h": "h",
+                "f": "f",
+            }
+            if resolution in resolution_map:
+                args.append(f"-D{resolution_map[resolution]}")
+            else:
+                raise ValueError(
+                    f"Invalid resolution: {resolution}. "
+                    f"Must be one of: {', '.join(resolution_map.keys())}"
+                )
+
+        # Borders
+        if borders is not None:
+            if isinstance(borders, str):
+                args.append(f"-N{borders}")
+            elif isinstance(borders, list):
+                for border in borders:
+                    args.append(f"-N{border}")
+
+        # DCW (Digital Chart of the World)
+        if dcw is not None:
+            if isinstance(dcw, str):
+                args.append(f"-E{dcw}")
+            elif isinstance(dcw, list):
+                # Multiple DCW codes
+                for code in dcw:
+                    args.append(f"-E{code}")
+
+        # Frame
+        if frame is True:
+            args.append("-Ba")
+        elif frame is False:
+            pass  # No frame
+        elif frame is None:
+            pass  # No frame by default for coast
+        elif isinstance(frame, str):
+            args.append(f"-B{frame}")
+        elif isinstance(frame, list):
+            for f in frame:
+                args.append(f"-B{f}")
+
+        # Ensure at least one drawing option is specified
+        # pscoast requires at least one of -C, -G, -S, -E, -I, -N, -Q, -W
+        has_drawing_option = any([
+            land,  # -G
+            water,  # -S
+            shorelines is not None,  # -W
+            borders is not None,  # -N
+            dcw is not None,  # -E
+        ])
+
+        if not has_drawing_option:
+            # Default: draw shorelines
+            args.append("-W")
+
+        # Output to PostScript
+        psfile = self._get_psfile_path()
+        if self._activated:
+            # Append to existing PS
+            args.append("-O")
+            args.append("-K")
+        else:
+            # Start new PS
+            args.append("-K")
+            self._activated = True
+
+        # Execute GMT pscoast via subprocess with output redirection
+        # Note: Using pscoast (classic mode) instead of coast (modern mode)
+        # because we're using -K/-O flags for PostScript output
+        cmd = ["gmt", "pscoast"] + args
+
+        try:
+            # Open file in appropriate mode
+            mode = "ab" if self._activated and os.path.exists(psfile) and os.path.getsize(psfile) > 0 else "wb"
+            with open(psfile, mode) as f:
+                result = subprocess.run(
+                    cmd,
+                    stdout=f,
+                    stderr=subprocess.PIPE,
+                    check=True,
+                    text=True
+                )
+        except subprocess.CalledProcessError as e:
+            raise RuntimeError(
+                f"GMT pscoast failed: {e.stderr}"
+            ) from e
+
     def savefig(
         self,
         fname: Union[str, Path],
