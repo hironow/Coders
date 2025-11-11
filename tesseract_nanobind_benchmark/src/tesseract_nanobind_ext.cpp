@@ -343,12 +343,18 @@ public:
         // Create bytes object for efficient transfer
         std::vector<uint8_t> data(height * width);
 
-        // Copy pixel data
+        // Copy pixel data efficiently using direct access
+        uint32_t* pixdata = pixGetData(pix8);
+        int wpl = pixGetWpl(pix8);  // words per line
+
         for (int y = 0; y < height; y++) {
+            uint32_t* line = pixdata + y * wpl;
             for (int x = 0; x < width; x++) {
-                uint32_t val;
-                pixGetPixel(pix8, x, y, &val);
-                data[y * width + x] = static_cast<uint8_t>(val);
+                // Each byte in the 32-bit word is a pixel (for 8bpp)
+                int word_index = x / 4;
+                int byte_index = x % 4;
+                uint8_t pixel = (line[word_index] >> (8 * (3 - byte_index))) & 0xFF;
+                data[y * width + x] = pixel;
             }
         }
 
