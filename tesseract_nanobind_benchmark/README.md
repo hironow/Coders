@@ -1,5 +1,8 @@
 # Tesseract Nanobind Benchmark
 
+[![Tesseract Nanobind CI](https://github.com/hironow/Coders/actions/workflows/tesseract-nanobind-ci.yml/badge.svg)](https://github.com/hironow/Coders/actions/workflows/tesseract-nanobind-ci.yml)
+[![Build Wheels](https://github.com/hironow/Coders/actions/workflows/tesseract-nanobind-build-wheels.yml/badge.svg)](https://github.com/hironow/Coders/actions/workflows/tesseract-nanobind-build-wheels.yml)
+
 High-performance Python bindings for Tesseract OCR using nanobind.
 
 ## Objective
