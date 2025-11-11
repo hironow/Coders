@@ -13,6 +13,8 @@ from pygmt_nb.src.grdimage import grdimage
 from pygmt_nb.src.colorbar import colorbar
 from pygmt_nb.src.grdcontour import grdcontour
 from pygmt_nb.src.logo import logo
+from pygmt_nb.src.legend import legend
+from pygmt_nb.src.histogram import histogram
 
 __all__ = [
     "basemap",
@@ -23,4 +25,6 @@ __all__ = [
     "colorbar",
     "grdcontour",
     "logo",
+    "legend",
+    "histogram",
 ]

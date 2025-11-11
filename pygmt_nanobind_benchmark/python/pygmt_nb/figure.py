@@ -184,6 +184,8 @@ class Figure:
         colorbar,
         grdcontour,
         logo,
+        legend,
+        histogram,
     )
 
 
