@@ -191,6 +191,8 @@ class Figure:
         grdview,
         inset,
         subplot,
+        shift_origin,
+        psconvert,
     )
 
 

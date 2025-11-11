@@ -21,6 +21,8 @@ from pygmt_nb.src.plot3d import plot3d
 from pygmt_nb.src.grdview import grdview
 from pygmt_nb.src.inset import inset
 from pygmt_nb.src.subplot import subplot
+from pygmt_nb.src.shift_origin import shift_origin
+from pygmt_nb.src.psconvert import psconvert
 
 __all__ = [
     "basemap",
@@ -39,4 +41,6 @@ __all__ = [
     "grdview",
     "inset",
     "subplot",
+    "shift_origin",
+    "psconvert",
 ]
