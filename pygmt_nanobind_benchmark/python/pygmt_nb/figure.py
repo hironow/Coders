@@ -16,6 +16,7 @@ from typing import Union, Optional, List
 from pathlib import Path
 import time
 import shlex
+import tempfile
 
 from pygmt_nb.clib import Session, Grid
 
@@ -118,32 +119,48 @@ class Figure:
         fname: Union[str, Path],
         transparent: bool = False,
         dpi: int = 300,
+        crop: bool = True,
+        anti_alias: bool = True,
         **kwargs
     ):
         """
         Save the figure to a file.
 
-        Extracts PostScript from GMT session directory and saves it.
-        For modern mode without Ghostscript, only .ps and .eps formats
-        are supported.
+        Supports PostScript (.ps, .eps) and raster formats (.png, .jpg, .pdf, .tif)
+        via GMT's psconvert command.
 
         Parameters:
-            fname: Output filename (currently only .ps/.eps supported)
-            transparent: Not used (PostScript doesn't support transparency)
-            dpi: Not used (PostScript is vector format)
-            **kwargs: Additional options (not yet implemented)
+            fname: Output filename (.ps, .eps, .png, .jpg, .jpeg, .pdf, .tif)
+            transparent: Enable transparency (PNG only)
+            dpi: Resolution in dots per inch (for raster formats)
+            crop: Crop the figure canvas to the plot area (default: True)
+            anti_alias: Use anti-aliasing for raster images (default: True)
+            **kwargs: Additional options passed to psconvert
 
         Raises:
             ValueError: If unsupported format requested
-            RuntimeError: If PostScript file not found
+            RuntimeError: If PostScript file not found or conversion fails
         """
         fname = Path(fname)
+        suffix = fname.suffix.lower()
 
-        # Check format
-        if fname.suffix.lower() not in ['.ps', '.eps']:
+        # Format mapping (file extension -> GMT psconvert format code)
+        fmt_map = {
+            '.bmp': 'b',
+            '.eps': 'e',
+            '.jpg': 'j',
+            '.jpeg': 'j',
+            '.pdf': 'f',
+            '.png': 'G' if transparent else 'g',
+            '.ppm': 'm',
+            '.tif': 't',
+            '.ps': None,  # PS doesn't need conversion
+        }
+
+        if suffix not in fmt_map:
             raise ValueError(
-                f"Only .ps and .eps formats supported without Ghostscript. "
-                f"Got: {fname.suffix}"
+                f"Unsupported file format: {suffix}. "
+                f"Supported formats: {', '.join(fmt_map.keys())}"
             )
 
         # Find the .ps- file
@@ -165,8 +182,39 @@ class Figure:
         if not content.rstrip().endswith("%%EOF"):
             content += "%%EOF\n"
 
-        # Save to destination
-        fname.write_text(content)
+        # For PS format, save directly without conversion
+        if suffix == '.ps':
+            fname.write_text(content)
+            return
+
+        # For EPS and raster formats, use GMT psconvert via nanobind
+        # Save PS content to temporary file first
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.ps', delete=False) as tmp_ps:
+            tmp_ps_path = Path(tmp_ps.name)
+            tmp_ps.write(content)
+
+        try:
+            # Use our psconvert implementation (which uses GMT C API via nanobind)
+            from pygmt_nb.src.psconvert import psconvert
+
+            # Prepare psconvert arguments
+            prefix = fname.with_suffix("").as_posix()
+            fmt = fmt_map[suffix]
+
+            # Call psconvert (uses GMT C API, not subprocess!)
+            psconvert(
+                self,
+                prefix=prefix,
+                fmt=fmt,
+                dpi=dpi,
+                crop=crop,
+                anti_alias="t2,g2" if anti_alias else None,
+                **kwargs
+            )
+        finally:
+            # Clean up temporary file
+            if tmp_ps_path.exists():
+                tmp_ps_path.unlink()
 
     def show(self, **kwargs):
         """
