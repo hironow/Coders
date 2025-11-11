@@ -198,6 +198,9 @@ class Figure:
         meca,
         rose,
         solar,
+        ternary,
+        tilemap,
+        timestamp,
     )
 
 

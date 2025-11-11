@@ -28,6 +28,9 @@ from pygmt_nb.src.vlines import vlines
 from pygmt_nb.src.meca import meca
 from pygmt_nb.src.rose import rose
 from pygmt_nb.src.solar import solar
+from pygmt_nb.src.ternary import ternary
+from pygmt_nb.src.tilemap import tilemap
+from pygmt_nb.src.timestamp import timestamp
 
 __all__ = [
     "basemap",
@@ -53,4 +56,7 @@ __all__ = [
     "meca",
     "rose",
     "solar",
+    "ternary",
+    "tilemap",
+    "timestamp",
 ]
