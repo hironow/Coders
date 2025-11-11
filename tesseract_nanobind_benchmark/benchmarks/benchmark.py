@@ -10,12 +10,36 @@ Usage:
     python benchmark.py [--iterations N] [--images N]
 """
 import argparse
+import os
 import time
 from PIL import Image, ImageDraw, ImageFont
 import pytesseract
 from tesseract_nanobind.compat import PyTessBaseAPI as NanobindAPI
 from tesserocr import PyTessBaseAPI as TesserocrAPI
 from pathlib import Path
+
+
+def get_tessdata_prefix():
+    """Get tessdata prefix path from environment or system default."""
+    # Check environment variable first
+    if 'TESSDATA_PREFIX' in os.environ:
+        return os.environ['TESSDATA_PREFIX']
+
+    # Try common installation paths
+    common_paths = [
+        '/usr/share/tessdata',  # Linux (apt)
+        '/usr/share/tesseract-ocr/4.00/tessdata',  # Linux (older)
+        '/usr/share/tesseract-ocr/5/tessdata',  # Linux (newer)
+        '/opt/homebrew/share/tessdata',  # macOS (brew)
+        '/usr/local/share/tessdata',  # macOS (brew, old)
+    ]
+
+    for path in common_paths:
+        if os.path.isdir(path) and os.path.exists(os.path.join(path, 'eng.traineddata')):
+            return path
+
+    # If nothing found, return empty string (let tesseract find it)
+    return ''
 
 
 def load_real_test_images():
@@ -116,7 +140,8 @@ def benchmark_pytesseract(images, iterations=1):
 def benchmark_tesserocr(images, iterations=1):
     """Benchmark tesserocr."""
     # Create API once and reuse
-    api = TesserocrAPI(path='/opt/homebrew/opt/tesseract/share/tessdata/', lang='eng')
+    tessdata_prefix = get_tessdata_prefix()
+    api = TesserocrAPI(path=tessdata_prefix, lang='eng')
 
     start = time.time()
 
@@ -174,7 +199,8 @@ def validate_results(images):
     pytess_text = pytesseract.image_to_string(img).strip()
 
     # tesserocr result
-    api_tesserocr = TesserocrAPI(path='/opt/homebrew/opt/tesseract/share/tessdata/', lang='eng')
+    tessdata_prefix = get_tessdata_prefix()
+    api_tesserocr = TesserocrAPI(path=tessdata_prefix, lang='eng')
     api_tesserocr.SetImage(img)
     tesserocr_text = api_tesserocr.GetUTF8Text().strip()
     api_tesserocr.End()
