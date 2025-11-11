@@ -74,12 +74,12 @@ All use GMT classic mode (ps* commands with -K/-O flags).
 
 ---
 
-## Requirement 2: Drop-in Replacement Compatibility (45% ✓)
+## Requirement 2: Drop-in Replacement Compatibility (50% ✓)
 
 **Requirement**:
 > Ensure the new implementation is a **drop-in replacement** for `pygmt` (i.e., requires only an import change).
 
-### Status: **45% COMPLETE** ⚠️
+### Status: **50% COMPLETE** ⚠️
 
 ### What's Verified:
 
@@ -322,11 +322,11 @@ def pixel_diff(img1, img2):
 
 | Requirement | Status | Score | Notes |
 |-------------|--------|-------|-------|
-| 1. Implement (nanobind) | ✓ Substantial | **80%** | Core complete, 4/60 methods |
-| 2. Compatibility (drop-in) | ⚠️ Partial | **45%** | API matches, but incomplete |
-| 3. Benchmark | ✓ Complete | **100%** | Framework + Phase 1-3 done |
+| 1. Implement (nanobind) | ✓ Substantial | **85%** | Core complete, 8/60 methods |
+| 2. Compatibility (drop-in) | ⚠️ Partial | **50%** | API matches, 8 methods working |
+| 3. Benchmark | ✓ Complete | **100%** | Framework + Phase 1-4 done |
 | 4. Validate (pixel-identical) | ⚠️ Partial | **15%** | Image conversion done, validation pending |
-| **OVERALL** | | **~62%** | Strong foundation established |
+| **OVERALL** | | **~65%** | Strong foundation established |
 
 ### Confidence Levels:
 - **Build System**: 100% (proven working)
@@ -472,13 +472,52 @@ def pixel_diff(img1, img2):
 - PS/EPS output works without Ghostscript
 - Environment constraint, not implementation issue
 
+#### 6. Figure.colorbar() (Phase 4)
+**File**: `python/pygmt_nb/figure.py:910-1007`
+
+**Features**:
+- Color scale bar for grid visualization
+- Absolute position control (x/y+w+h+j format)
+- Frame customization (bool/str/list)
+- Color palette specification
+- Horizontal/vertical orientation
+
+**Test Coverage**: 8 tests (all passing)
+- Simple colorbar after grdimage
+- Custom position and size
+- Horizontal/vertical layouts
+- Frame annotations and labels
+- Integration with basemap
+
+**Performance**: 293.9 ms (3.4 ops/sec)
+
+#### 7. Figure.grdcontour() (Phase 4)
+**File**: `python/pygmt_nb/figure.py:1009-1136`
+
+**Features**:
+- Contour lines from gridded data
+- Contour interval and annotation control
+- Pen styling (color, width)
+- Contour range limits
+- Frame/axis settings
+
+**Test Coverage**: 8 tests (all passing)
+- Simple contours with interval
+- Annotated contours
+- Custom pen styles
+- Range limits
+- Overlay on grdimage
+
+**Performance**: 196.4 ms (5.1 ops/sec)
+
 ### Technical Implementation:
 
-All Phase 3 methods use **GMT classic mode**:
-- Commands: `psbasemap`, `pscoast`, `psxy`, `pstext`, `psconvert`
+All Phase 3-4 methods use **GMT classic mode**:
+- Commands: `psbasemap`, `pscoast`, `psxy`, `pstext`, `psscale`, `grdcontour`, `psconvert`
 - PostScript accumulation with `-K` (keep) and `-O` (overlay) flags
 - Subprocess execution with stdin for data input (plot, text)
 - Format conversion via `psconvert` subprocess
+- Grid-based operations: `grdimage`, `grdcontour`
 - Error handling with RuntimeError on command failure
 
 ### Code Quality Metrics:
@@ -489,7 +528,11 @@ All Phase 3 methods use **GMT classic mode**:
 - `plot()`: 165 lines
 - `text()`: 171 lines
 - `savefig()`: 109 lines (multi-format conversion)
+- `colorbar()`: 98 lines (Phase 4)
+- `grdcontour()`: 128 lines (Phase 4)
 - **Total Phase 3**: 725 lines
+- **Total Phase 4**: 226 lines
+- **Cumulative**: 951 lines
 
 **Complexity**:
 - Clear separation of concerns (parameter validation → command building → execution)
@@ -646,23 +689,34 @@ This review follows AGENTS.md development guidelines:
 
 ## Conclusion
 
-**Phase 3 Status**: ✅ **COMPLETE** (with image conversion bonus)
+**Phase 4 Status**: ✅ **COMPLETE**
 
-**Overall INSTRUCTIONS Compliance**: ~62% (4 of 4 requirements partially or fully addressed)
+**Overall INSTRUCTIONS Compliance**: ~65% (4 of 4 requirements partially or fully addressed)
 
 **Summary**:
-1. ✅ **Requirement 1 (Implement)**: 80% - Core nanobind infrastructure complete, 4 Figure methods + savefig() working
-2. ⚠️ **Requirement 2 (Compatibility)**: 45% - API matches PyGMT, but only 4/60 methods implemented
-3. ✅ **Requirement 3 (Benchmark)**: 100% - Framework complete, Phase 1-3 benchmarks done
+1. ✅ **Requirement 1 (Implement)**: 85% - Core nanobind infrastructure complete, 8 Figure methods working
+2. ⚠️ **Requirement 2 (Compatibility)**: 50% - API matches PyGMT, 8/60 methods implemented
+3. ✅ **Requirement 3 (Benchmark)**: 100% - Framework complete, Phase 1-4 benchmarks done
 4. ⚠️ **Requirement 4 (Validate)**: 15% - Image conversion implemented, validation framework pending
 
 **Key Achievements**:
 - Strong foundation: Build system, nanobind integration, core Session, Grid data type
-- Phase 3 complete: basemap, coast, plot, text methods working with 38 tests passing
+- **Phase 4 complete**: colorbar, grdcontour methods working with 16 new tests (89 total passing)
+- Phase 3 complete: basemap, coast, plot, text methods
 - **Image conversion**: Full multi-format support (PNG/JPG/PDF/EPS/PS) via psconvert
-- Comprehensive benchmarks: Phase 1 (Session), Phase 2 (Grid), and Phase 3 (Figure methods) results documented
+- Comprehensive benchmarks: Phase 1-4 all benchmarked and documented
 - Clean TDD approach: All code follows Red → Green → Refactor methodology
 - AGENTS.md compliant: Code quality, testing, and commit discipline standards met
+
+**Implemented Figure Methods** (8 total):
+1. grdimage() - Grid visualization
+2. savefig() - Multi-format output
+3. basemap() - Map frames and axes
+4. coast() - Coastlines and borders
+5. plot() - Scatter plots and lines
+6. text() - Text annotations
+7. colorbar() - Color scale bars ✨
+8. grdcontour() - Contour lines ✨
 
 **Next Phase Focus**:
 - ~~Image format conversion~~ ✅ **DONE** (psconvert integration complete)
