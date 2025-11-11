@@ -40,3 +40,21 @@ This file coordinates work between multiple AI agents to prevent conflicts.
 ## Active Work
 
 <!-- Agents: Add your work sections below this line -->
+
+<tesseract-nanobind>
+## Task: Implement Tesseract nanobind benchmark
+
+### Files being modified
+- tesseract_nanobind_benchmark/ (all files in this directory)
+- justfile (add recipes for tesseract benchmark)
+
+### Progress
+- [x] Read INSTRUCTIONS and AGENTS.md
+- [x] Initialize external submodules
+- [ ] Create project structure (pyproject.toml, CMakeLists.txt)
+- [ ] Implement nanobind wrapper for Tesseract API
+- [ ] Add tests following TDD
+- [ ] Add benchmarking code
+- [ ] Validate against pytesseract/tesserocr
+- [ ] Update documentation
+</tesseract-nanobind>
