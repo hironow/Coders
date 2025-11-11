@@ -6,7 +6,6 @@ Modern mode implementation using nanobind.
 
 from typing import Union, Optional, List
 from pathlib import Path
-import subprocess
 import numpy as np
 
 from pygmt_nb.clib import Grid
