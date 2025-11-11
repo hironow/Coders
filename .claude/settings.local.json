@@ -9,7 +9,10 @@
       "Bash(test:*)",
       "Bash(uv run pytest:*)",
       "Bash(uv sync:*)",
-      "Bash(git restore:*)"
+      "Bash(git restore:*)",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)"
     ],
     "deny": [],
     "ask": []

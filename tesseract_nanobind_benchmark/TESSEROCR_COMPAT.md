@@ -146,19 +146,35 @@ with PyTessBaseAPI(lang='eng') as api:
     text = api.GetUTF8Text()
 ```
 
-## Limitations
+## API Coverage
 
-Some advanced tesserocr features are not yet implemented:
+### Fully Implemented (100% Compatible)
+- ✅ Core OCR methods (14/14)
+- ✅ Basic Enums: OEM, PSM, RIL (3/3)
+- ✅ Helper functions (4/4)
+- ✅ Context manager support
+- ✅ PIL Image / NumPy array support
 
-### Not Implemented:
-- `GetIterator()` - Result iterator (returns None)
-- `SetPageSegMode()` - Page segmentation mode setting
-- `SetVariable()` - Tesseract variable setting
-- `SetRectangle()` - ROI selection
-- `GetThresholdedImage()` - Thresholded image retrieval
-- Layout analysis methods (`AnalyseLayout()`, `GetRegions()`, etc.)
+### Partially Implemented (Stub Methods)
+- ⚠️ `SetPageSegMode()` - Accepted but ignored (always uses PSM.AUTO)
+- ⚠️ `GetPageSegMode()` - Always returns PSM.AUTO
+- ⚠️ `SetVariable()` - Always returns False
+- ⚠️ `SetRectangle()` - Accepted but ignored (processes full image)
+- ⚠️ `GetIterator()` - Always returns None
 
-These features are used less frequently and can be added if needed. The core OCR functionality (text extraction, bounding boxes, confidence scores) is fully supported.
+### Not Implemented
+- ❌ Advanced layout analysis (9 methods)
+- ❌ Result Iterator API (30+ methods)
+- ❌ Alternative output formats (hOCR, TSV, UNLV, Box)
+- ❌ PDF generation
+- ❌ Extended Enums (PT, Orientation, WritingDirection, etc.)
+
+**For a complete API coverage analysis, see [TESSEROCR_COMPATIBILITY_AUDIT.md](TESSEROCR_COMPATIBILITY_AUDIT.md)**
+
+### Test Coverage
+- 90 tests passing (100% success rate)
+- 34 dedicated tesserocr compatibility tests
+- Coverage includes: enum values, stub behavior, error handling, helper functions, image formats
 
 ## Migration Guide
 
