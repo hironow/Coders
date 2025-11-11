@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Find required packages
-find_package(Python 3.11 COMPONENTS Interpreter Development.Module REQUIRED)
+find_package(Python 3.10 COMPONENTS Interpreter Development.Module REQUIRED)
 
 # Allow user to specify GMT paths via CMake variables or environment
 set(GMT_INCLUDE_DIR "$ENV{GMT_INCLUDE_DIR}" CACHE PATH "GMT include directory")
