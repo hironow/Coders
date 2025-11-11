@@ -5,6 +5,7 @@ default: help
 help:
     @just --list
 
+
 UV := "uv"
 PYTHON := "uv run python"
 PIP := "uv pip"
@@ -12,6 +13,7 @@ PYTEST := "uv run --all-extras pytest"
 
 # Tesseract nanobind benchmark
 
+[group('tesseract')]
 tesseract-build:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -23,6 +25,7 @@ tesseract-build:
         {{PIP}} install --system -e .[test]
     fi
 
+[group('tesseract')]
 tesseract-check:
     {{UV}} tool install ruff
     {{UV}} tool install semgrep
@@ -31,6 +34,7 @@ tesseract-check:
     {{UV}} tool run ruff check tesseract_nanobind_benchmark/
     {{UV}} tool run semgrep --config=auto tesseract_nanobind_benchmark/
 
+[group('tesseract')]
 tesseract-test:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -42,6 +46,7 @@ tesseract-test:
         python -m pytest tests/ -v
     fi
 
+[group('tesseract')]
 tesseract-benchmark:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -53,16 +58,19 @@ tesseract-benchmark:
         python benchmarks/benchmark.py
     fi
 
+[group('tesseract')]
 tesseract-clean:
     cd tesseract_nanobind_benchmark && rm -rf build/ dist/ *.egg-info .pytest_cache/
 
 # Version management
 
 # Show current version
+[group('tesseract')]
 tesseract-version:
     @grep '^version = ' tesseract_nanobind_benchmark/pyproject.toml | sed 's/version = "\(.*\)"/\1/'
 
 # Bump patch version (0.1.0 -> 0.1.1)
+[group('tesseract')]
 tesseract-version-bump-patch:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -81,6 +89,7 @@ tesseract-version-bump-patch:
     echo "✓ Committed version bump"
 
 # Bump minor version (0.1.0 -> 0.2.0)
+[group('tesseract')]
 tesseract-version-bump-minor:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -98,6 +107,7 @@ tesseract-version-bump-minor:
     echo "✓ Committed version bump"
 
 # Bump major version (0.1.0 -> 1.0.0)
+[group('tesseract')]
 tesseract-version-bump-major:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -114,6 +124,7 @@ tesseract-version-bump-major:
     echo "✓ Committed version bump"
 
 # Create and push release tag
+[group('tesseract')]
 tesseract-release:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -129,3 +140,76 @@ tesseract-release:
     echo ""
     echo "Or to push all tags:"
     echo "  git push --tags"
+
+
+# Build the nanobind extension
+[group('gmt')]
+gmt-build:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    cd pygmt_nanobind_benchmark
+    # Use --system flag if not in a virtual environment (for CI compatibility)
+    if [ -n "${VIRTUAL_ENV:-}" ] || [ -d ".venv" ]; then
+        {{PIP}} install -e .[test]
+    else
+        {{PIP}} install --system -e .[test]
+    fi
+
+# Run code quality checks
+[group('gmt')]
+gmt-check:
+    {{UV}} tool install ruff
+    {{UV}} tool install semgrep
+    @echo "Installed tools:"
+    @{{UV}} tool list
+    {{UV}} tool run ruff check pygmt_nanobind_benchmark/
+    {{UV}} tool run semgrep --config=auto pygmt_nanobind_benchmark/
+
+# Run all tests
+[group('gmt')]
+gmt-test:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    cd pygmt_nanobind_benchmark
+    # Use system python if not in a virtual environment (for CI compatibility)
+    if [ -n "${VIRTUAL_ENV:-}" ] || [ -d ".venv" ]; then
+        {{PYTEST}} tests/ -v
+    else
+        python -m pytest tests/ -v
+    fi
+
+# Run all benchmarks
+[group('gmt')]
+gmt-benchmark:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    cd pygmt_nanobind_benchmark
+    # Use system python if not in a virtual environment (for CI compatibility)
+    if [ -n "${VIRTUAL_ENV:-}" ] || [ -d ".venv" ]; then
+        uv run --all-extras python benchmarks/benchmark.py
+    else
+        python benchmarks/benchmark.py
+    fi
+
+# Run validation suite
+[group('gmt')]
+gmt-validate:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    cd pygmt_nanobind_benchmark
+    # Use system python if not in a virtual environment (for CI compatibility)
+    if [ -n "${VIRTUAL_ENV:-}" ] || [ -d ".venv" ]; then
+        uv run --all-extras python validation/validate.py
+    else
+        python validation/validate.py
+    fi
+
+# Clean build artifacts
+[group('gmt')]
+gmt-clean:
+    rm -rf pygmt_nanobind_benchmark/build/
+    rm -rf pygmt_nanobind_benchmark/*.egg-info/
+    rm -rf pygmt_nanobind_benchmark/python/**/__pycache__/
+    rm -rf pygmt_nanobind_benchmark/tests/__pycache__/
+    find . -name "*.so" -delete
+    find . -name "*.pyc" -delete

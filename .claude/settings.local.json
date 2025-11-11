@@ -16,7 +16,12 @@
       "Bash(find:*)",
       "Bash(head:*)",
       "Bash(done)",
-      "Bash(git mv:*)"
+      "Bash(git mv:*)",
+      "Bash(mise exec:*)",
+      "Bash(just gmt-install:*)",
+      "Bash(just gmt-test:*)",
+      "Bash(uv run ruff:*)",
+      "Bash(uv run python:*)"
     ],
     "deny": [
       "Bash(sudo:*)",

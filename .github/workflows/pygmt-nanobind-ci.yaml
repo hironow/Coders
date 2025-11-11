@@ -1,17 +1,17 @@
-name: Tesseract Nanobind CI
+name: PyGMT Nanobind CI
 
 on:
   push:
     branches: [ main, develop ]
     paths:
-      - 'tesseract_nanobind_benchmark/**'
-      - '.github/workflows/tesseract-nanobind-ci.yaml'
+      - 'pygmt_nanobind_benchmark/**'
+      - '.github/workflows/pygmt-nanobind-ci.yaml'
       - 'justfile'
   pull_request:
     branches: [ main, develop ]
     paths:
-      - 'tesseract_nanobind_benchmark/**'
-      - '.github/workflows/tesseract-nanobind-ci.yaml'
+      - 'pygmt_nanobind_benchmark/**'
+      - '.github/workflows/pygmt-nanobind-ci.yaml'
       - 'justfile'
   workflow_dispatch:
 
@@ -37,13 +37,14 @@ jobs:
         python-version: ${{ matrix.python-version }}
 
     - name: Install system dependencies (Ubuntu)
+      if: runner.os == 'Linux'
       run: |
         sudo apt-get update
         sudo apt-get install -y \
-          tesseract-ocr \
-          libtesseract-dev \
-          libleptonica-dev \
-          pkg-config \
+          libgmt-dev \
+          gmt \
+          gmt-dcw \
+          gmt-gshhg \
           cmake \
           ninja-build
 
@@ -55,14 +56,14 @@ jobs:
 
     - name: Build package
       run: |
-        just tesseract-build
+        just gmt-build
 
     - name: Run tests
       run: |
-        just tesseract-test
+        just gmt-test
 
   compatibility-test:
-    name: Compatibility Test (tesserocr API)
+    name: Compatibility Test (PyGMT API)
     runs-on: ubuntu-latest
 
     steps:
@@ -80,12 +81,13 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y \
-          tesseract-ocr \
-          libtesseract-dev \
-          libleptonica-dev \
-          pkg-config \
+          libgmt-dev \
+          gmt \
+          gmt-dcw \
+          gmt-gshhg \
           cmake \
-          ninja-build
+          ninja-build \
+          ghostscript
 
     - name: Install build tools (uv and just)
       run: |
@@ -93,18 +95,70 @@ jobs:
         pip install uv
         pipx install rust-just
 
-    - name: Install tesserocr for compatibility testing
+    - name: Install PyGMT for compatibility testing
       run: |
-        pip install tesserocr pillow>=12.0 numpy>=2.0 pytest>=9.0
+        pip install pygmt pytest
 
     - name: Build package
       run: |
-        just tesseract-build
+        just gmt-build
 
     - name: Run compatibility tests
-      working-directory: tesseract_nanobind_benchmark
+      working-directory: pygmt_nanobind_benchmark
       run: |
-        python -m pytest tests/test_compat.py -v
+        python -m pytest tests/ -v -k "not benchmark"
+
+  validation:
+    name: Validation (PyGMT Output Compatibility)
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          libgmt-dev \
+          gmt \
+          gmt-dcw \
+          gmt-gshhg \
+          cmake \
+          ninja-build \
+          ghostscript
+
+    - name: Install build tools (uv and just)
+      run: |
+        python -m pip install --upgrade pip
+        pip install uv
+        pipx install rust-just
+
+    - name: Install validation dependencies
+      run: |
+        pip install pygmt
+
+    - name: Build package
+      run: |
+        just gmt-build
+
+    - name: Run validation suite
+      run: |
+        just gmt-validate
+
+    - name: Upload validation results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: validation-results
+        path: pygmt_nanobind_benchmark/output/validation/
 
   benchmark:
     name: Performance Benchmark
@@ -126,12 +180,13 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y \
-          tesseract-ocr \
-          libtesseract-dev \
-          libleptonica-dev \
-          pkg-config \
+          libgmt-dev \
+          gmt \
+          gmt-dcw \
+          gmt-gshhg \
           cmake \
-          ninja-build
+          ninja-build \
+          ghostscript
 
     - name: Install build tools (uv and just)
       run: |
@@ -141,27 +196,22 @@ jobs:
 
     - name: Install benchmark dependencies
       run: |
-        pip install pytesseract tesserocr pillow>=12.0 numpy>=2.0
+        pip install pygmt pytest numpy
 
     - name: Build package
       run: |
-        just tesseract-build
-
-    - name: Initialize submodules for test images
-      run: |
-        git submodule update --init --depth 1 external/pytesseract
-        git submodule update --init --depth 1 external/tesserocr
+        just gmt-build
 
     - name: Run comprehensive benchmark
       run: |
-        just tesseract-benchmark > tesseract_nanobind_benchmark/benchmark_results.txt
-        cat tesseract_nanobind_benchmark/benchmark_results.txt
+        just gmt-benchmark > pygmt_nanobind_benchmark/benchmark_results.txt
+        cat pygmt_nanobind_benchmark/benchmark_results.txt
 
     - name: Upload benchmark results
       uses: actions/upload-artifact@v4
       with:
         name: benchmark-results
-        path: tesseract_nanobind_benchmark/benchmark_results.txt
+        path: pygmt_nanobind_benchmark/benchmark_results.txt
 
   code-quality:
     name: Code Quality Checks
@@ -184,4 +234,4 @@ jobs:
 
     - name: Run code quality checks
       run: |
-        just tesseract-check
+        just gmt-check

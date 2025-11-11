@@ -1,0 +1,95 @@
+[build-system]
+requires = [
+    "scikit-build-core",
+    "nanobind",
+]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "pygmt-nb"
+version = "0.1.0"
+description = "High-performance PyGMT reimplementation using nanobind"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+    { name = "PyGMT nanobind contributors" }
+]
+license = { text = "BSD-3-Clause" }
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: C++",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: GIS",
+]
+dependencies = [
+    "numpy>=2.0",
+    "pandas>=2.2",
+    "xarray>=2024.5",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=7.0",
+    "pytest-cov",
+    "pytest-mpl",
+]
+dev = [
+    "ruff",
+    "mypy",
+    "build",
+]
+benchmark = [
+    "pygmt>=0.12",
+    "matplotlib",
+]
+
+[tool.scikit-build]
+cmake.minimum-version = "3.16"
+cmake.build-type = "Release"
+wheel.packages = ["python/pygmt_nb"]
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = [
+    "-v",
+    "--strict-markers",
+    "--tb=short",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "C4", # flake8-comprehensions
+    "UP", # pyupgrade
+]
+ignore = [
+    "E501", # line too long (handled by formatter)
+]
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+check_untyped_defs = true
