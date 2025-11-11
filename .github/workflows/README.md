@@ -16,7 +16,7 @@ This directory contains GitHub Actions workflows for the Tesseract Nanobind proj
 **Jobs**:
 
 #### build-and-test
-- **Matrix**: Tests on Ubuntu and macOS with Python 3.8-3.12
+- **Matrix**: Tests on Ubuntu and macOS with Python 3.8-3.14
 - **Steps**:
   1. Checkout repository with submodules
   2. Install system dependencies (Tesseract, Leptonica, CMake)
@@ -63,8 +63,8 @@ This directory contains GitHub Actions workflows for the Tesseract Nanobind proj
 - **Matrix**: Build on Ubuntu and macOS
 - **Uses**: cibuildwheel for building wheels
 - **Platforms**:
-  - Linux: x86_64 (Python 3.8-3.12)
-  - macOS: x86_64 and arm64 (Python 3.8-3.12)
+  - Linux: x86_64 (Python 3.8-3.14)
+  - macOS: x86_64 and arm64 (Python 3.8-3.14)
 - **Output**: Wheels for each platform uploaded as artifacts
 
 #### build_sdist
