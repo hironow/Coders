@@ -187,13 +187,12 @@ class TestPlot(unittest.TestCase):
 
         fig = Figure()
         fig.basemap(region=self.region, projection="X10c", frame="afg")
-        # Note: Currently region/projection must be provided explicitly
-        # Future: Inherit from previous basemap call
+        # Modern mode: region/projection automatically inherited from basemap
+        # Can be provided explicitly if needed to override
         fig.plot(
             x=self.x,
             y=self.y,
-            region=self.region,
-            projection="X10c",
+            # region and projection inherited from basemap() call above
             style="c0.2c",
             fill="red"
         )

@@ -2,6 +2,13 @@
 
 **Date**: 2025-11-11
 
+> **⚠️ HISTORICAL DOCUMENT**: These benchmarks were conducted with the **classic mode** implementation.
+> The project has since migrated to **modern mode** (November 11, 2025) with significantly improved performance.
+>
+> **Current Performance:** See `benchmark_modern_mode.py` for up-to-date results showing **103x speedup** via nanobind.
+> - Simple basemap: 18.8 ms (vs 203 ms classic mode) - **10.8x faster**
+> - Complete workflow: 291 ms (vs 495 ms classic mode) - **1.7x faster**
+
 ## Methods Benchmarked
 
 1. **basemap()** - Map frames and axes

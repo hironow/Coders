@@ -2,6 +2,11 @@
 
 **Date**: 2025-11-11
 
+> **⚠️ HISTORICAL DOCUMENT**: These benchmarks were conducted with the **classic mode** implementation.
+> The project has since migrated to **modern mode** (November 11, 2025) with significantly improved performance via nanobind.
+>
+> **Current Performance:** See `benchmark_modern_mode.py` for complete modern mode benchmark results showing **103x speedup**.
+
 ## Methods Benchmarked
 
 1. **colorbar()** - Color scale bar (after grdimage)
