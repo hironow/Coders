@@ -15,7 +15,16 @@
       "WebFetch(domain:raw.githubusercontent.com)",
       "Bash(uv pip install:*)",
       "Bash(uv run python:*)",
-      "Bash(brew --prefix:*)"
+      "Bash(brew --prefix:*)",
+      "Bash(just help:*)",
+      "Bash(just tesseract-build:*)",
+      "Bash(just tesseract-check)",
+      "Bash(uv tool run ruff:*)",
+      "Bash(find:*)",
+      "Bash(uv tool run semgrep:*)",
+      "Bash(just tesseract-test:*)",
+      "Bash(just tesseract-benchmark)",
+      "Bash(just tesseract-clean:*)"
     ],
     "deny": [],
     "ask": []

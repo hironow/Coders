@@ -13,7 +13,7 @@ def create_test_image(text="Test", format="PNG"):
     
     try:
         font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 36)
-    except:
+    except Exception:
         font = ImageFont.load_default()
     
     draw.text((10, 30), text, fill='black', font=font)
@@ -60,7 +60,7 @@ def test_numpy_array_input():
     draw = ImageDraw.Draw(img)
     try:
         font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 36)
-    except:
+    except Exception:
         font = ImageFont.load_default()
     draw.text((10, 30), "Test", fill='black', font=font)
     
@@ -100,7 +100,7 @@ def test_grayscale_image_conversion():
     draw = ImageDraw.Draw(img)
     try:
         font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 36)
-    except:
+    except Exception:
         font = ImageFont.load_default()
     draw.text((10, 30), "Gray", fill=0, font=font)
     

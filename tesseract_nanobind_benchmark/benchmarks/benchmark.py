@@ -11,7 +11,6 @@ Usage:
 """
 import argparse
 import time
-import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 import pytesseract
 from tesseract_nanobind.compat import PyTessBaseAPI as NanobindAPI
@@ -70,7 +69,7 @@ def create_synthetic_test_images(count=10):
 
         try:
             font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 30)
-        except:
+        except Exception:
             font = ImageFont.load_default()
 
         draw.text((10, 50), text, fill='black', font=font)
@@ -108,7 +107,7 @@ def benchmark_pytesseract(images, iterations=1):
 
     for _ in range(iterations):
         for img in images:
-            text = pytesseract.image_to_string(img)
+            _ = pytesseract.image_to_string(img)
 
     elapsed = time.time() - start
     return elapsed
@@ -124,7 +123,7 @@ def benchmark_tesserocr(images, iterations=1):
     for _ in range(iterations):
         for img in images:
             api.SetImage(img)
-            text = api.GetUTF8Text()
+            _ = api.GetUTF8Text()
 
     elapsed = time.time() - start
     api.End()
@@ -140,7 +139,7 @@ def benchmark_nanobind(images, iterations=1):
     for _ in range(iterations):
         for img in images:
             api.SetImage(img)
-            text = api.GetUTF8Text()
+            _ = api.GetUTF8Text()
 
     elapsed = time.time() - start
     api.End()
@@ -157,7 +156,7 @@ def benchmark_nanobind_with_boxes(images, iterations=1):
         for img in images:
             api.SetImage(img)
             api.Recognize()
-            boxes = api.GetWords()
+            _ = api.GetWords()
 
     elapsed = time.time() - start
     api.End()
@@ -272,15 +271,15 @@ def main():
         degradation = (nanobind_time / tesserocr_time - 1) * 100
         print(f"Performance difference vs tesserocr: +{degradation:.1f}% (slightly slower)")
     else:
-        print(f"Performance is equivalent to tesserocr")
+        print("Performance is equivalent to tesserocr")
 
     print("\n" + "=" * 70)
     print("  Summary")
     print("=" * 70)
-    print(f"✓ All benchmarks completed successfully")
+    print("✓ All benchmarks completed successfully")
     print(f"✓ tesseract_nanobind vs tesserocr: {'faster' if speedup_vs_tesserocr > 1.05 else 'comparable' if speedup_vs_tesserocr > 0.95 else 'slower'}")
     print(f"✓ tesseract_nanobind is {'significantly faster' if speedup_vs_pytesseract > 2 else 'faster'} than pytesseract")
-    print(f"✓ API compatibility with tesserocr verified")
+    print("✓ API compatibility with tesserocr verified")
 
 
 if __name__ == "__main__":

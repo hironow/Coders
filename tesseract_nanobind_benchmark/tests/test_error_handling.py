@@ -43,7 +43,7 @@ def test_set_image_without_init():
     # Should work even without init (init is needed for recognition though)
     try:
         api.set_image(image)
-    except:
+    except Exception:
         # Some implementations may require init first
         pass
 
@@ -125,7 +125,7 @@ def test_very_large_text():
     
     try:
         font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 20)
-    except:
+    except Exception:
         font = ImageFont.load_default()
     
     # Draw multiple lines

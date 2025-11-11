@@ -1,6 +1,5 @@
 """Advanced tests for tesseract_nanobind with real OCR operations."""
 import numpy as np
-import pytest
 from PIL import Image, ImageDraw, ImageFont
 
 
@@ -12,7 +11,7 @@ def create_test_image_with_text(text="Hello", width=200, height=100):
     # Use default font
     try:
         font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 40)
-    except:
+    except Exception:
         font = ImageFont.load_default()
     
     # Draw text in black

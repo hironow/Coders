@@ -13,7 +13,7 @@ PYTEST := "uv run pytest"
 # Tesseract nanobind benchmark
 
 tesseract-build:
-    cd tesseract_nanobind_benchmark && {{PIP}} install --user -e .
+    cd tesseract_nanobind_benchmark && {{PIP}} install -e .
 
 tesseract-check:
     {{UV}} tool install ruff

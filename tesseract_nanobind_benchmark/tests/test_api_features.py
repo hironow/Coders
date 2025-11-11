@@ -1,6 +1,5 @@
 """Test advanced API features matching tesserocr functionality."""
 import numpy as np
-import pytest
 from PIL import Image, ImageDraw, ImageFont
 
 
@@ -11,7 +10,7 @@ def create_test_image_with_text(text="Test", width=300, height=150):
     
     try:
         font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 40)
-    except:
+    except Exception:
         font = ImageFont.load_default()
     
     draw.text((10, 50), text, fill='black', font=font)

@@ -1,6 +1,5 @@
 """Basic tests for tesseract_nanobind."""
 import numpy as np
-import pytest
 
 
 def test_import():

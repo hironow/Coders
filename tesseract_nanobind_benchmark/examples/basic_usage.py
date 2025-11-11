@@ -13,7 +13,7 @@ def main():
     
     try:
         font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 36)
-    except:
+    except Exception:
         font = ImageFont.load_default()
     
     draw.text((20, 80), "Hello Tesseract!", fill='black', font=font)

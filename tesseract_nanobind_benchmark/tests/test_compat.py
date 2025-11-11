@@ -1,6 +1,5 @@
 """Tests for tesserocr compatibility layer."""
 import numpy as np
-import pytest
 from PIL import Image, ImageDraw, ImageFont
 
 
@@ -11,7 +10,7 @@ def create_test_image_with_text(text="Test", width=200, height=100):
     
     try:
         font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 36)
-    except:
+    except Exception:
         font = ImageFont.load_default()
     
     draw.text((10, 30), text, fill='black', font=font)

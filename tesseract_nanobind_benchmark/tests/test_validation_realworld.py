@@ -1,8 +1,6 @@
 """Real-world validation tests for Phase 1 features."""
 import numpy as np
-import pytest
 from PIL import Image, ImageDraw, ImageFont
-from pathlib import Path
 
 
 def create_complex_document():
@@ -13,7 +11,7 @@ def create_complex_document():
     try:
         font_large = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 36)
         font_normal = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 24)
-    except:
+    except Exception:
         font_large = ImageFont.load_default()
         font_normal = ImageFont.load_default()
 
@@ -45,7 +43,7 @@ def test_realworld_psm_single_line():
     draw = ImageDraw.Draw(img)
     try:
         font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 36)
-    except:
+    except Exception:
         font = ImageFont.load_default()
     draw.text((20, 30), "Invoice #12345", fill='black', font=font)
 
@@ -70,7 +68,7 @@ def test_realworld_number_extraction():
     draw = ImageDraw.Draw(img)
     try:
         font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 36)
-    except:
+    except Exception:
         font = ImageFont.load_default()
     draw.text((20, 30), "Amount: $1234.56", fill='black', font=font)
 
@@ -120,7 +118,7 @@ def test_realworld_hocr_output():
     draw = ImageDraw.Draw(img)
     try:
         font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 36)
-    except:
+    except Exception:
         font = ImageFont.load_default()
     draw.text((20, 30), "Hello World", fill='black', font=font)
     draw.text((20, 100), "Test Document", fill='black', font=font)
@@ -146,7 +144,7 @@ def test_realworld_tsv_parsing():
     draw = ImageDraw.Draw(img)
     try:
         font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 36)
-    except:
+    except Exception:
         font = ImageFont.load_default()
     draw.text((20, 30), "Word1 Word2 Word3", fill='black', font=font)
 
@@ -177,7 +175,7 @@ def test_realworld_mixed_psm_and_variable():
     draw = ImageDraw.Draw(img)
     try:
         font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 36)
-    except:
+    except Exception:
         font = ImageFont.load_default()
     draw.text((20, 30), "Code: ABC123XYZ", fill='black', font=font)
 
@@ -204,7 +202,7 @@ def test_realworld_clear_and_reuse():
     draw1 = ImageDraw.Draw(img1)
     try:
         font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 36)
-    except:
+    except Exception:
         font = ImageFont.load_default()
     draw1.text((20, 30), "Image One", fill='black', font=font)
 
@@ -237,7 +235,7 @@ def test_realworld_multi_region_processing():
     draw = ImageDraw.Draw(img)
     try:
         font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 36)
-    except:
+    except Exception:
         font = ImageFont.load_default()
 
     # Left section
@@ -273,7 +271,7 @@ def test_realworld_confidence_with_psm():
     draw = ImageDraw.Draw(img)
     try:
         font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 48)
-    except:
+    except Exception:
         font = ImageFont.load_default()
     draw.text((20, 20), "CLEAR TEXT", fill='black', font=font)
 

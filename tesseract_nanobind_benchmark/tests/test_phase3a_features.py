@@ -15,7 +15,6 @@ from tesseract_nanobind.compat import (
     PyTessBaseAPI,
     WritingDirection,
     TextlineOrder,
-    RIL,
 )
 
 

@@ -1,6 +1,4 @@
 """Tests for Phase 2 features - medium-priority tesserocr compatibility."""
-import numpy as np
-import pytest
 from PIL import Image, ImageDraw, ImageFont
 
 
@@ -11,7 +9,7 @@ def create_test_image_with_text(text="Test", width=400, height=200):
 
     try:
         font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 36)
-    except:
+    except Exception:
         font = ImageFont.load_default()
 
     draw.text((20, 80), text, fill='black', font=font)

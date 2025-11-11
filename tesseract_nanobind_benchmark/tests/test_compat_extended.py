@@ -1,5 +1,4 @@
 """Extended tests for tesserocr compatibility layer - comprehensive API coverage."""
-import numpy as np
 import pytest
 from PIL import Image, ImageDraw, ImageFont
 from pathlib import Path
@@ -13,7 +12,7 @@ def create_test_image_with_text(text="Test", width=200, height=100):
 
     try:
         font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 36)
-    except:
+    except Exception:
         font = ImageFont.load_default()
 
     draw.text((10, 30), text, fill='black', font=font)
@@ -335,7 +334,7 @@ def test_set_image_grayscale_conversion():
     draw = ImageDraw.Draw(gray_image)
     try:
         font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 36)
-    except:
+    except Exception:
         font = ImageFont.load_default()
     draw.text((10, 30), "Gray", fill=0, font=font)
 
@@ -357,7 +356,7 @@ def test_set_image_rgba_conversion():
     draw = ImageDraw.Draw(rgba_image)
     try:
         font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 36)
-    except:
+    except Exception:
         font = ImageFont.load_default()
     draw.text((10, 30), "RGBA", fill=(0, 0, 0, 255), font=font)
 

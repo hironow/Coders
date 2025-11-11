@@ -1,6 +1,4 @@
 """Tests for Phase 1 features - high-priority tesserocr compatibility."""
-import numpy as np
-import pytest
 from PIL import Image, ImageDraw, ImageFont
 
 
@@ -11,7 +9,7 @@ def create_test_image_with_text(text="Test", width=200, height=100):
 
     try:
         font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 36)
-    except:
+    except Exception:
         font = ImageFont.load_default()
 
     draw.text((10, 30), text, fill='black', font=font)
@@ -156,7 +154,7 @@ def test_rectangle_restricts_ocr():
     draw = ImageDraw.Draw(image)
     try:
         font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 36)
-    except:
+    except Exception:
         font = ImageFont.load_default()
 
     # Left text
