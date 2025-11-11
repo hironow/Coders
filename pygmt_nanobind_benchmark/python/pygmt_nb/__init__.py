@@ -12,5 +12,8 @@ from pygmt_nb.clib import Session, Grid
 from pygmt_nb.figure import Figure
 from pygmt_nb.makecpt import makecpt
 from pygmt_nb.info import info
+from pygmt_nb.grdinfo import grdinfo
+from pygmt_nb.select import select
+from pygmt_nb.grdcut import grdcut
 
-__all__ = ["Session", "Grid", "Figure", "makecpt", "info", "__version__"]
+__all__ = ["Session", "Grid", "Figure", "makecpt", "info", "grdinfo", "select", "grdcut", "__version__"]
