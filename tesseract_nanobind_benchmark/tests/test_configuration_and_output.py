@@ -1,4 +1,12 @@
-"""Tests for Phase 1 features - high-priority tesserocr compatibility."""
+"""Tests for configuration, output formats, and advanced tesserocr compatibility features.
+
+This module tests:
+- Page segmentation modes (PSM)
+- Tesseract variables
+- Region of interest (ROI) with SetRectangle
+- Alternative output formats (hOCR, TSV, Box, UNLV)
+- Clear methods and data path access
+"""
 from PIL import Image, ImageDraw, ImageFont
 
 

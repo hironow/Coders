@@ -1,4 +1,10 @@
-"""Tests for Phase 2 features - medium-priority tesserocr compatibility."""
+"""Tests for orientation detection and layout analysis features.
+
+This module tests:
+- DetectOrientationScript for page orientation and script detection
+- GetComponentImages for layout analysis at various levels (BLOCK, PARA, TEXTLINE, WORD, SYMBOL)
+- PolyBlockType (PT) and Orientation enumerations
+"""
 from PIL import Image, ImageDraw, ImageFont
 
 
@@ -242,14 +248,14 @@ def test_get_component_images_text_only():
 # Integration Tests
 # ============================================================================
 
-def test_phase2_all_features():
-    """Integration test for all Phase 2 features."""
+def test_all_orientation_and_layout_features():
+    """Integration test for all orientation detection and layout analysis features."""
     from tesseract_nanobind.compat import PyTessBaseAPI, RIL, PT, Orientation
 
     # given: image with text
     image = create_test_image_with_text("Integration Test")
 
-    # when: using all Phase 2 features
+    # when: using all orientation and layout features
     with PyTessBaseAPI(lang='eng') as api:
         api.SetImage(image)
 

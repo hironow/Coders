@@ -1,7 +1,9 @@
-"""Tests for Phase 3b features: GetThresholdedImage.
+"""Tests for image thresholding and binarization features.
 
-Phase 3b adds:
-- GetThresholdedImage() method for retrieving the binarized image
+This module tests:
+- GetThresholdedImage() method for retrieving the binarized (thresholded) image
+- Image format and shape validation
+- Integration with recognition and ROI features
 """
 
 import numpy as np
@@ -208,15 +210,15 @@ def test_get_thresholded_image_different_images():
 # Integration Tests
 # ============================================================================
 
-def test_phase3b_all_features():
-    """Integration test using all Phase 3b features."""
+def test_all_thresholding_features():
+    """Integration test using all image thresholding features."""
     img = Image.new('RGB', (300, 150), color='white')
 
     with PyTessBaseAPI(lang='eng') as api:
         api.SetImage(img)
         api.Recognize()
 
-        # Test Phase 3b feature
+        # Test thresholding feature
         thresholded = api.GetThresholdedImage()
 
         # Should return valid numpy array
@@ -240,7 +242,7 @@ def test_thresholded_image_with_layout_analysis():
         # Get thresholded image
         thresholded = api.GetThresholdedImage()
 
-        # Also get layout information (Phase 3a)
+        # Also get layout information (word and line extraction)
         words = api.GetWords()
         lines = api.GetTextlines()
 

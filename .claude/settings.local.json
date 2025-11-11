@@ -24,7 +24,12 @@
       "Bash(uv tool run semgrep:*)",
       "Bash(just tesseract-test:*)",
       "Bash(just tesseract-benchmark)",
-      "Bash(just tesseract-clean:*)"
+      "Bash(just tesseract-clean:*)",
+      "Bash(for file in /Users/nino/Coders/tesseract_nanobind_benchmark/tests/test_phase*.py)",
+      "Bash(do echo \"=== $file ===\")",
+      "Bash(head:*)",
+      "Bash(done)",
+      "Bash(git mv:*)"
     ],
     "deny": [],
     "ask": []

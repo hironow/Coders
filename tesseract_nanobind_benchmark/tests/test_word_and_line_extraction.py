@@ -1,10 +1,10 @@
-"""Tests for Phase 3a features: Additional Enums and Layout Analysis methods.
+"""Tests for word and text line extraction with detailed layout information.
 
-Phase 3a adds:
-- WritingDirection Enum (4 values)
-- TextlineOrder Enum (4 values)
-- GetWords() method for word-level layout information
-- GetTextlines() method for line-level layout information
+This module tests:
+- WritingDirection and TextlineOrder enumerations
+- GetWords() method for word-level text, confidence, and bounding boxes
+- GetTextlines() method for line-level text, confidence, and bounding boxes
+- Integration with page segmentation modes and ROI
 """
 
 import numpy as np
@@ -287,15 +287,15 @@ def test_words_and_textlines_coordinates():
 # Integration Tests
 # ============================================================================
 
-def test_phase3a_all_features():
-    """Integration test using all Phase 3a features."""
+def test_all_word_and_line_features():
+    """Integration test using all word and line extraction features."""
     img = np.ones((150, 500, 3), dtype=np.uint8) * 255
 
     with PyTessBaseAPI(lang='eng') as api:
         api.SetImage(img)
         api.Recognize()
 
-        # Test all Phase 3a features
+        # Test all word and line extraction features
         words = api.GetWords()
         lines = api.GetTextlines()
 

@@ -108,7 +108,7 @@ public:
         return tesseract::TessBaseAPI::Version();
     }
 
-    // Phase 1: High-priority methods for tesserocr compatibility
+    // Configuration and output methods for tesserocr compatibility
 
     // Page Segmentation Mode
     void set_page_seg_mode(int mode) {
@@ -204,7 +204,7 @@ public:
         return api_->GetInitLanguagesAsString();
     }
 
-    // Phase 2: Medium-priority methods
+    // Orientation detection and layout analysis methods
     nb::tuple detect_orientation_script() {
         int orient_deg = 0;
         float orient_conf = 0.0f;
@@ -249,7 +249,7 @@ public:
         return boxes;
     }
 
-    // Phase 3: Additional layout analysis methods
+    // Word and line extraction methods
     nb::list get_words() {
         nb::list words;
 
@@ -306,7 +306,7 @@ public:
         return lines;
     }
 
-    // Phase 3b: GetThresholdedImage
+    // Image thresholding method
     // Returns (height, width, data_as_list) tuple for Python to convert to numpy
     nb::tuple get_thresholded_image() {
         Pix* pix = api_->GetThresholdedImage();
@@ -382,7 +382,7 @@ NB_MODULE(_tesseract_nanobind, m) {
         .def_static("version", &TesseractAPI::version,
                    "Get Tesseract version")
 
-        // Phase 1: High-priority methods
+        // Configuration and output methods
         .def("set_page_seg_mode", &TesseractAPI::set_page_seg_mode,
              "mode"_a,
              "Set page segmentation mode")
@@ -426,20 +426,20 @@ NB_MODULE(_tesseract_nanobind, m) {
         .def("get_init_languages_as_string", &TesseractAPI::get_init_languages_as_string,
              "Get initialized languages as string")
 
-        // Phase 2: Medium-priority methods
+        // Orientation detection and layout analysis methods
         .def("detect_orientation_script", &TesseractAPI::detect_orientation_script,
              "Detect page orientation and script")
         .def("get_component_images", &TesseractAPI::get_component_images,
              "level"_a, "text_only"_a = true,
              "Get component images at specified level")
 
-        // Phase 3: Additional layout analysis methods
+        // Word and line extraction methods
         .def("get_words", &TesseractAPI::get_words,
              "Get all words with text, confidence, and bounding boxes")
         .def("get_textlines", &TesseractAPI::get_textlines,
              "Get all text lines with text, confidence, and bounding boxes")
 
-        // Phase 3b: GetThresholdedImage
+        // Image thresholding method
         .def("get_thresholded_image", &TesseractAPI::get_thresholded_image,
              "Get the thresholded (binarized) image as a numpy array");
 }
