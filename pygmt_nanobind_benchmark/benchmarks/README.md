@@ -2,65 +2,45 @@
 
 パフォーマンスベンチマークスクリプト集
 
-## 📁 Available Benchmarks
+## 📁 Main Benchmark
 
-### 1. `benchmark.py` - 完全なベンチマークスイート
+### `benchmark.py` - 包括的ベンチマークスイート
 
-全64関数の包括的なベンチマーク。
+全てのベンチマークを統合した完全版。以下を含みます：
+
+1. **Basic Operations** - 基本操作（basemap, plot, coast, info）
+2. **Function Coverage** - 関数カバレッジ（histogram, makecpt, select, blockmean）
+3. **Real-World Workflows** - 実世界ワークフロー（animation, batch processing）
 
 **実行**:
 ```bash
-just gmt-benchmark
-# または
 uv run python benchmarks/benchmark.py
 ```
 
-### 2. `quick_benchmark.py` - クイックベンチマーク
+**結果例**:
+```
+🚀 Average Speedup: 9.78x faster with pygmt_nb
+   Range: 0.99x - 21.22x
+   Benchmarks: 10 tests
 
-単一の操作を素早くベンチマークします。
-
-**使い方**:
-```bash
-# basemapをベンチマーク（デフォルト）
-uv run python benchmarks/quick_benchmark.py
-
-# 特定の操作をベンチマーク
-uv run python benchmarks/quick_benchmark.py plot
-uv run python benchmarks/quick_benchmark.py coast
-uv run python benchmarks/quick_benchmark.py info
+💡 Key Insights:
+   - pygmt_nb provides 9.8x average performance improvement
+   - Direct GMT C API via nanobind (zero subprocess overhead)
+   - Modern mode session persistence (no repeated session creation)
+   - Consistent speedup across basic operations and complex workflows
 ```
 
-**出力例**:
-```
-BASEMAP BENCHMARK
-[pygmt_nb]
-  Average: 3.10 ms
-  Min/Max: 2.70 - 3.93 ms
+結果は `output/benchmark_results.txt` に保存されます。
 
-[PyGMT]
-  Average: 61.82 ms
-  Min/Max: 59.10 - 63.27 ms
+### その他のベンチマークスクリプト
 
-🚀 Speedup: 19.94x faster with pygmt_nb
-```
+個別のベンチマークスクリプトも利用可能（後方互換性のため）:
 
-### 3. `real_world_benchmark.py` - 実世界ワークフロー
+- `quick_benchmark.py` - 単一操作のクイックベンチマーク
+- `real_world_benchmark.py` - 実世界ワークフロー（完全版）
+- `real_world_benchmark_quick.py` - 実世界ワークフロー（クイック版）
 
-アニメーション生成、バッチ処理など、実世界のユースケースをベンチマーク。
-
-**使い方**:
-```bash
-# 完全版（100フレーム、10データセット）
-uv run python benchmarks/real_world_benchmark.py
-
-# クイック版（10フレーム、5データセット）
-uv run python benchmarks/real_world_benchmark_quick.py
-```
-
-**シナリオ**:
-- **Animation**: 100フレームのアニメーション生成
-- **Batch Processing**: 10データセットのバッチ処理
-- **Parallel Processing**: マルチコアでの並列レンダリング
+**推奨**: 統合された `benchmark.py` を使用してください。
 
 ## 📊 Output Files
 

@@ -5,12 +5,12 @@
 
 **High-performance PyGMT reimplementation with complete API compatibility.**
 
-A drop-in replacement for PyGMT that's **8.16x faster** with direct GMT C API access via nanobind.
+A drop-in replacement for PyGMT that's **9.78x faster** with direct GMT C API access via nanobind.
 
 ## Why Use This?
 
 ✅ **PyGMT-compatible API** - Change one import line and you're done
-✅ **8.16x faster than PyGMT** - Direct C++ API, no subprocess overhead
+✅ **9.78x faster than PyGMT** - Direct C++ API, no subprocess overhead
 ✅ **100% API coverage** - All 64 PyGMT functions implemented
 ✅ **No Ghostscript dependency** - Native PostScript output
 ✅ **104 passing tests** - Comprehensive test coverage
@@ -115,30 +115,58 @@ fig.savefig("output.ps")
 
 Latest results (10 iterations per test, macOS M-series):
 
-| Function | pygmt_nb (ms) | PyGMT (ms) | Speedup |
-|----------|---------------|------------|---------|
-| **basemap** | 3.11 | 68.86 | **22.12x faster** |
-| **plot** | 3.67 | 76.20 | **20.77x faster** |
-| **histogram** | 3.45 | 63.63 | **18.42x faster** |
-| **grdimage** | 6.18 | 78.88 | **12.77x faster** |
-| **coast** | 15.27 | 88.60 | **5.80x faster** |
-| **blockmean** | 2.00 | 2.57 | **1.28x faster** |
-| **grdgradient** | 1.05 | 1.24 | **1.18x faster** |
-| **info** | 10.34 | 10.57 | **1.02x faster** |
-| **makecpt** | 1.81 | 1.84 | **1.01x faster** |
-| **select** | 13.08 | 12.95 | 0.99x (equivalent) |
-| **Average** | - | - | **8.16x faster** |
+### Basic Operations
+
+| Operation | pygmt_nb | PyGMT | Speedup |
+|-----------|----------|-------|---------|
+| **basemap** | 3.51 ms | 74.40 ms | **21.22x** |
+| **plot** | 4.21 ms | 74.64 ms | **17.73x** |
+| **coast** | 15.09 ms | 89.25 ms | **5.92x** |
+| **info** | 10.73 ms | 10.69 ms | **1.00x** |
+| **Average** | - | - | **11.46x** |
+
+### Function Coverage
+
+| Function | pygmt_nb | PyGMT | Speedup |
+|----------|----------|-------|---------|
+| **histogram** | 4.29 ms | 71.93 ms | **16.77x** |
+| **makecpt** | 1.97 ms | 1.95 ms | **0.99x** |
+| **select** | 11.54 ms | 11.74 ms | **1.02x** |
+| **blockmean** | 2.09 ms | 2.52 ms | **1.20x** |
+| **Average** | - | - | **4.99x** |
+
+### Real-World Workflows
+
+| Workflow | pygmt_nb | PyGMT | Speedup |
+|----------|----------|-------|---------|
+| **Animation (50 frames)** | 193.85 ms | 3.66 s | **18.90x** |
+| **Batch Processing (8 datasets)** | 44.25 ms | 576.69 ms | **13.03x** |
+| **Average** | - | - | **15.97x** |
+
+### Overall Summary
+
+**🚀 Average Speedup: 9.78x faster** (Range: 0.99x - 21.22x across 10 benchmarks)
 
 **Key Findings:**
-- ✅ **8.16x average speedup** across all functions
-- ✅ **Best performance**: 22.12x faster for basemap (figure methods)
-- ✅ **Figure methods**: 15.98x average speedup
-- ✅ **Module functions**: 1.01x average speedup
-- ✅ **Direct C API access** - No subprocess overhead
-- ✅ **Native PostScript output** - No Ghostscript dependency
+- ✅ **9.78x average speedup** across all operations
+- ✅ **Best performance**: 21.22x faster for basemap
+- ✅ **Basic operations**: 11.46x average speedup
+- ✅ **Real-world workflows**: 15.97x average speedup
+- ✅ **Direct C API access** - Zero subprocess overhead
+- ✅ **Session persistence** - No repeated session creation
 
 **Why faster?**
-pygmt_nb uses nanobind for direct GMT C API access, eliminating the subprocess overhead and providing more efficient data handling compared to PyGMT's approach.
+pygmt_nb uses nanobind for direct GMT C API access with persistent session management, eliminating subprocess overhead and session recreation costs.
+
+**Run benchmarks yourself:**
+```bash
+# Comprehensive benchmark suite
+uv run python benchmarks/benchmark.py
+
+# Results saved to output/benchmark_results.txt
+```
+
+See [docs/ARCHITECTURE_ANALYSIS.md](docs/ARCHITECTURE_ANALYSIS.md) for detailed performance analysis.
 
 ## Supported Features
 
@@ -228,6 +256,9 @@ just gmt-check
 
 # Run benchmarks
 just gmt-benchmark
+
+# Run validation
+just gmt-validate
 ```
 
 ### Building
@@ -236,12 +267,21 @@ just gmt-benchmark
 # Clean build
 just gmt-clean
 just gmt-build
-
-# Run validation
-python validation/validate_basic.py
 ```
 
-See `just --list` for all available commands.
+See `just --list` for all available commands:
+```bash
+just --list
+# Available GMT commands (in [gmt] group):
+#   gmt-build      - Build the nanobind extension
+#   gmt-check      - Run code quality checks
+#   gmt-test       - Run all tests
+#   gmt-benchmark  - Run comprehensive benchmark suite
+#   gmt-validate   - Run validation suite
+#   gmt-clean      - Clean build artifacts
+```
+
+**Note**: Commands use the root `justfile` (`/Users/nino/Coders/justfile`).
 
 ## Validation Results
 
@@ -278,7 +318,7 @@ All core functionality validated successfully. See [docs/VALIDATION.md](docs/VAL
 | Feature | PyGMT | pygmt_nb |
 |---------|-------|----------|
 | **Functions** | 64 | 64 (100% coverage) |
-| **Performance** | Baseline | **8.16x faster** |
+| **Performance** | Baseline | **9.78x faster** |
 | **Dependencies** | GMT + Ghostscript | **GMT only** |
 | **Output** | EPS (via Ghostscript) | **PS (native)** |
 | **API** | Reference | **100% compatible** |

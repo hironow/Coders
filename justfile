@@ -191,6 +191,19 @@ gmt-benchmark:
         python benchmarks/benchmark.py
     fi
 
+# Run validation suite
+[group('gmt')]
+gmt-validate:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    cd pygmt_nanobind_benchmark
+    # Use system python if not in a virtual environment (for CI compatibility)
+    if [ -n "${VIRTUAL_ENV:-}" ] || [ -d ".venv" ]; then
+        uv run --all-extras python validation/validate.py
+    else
+        python validation/validate.py
+    fi
+
 # Clean build artifacts
 [group('gmt')]
 gmt-clean:
