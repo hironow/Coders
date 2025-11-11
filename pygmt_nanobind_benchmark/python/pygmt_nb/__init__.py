@@ -33,5 +33,8 @@ from pygmt_nb.blockmean import blockmean
 from pygmt_nb.blockmedian import blockmedian
 from pygmt_nb.blockmode import blockmode
 from pygmt_nb.grd2cpt import grd2cpt
+from pygmt_nb.sphdistance import sphdistance
+from pygmt_nb.grdhisteq import grdhisteq
+from pygmt_nb.grdlandmask import grdlandmask
 
-__all__ = ["Session", "Grid", "Figure", "makecpt", "info", "grdinfo", "select", "grdcut", "grd2xyz", "xyz2grd", "grdfilter", "project", "triangulate", "surface", "grdgradient", "grdsample", "nearneighbor", "grdproject", "grdtrack", "filter1d", "grdclip", "grdfill", "blockmean", "blockmedian", "blockmode", "grd2cpt", "__version__"]
+__all__ = ["Session", "Grid", "Figure", "makecpt", "info", "grdinfo", "select", "grdcut", "grd2xyz", "xyz2grd", "grdfilter", "project", "triangulate", "surface", "grdgradient", "grdsample", "nearneighbor", "grdproject", "grdtrack", "filter1d", "grdclip", "grdfill", "blockmean", "blockmedian", "blockmode", "grd2cpt", "sphdistance", "grdhisteq", "grdlandmask", "__version__"]
