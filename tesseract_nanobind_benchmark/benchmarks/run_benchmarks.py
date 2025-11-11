@@ -5,10 +5,41 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 import pytesseract
 from tesseract_nanobind import TesseractAPI
+import os
+from pathlib import Path
 
 
-def create_test_images(count=10):
-    """Create test images with various text."""
+def load_real_test_images():
+    """Load real test images from pytesseract and tesserocr test data."""
+    images = []
+    image_names = []
+    
+    # Find test images from external repos
+    base_dir = Path(__file__).parent.parent.parent
+    test_image_paths = [
+        base_dir / "external/pytesseract/tests/data/test.jpg",
+        base_dir / "external/pytesseract/tests/data/test.png",
+        base_dir / "external/pytesseract/tests/data/test-small.jpg",
+        base_dir / "external/pytesseract/tests/data/test-european.jpg",
+        base_dir / "external/tesserocr/tests/eurotext.png",
+    ]
+    
+    for img_path in test_image_paths:
+        if img_path.exists():
+            try:
+                img = Image.open(img_path)
+                if img.mode != 'RGB':
+                    img = img.convert('RGB')
+                images.append(np.array(img))
+                image_names.append(img_path.name)
+            except Exception as e:
+                print(f"Warning: Could not load {img_path}: {e}")
+    
+    return images, image_names
+
+
+def create_synthetic_test_images(count=10):
+    """Create synthetic test images with various text patterns."""
     images = []
     texts = [
         "Hello World",
@@ -35,6 +66,29 @@ def create_test_images(count=10):
         
         draw.text((10, 50), text, fill='black', font=font)
         images.append(np.array(img))
+    
+    return images
+
+
+def create_test_images(count=10):
+    """Create a mix of real and synthetic test images."""
+    images = []
+    
+    # Try to load real test images first
+    real_images, real_names = load_real_test_images()
+    
+    if real_images:
+        print(f"Loaded {len(real_images)} real test images from pytesseract/tesserocr:")
+        for name in real_names:
+            print(f"  - {name}")
+        images.extend(real_images)
+    
+    # Add synthetic images to reach desired count
+    remaining = max(0, count - len(images))
+    if remaining > 0:
+        print(f"Adding {remaining} synthetic test images")
+        synthetic = create_synthetic_test_images(remaining)
+        images.extend(synthetic)
     
     return images
 
