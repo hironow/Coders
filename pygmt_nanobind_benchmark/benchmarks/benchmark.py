@@ -137,7 +137,7 @@ class BasemapBenchmark(Benchmark):
     def run_pygmt(self):
         fig = pygmt.Figure()
         fig.basemap(region=[0, 10, 0, 10], projection="X10c", frame="afg")
-        fig.savefig(str(self.temp_dir / "pygmt_basemap.ps"))
+        fig.savefig(str(self.temp_dir / "pygmt_basemap.eps"))
 
     def run_pygmt_nb(self):
         fig = pygmt_nb.Figure()
@@ -155,7 +155,7 @@ class CoastBenchmark(Benchmark):
         fig = pygmt.Figure()
         fig.basemap(region=[130, 150, 30, 45], projection="M15c", frame=True)
         fig.coast(land="tan", water="lightblue", shorelines="thin")
-        fig.savefig(str(self.temp_dir / "pygmt_coast.ps"))
+        fig.savefig(str(self.temp_dir / "pygmt_coast.eps"))
 
     def run_pygmt_nb(self):
         fig = pygmt_nb.Figure()
@@ -175,8 +175,8 @@ class PlotBenchmark(Benchmark):
     def run_pygmt(self):
         fig = pygmt.Figure()
         fig.basemap(region=[0, 10, 0, 10], projection="X15c", frame="afg")
-        fig.plot(x=self.x, y=self.y, style="c0.1c", color="red", pen="0.5p,black")
-        fig.savefig(str(self.temp_dir / "pygmt_plot.ps"))
+        fig.plot(x=self.x, y=self.y, style="c0.1c", fill="red", pen="0.5p,black")
+        fig.savefig(str(self.temp_dir / "pygmt_plot.eps"))
 
     def run_pygmt_nb(self):
         fig = pygmt_nb.Figure()
@@ -202,7 +202,7 @@ class HistogramBenchmark(Benchmark):
             pen="1p,black",
             fill="skyblue",
         )
-        fig.savefig(str(self.temp_dir / "pygmt_histogram.ps"))
+        fig.savefig(str(self.temp_dir / "pygmt_histogram.eps"))
 
     def run_pygmt_nb(self):
         fig = pygmt_nb.Figure()
@@ -234,7 +234,7 @@ class GridImageBenchmark(Benchmark):
             cmap="viridis",
         )
         fig.colorbar(frame="af")
-        fig.savefig(str(self.temp_dir / "pygmt_grid.ps"))
+        fig.savefig(str(self.temp_dir / "pygmt_grid.eps"))
 
     def run_pygmt_nb(self):
         fig = pygmt_nb.Figure()
@@ -317,12 +317,12 @@ class GrdFilterBenchmark(Benchmark):
 
     def run_pygmt(self):
         pygmt.grdfilter(
-            self.grid_file, filter="m5", distance="4", outgrid=self.output_file
+            self.grid_file, filter="m5", distance=4, outgrid=self.output_file
         )
 
     def run_pygmt_nb(self):
         pygmt_nb.grdfilter(
-            self.grid_file, filter="m5", distance="4", outgrid=self.output_file
+            self.grid_file, filter="m5", distance=4, outgrid=self.output_file
         )
 
 
@@ -381,10 +381,10 @@ class TriangulateBenchmark(Benchmark):
         self.y = np.random.uniform(0, 10, 100)
 
     def run_pygmt(self):
-        pygmt.triangulate(x=self.x, y=self.y, region=[0, 10, 0, 10])
+        pygmt.triangulate(x=self.x, y=self.y)
 
     def run_pygmt_nb(self):
-        pygmt_nb.triangulate(x=self.x, y=self.y, region=[0, 10, 0, 10])
+        pygmt_nb.triangulate(x=self.x, y=self.y)
 
 
 # =============================================================================
@@ -404,10 +404,10 @@ class SimpleMapWorkflow(Benchmark):
         fig = pygmt.Figure()
         fig.basemap(region=[130, 150, 30, 45], projection="M15c", frame="afg")
         fig.coast(land="lightgray", water="azure", shorelines="0.5p")
-        fig.plot(x=self.x, y=self.y, style="c0.3c", color="red", pen="1p,black")
+        fig.plot(x=self.x, y=self.y, style="c0.3c", fill="red", pen="1p,black")
         fig.text(x=140, y=42, text="Japan", font="18p,Helvetica-Bold,darkblue")
         fig.logo(position="jBR+o0.5c+w5c", box=True)
-        fig.savefig(str(self.temp_dir / "pygmt_workflow.ps"))
+        fig.savefig(str(self.temp_dir / "pygmt_workflow.eps"))
 
     def run_pygmt_nb(self):
         fig = pygmt_nb.Figure()
@@ -432,7 +432,7 @@ class GridProcessingWorkflow(Benchmark):
 
     def run_pygmt(self):
         # Grid processing pipeline
-        pygmt.grdfilter(self.grid_file, filter="m5", distance="4", outgrid=self.filtered_file)
+        pygmt.grdfilter(self.grid_file, filter="m5", distance=4, outgrid=self.filtered_file)
         pygmt.grdgradient(
             self.filtered_file, azimuth=45, normalize="e0.8", outgrid=self.gradient_file
         )
@@ -448,11 +448,11 @@ class GridProcessingWorkflow(Benchmark):
             cmap="gray",
         )
         fig.colorbar(frame="af")
-        fig.savefig(str(self.temp_dir / "pygmt_gridflow.ps"))
+        fig.savefig(str(self.temp_dir / "pygmt_gridflow.eps"))
 
     def run_pygmt_nb(self):
         # Grid processing pipeline
-        pygmt_nb.grdfilter(self.grid_file, filter="m5", distance="4", outgrid=self.filtered_file)
+        pygmt_nb.grdfilter(self.grid_file, filter="m5", distance=4, outgrid=self.filtered_file)
         pygmt_nb.grdgradient(
             self.filtered_file, azimuth=45, normalize="e0.8", outgrid=self.gradient_file
         )
@@ -532,8 +532,12 @@ def main():
 
         category_speedups = []
         for name, results in categories[category]:
-            pygmt_nb_time = results.get("pygmt_nb", {}).get("avg", 0)
-            pygmt_time = results.get("pygmt", {}).get("avg", 0)
+            if results is None:
+                continue
+            pygmt_nb_dict = results.get("pygmt_nb") or {}
+            pygmt_dict = results.get("pygmt") or {}
+            pygmt_nb_time = pygmt_nb_dict.get("avg", 0)
+            pygmt_time = pygmt_dict.get("avg", 0)
 
             pygmt_nb_str = format_time(pygmt_nb_time) if pygmt_nb_time else "N/A"
             pygmt_str = format_time(pygmt_time) if pygmt_time else "N/A"

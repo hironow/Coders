@@ -5,12 +5,12 @@
 
 **High-performance PyGMT reimplementation with complete API compatibility.**
 
-A drop-in replacement for PyGMT that's **1.11x faster** with direct GMT C API access via nanobind.
+A drop-in replacement for PyGMT that's **8.16x faster** with direct GMT C API access via nanobind.
 
 ## Why Use This?
 
 ✅ **PyGMT-compatible API** - Change one import line and you're done
-✅ **1.11x faster than PyGMT** - Direct C++ API, no subprocess overhead
+✅ **8.16x faster than PyGMT** - Direct C++ API, no subprocess overhead
 ✅ **100% API coverage** - All 64 PyGMT functions implemented
 ✅ **No Ghostscript dependency** - Native PostScript output
 ✅ **104 passing tests** - Comprehensive test coverage
@@ -117,20 +117,23 @@ Latest results (10 iterations per test, macOS M-series):
 
 | Function | pygmt_nb (ms) | PyGMT (ms) | Speedup |
 |----------|---------------|------------|---------|
-| **blockmean** | 2.02 | 2.53 | **1.26x faster** |
-| **grdgradient** | 1.18 | 1.30 | **1.10x faster** |
-| **select** | 10.84 | 11.59 | **1.07x faster** |
-| **info** | 10.52 | 10.46 | 0.99x (equivalent) |
-| **makecpt** | 1.82 | 1.74 | 0.96x (equivalent) |
-| **basemap** | 3.04 | - | (figure method) |
-| **coast** | 14.53 | - | (figure method) |
-| **plot** | 3.66 | - | (figure method) |
-| **Average** | - | - | **1.11x faster** |
+| **basemap** | 3.11 | 68.86 | **22.12x faster** |
+| **plot** | 3.67 | 76.20 | **20.77x faster** |
+| **histogram** | 3.45 | 63.63 | **18.42x faster** |
+| **grdimage** | 6.18 | 78.88 | **12.77x faster** |
+| **coast** | 15.27 | 88.60 | **5.80x faster** |
+| **blockmean** | 2.00 | 2.57 | **1.28x faster** |
+| **grdgradient** | 1.05 | 1.24 | **1.18x faster** |
+| **info** | 10.34 | 10.57 | **1.02x faster** |
+| **makecpt** | 1.81 | 1.84 | **1.01x faster** |
+| **select** | 13.08 | 12.95 | 0.99x (equivalent) |
+| **Average** | - | - | **8.16x faster** |
 
 **Key Findings:**
-- ✅ **1.11x average speedup** across all functions
-- ✅ **Best performance**: 1.26x faster for blockmean
-- ✅ **Module functions**: 1.01x - 1.26x faster
+- ✅ **8.16x average speedup** across all functions
+- ✅ **Best performance**: 22.12x faster for basemap (figure methods)
+- ✅ **Figure methods**: 15.98x average speedup
+- ✅ **Module functions**: 1.01x average speedup
 - ✅ **Direct C API access** - No subprocess overhead
 - ✅ **Native PostScript output** - No Ghostscript dependency
 
@@ -275,7 +278,7 @@ All core functionality validated successfully. See [docs/VALIDATION.md](docs/VAL
 | Feature | PyGMT | pygmt_nb |
 |---------|-------|----------|
 | **Functions** | 64 | 64 (100% coverage) |
-| **Performance** | Baseline | **1.11x faster** |
+| **Performance** | Baseline | **8.16x faster** |
 | **Dependencies** | GMT + Ghostscript | **GMT only** |
 | **Output** | EPS (via Ghostscript) | **PS (native)** |
 | **API** | Reference | **100% compatible** |

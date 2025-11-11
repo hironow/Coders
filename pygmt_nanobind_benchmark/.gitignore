@@ -38,3 +38,6 @@ gmt.conf
 
 # Test output
 pygmt_nb_*.pdf
+
+# Output directory
+output/
