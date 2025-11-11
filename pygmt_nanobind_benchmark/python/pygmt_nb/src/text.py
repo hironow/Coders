@@ -6,7 +6,6 @@ Modern mode implementation using nanobind.
 
 from typing import Union, Optional, List
 from pathlib import Path
-import subprocess
 import numpy as np
 
 
@@ -89,8 +88,6 @@ def text(
             args.append(f"-B{frame}")
 
     # Prepare text data
-    import subprocess
-
     # Handle single or multiple text entries
     if isinstance(text, str):
         text = [text]
@@ -99,17 +96,22 @@ def text(
     if not isinstance(y, list):
         y = [y]
 
-    data_str = "\n".join(f"{xi} {yi} {t}" for xi, yi, t in zip(x, y, text))
+    # Pass coordinates via virtual file, text via temporary file
+    # (GMT text requires text as a separate column/file)
+    x_array = np.asarray(x, dtype=np.float64)
+    y_array = np.asarray(y, dtype=np.float64)
 
-    cmd = ["gmt", "text"] + args
+    # For now, write text to a temporary file and use that
+    # TODO: Implement GMT_Put_Strings for full virtual file support
+    import tempfile
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+        for xi, yi, t in zip(x, y, text):
+            f.write(f"{xi} {yi} {t}\n")
+        tmpfile = f.name
+
     try:
-        subprocess.run(
-            cmd,
-            input=data_str,
-            text=True,
-            check=True,
-            capture_output=True
-        )
-    except subprocess.CalledProcessError as e:
-        raise RuntimeError(f"GMT text failed: {e.stderr}") from e
+        self._session.call_module("text", f"{tmpfile} " + " ".join(args))
+    finally:
+        import os
+        os.unlink(tmpfile)
 

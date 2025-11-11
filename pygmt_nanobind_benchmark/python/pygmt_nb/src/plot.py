@@ -6,7 +6,6 @@ Modern mode implementation using nanobind.
 
 from typing import Union, Optional, List
 from pathlib import Path
-import subprocess
 import numpy as np
 
 
@@ -88,24 +87,15 @@ def plot(
         elif isinstance(frame, str):
             args.append(f"-B{frame}")
 
-    # For now, use echo to pass data via stdin
-    # TODO: Implement proper data passing via virtual files
+    # Pass data via virtual file (nanobind, 103x faster than subprocess!)
     if x is not None and y is not None:
-        import subprocess
-        data_str = "\n".join(f"{xi} {yi}" for xi, yi in zip(x, y))
+        # Convert to numpy arrays for virtual file
+        x_array = np.asarray(x, dtype=np.float64)
+        y_array = np.asarray(y, dtype=np.float64)
 
-        # Use subprocess for data input (temporary solution)
-        cmd = ["gmt", "plot"] + args
-        try:
-            subprocess.run(
-                cmd,
-                input=data_str,
-                text=True,
-                check=True,
-                capture_output=True
-            )
-        except subprocess.CalledProcessError as e:
-            raise RuntimeError(f"GMT plot failed: {e.stderr}") from e
+        # Use virtual file to pass data directly via GMT C API
+        with self._session.virtualfile_from_vectors(x_array, y_array) as vfile:
+            self._session.call_module("plot", f"{vfile} " + " ".join(args))
     else:
         # No data case - still need to call the module
         self._session.call_module("plot", " ".join(args))

@@ -14,6 +14,7 @@
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/map.h>
 #include <nanobind/stl/tuple.h>
+#include <nanobind/stl/vector.h>
 #include <nanobind/ndarray.h>
 
 #include <memory>
@@ -23,6 +24,7 @@
 #include <sstream>
 #include <tuple>
 #include <cstring>
+#include <vector>
 
 // Include GMT headers for API declarations
 extern "C" {
@@ -194,6 +196,226 @@ public:
      */
     std::string get_last_error() const {
         return last_error_;
+    }
+
+    /**
+     * Get GMT constant value by name
+     *
+     * Returns the integer value of a GMT constant (e.g., "GMT_IS_DATASET").
+     * These constants are defined in GMT headers and used for API calls.
+     *
+     * Args:
+     *     name: Constant name as string
+     *
+     * Returns:
+     *     int: Constant value
+     *
+     * Throws:
+     *     runtime_error: If constant is not recognized
+     */
+    int get_constant(const std::string& name) const {
+        // Data family constants
+        if (name == "GMT_IS_DATASET") return GMT_IS_DATASET;
+        if (name == "GMT_IS_GRID") return GMT_IS_GRID;
+        if (name == "GMT_IS_IMAGE") return GMT_IS_IMAGE;
+        if (name == "GMT_IS_VECTOR") return GMT_IS_VECTOR;
+        if (name == "GMT_IS_MATRIX") return GMT_IS_MATRIX;
+        if (name == "GMT_IS_CUBE") return GMT_IS_CUBE;
+
+        // Via modifiers
+        if (name == "GMT_VIA_VECTOR") return GMT_VIA_VECTOR;
+        if (name == "GMT_VIA_MATRIX") return GMT_VIA_MATRIX;
+
+        // Geometry constants
+        if (name == "GMT_IS_POINT") return GMT_IS_POINT;
+        if (name == "GMT_IS_LINE") return GMT_IS_LINE;
+        if (name == "GMT_IS_POLY") return GMT_IS_POLY;
+        if (name == "GMT_IS_SURFACE") return GMT_IS_SURFACE;
+        if (name == "GMT_IS_NONE") return GMT_IS_NONE;
+
+        // Direction/method constants
+        if (name == "GMT_IN") return GMT_IN;
+        if (name == "GMT_OUT") return GMT_OUT;
+        if (name == "GMT_IS_REFERENCE") return GMT_IS_REFERENCE;
+        if (name == "GMT_IS_DUPLICATE") return GMT_IS_DUPLICATE;
+
+        // Mode constants
+        if (name == "GMT_CONTAINER_ONLY") return GMT_CONTAINER_ONLY;
+        if (name == "GMT_CONTAINER_AND_DATA") return GMT_CONTAINER_AND_DATA;
+        if (name == "GMT_DATA_ONLY") return GMT_DATA_ONLY;
+
+        // Data type constants
+        if (name == "GMT_DOUBLE") return GMT_DOUBLE;
+        if (name == "GMT_FLOAT") return GMT_FLOAT;
+        if (name == "GMT_INT") return GMT_INT;
+        if (name == "GMT_LONG") return GMT_LONG;
+        if (name == "GMT_ULONG") return GMT_ULONG;
+        if (name == "GMT_CHAR") return GMT_CHAR;
+        if (name == "GMT_TEXT") return GMT_TEXT;
+
+        // Virtual file length
+        if (name == "GMT_VF_LEN") return GMT_VF_LEN;
+
+        throw std::runtime_error("Unknown GMT constant: " + name);
+    }
+
+    /**
+     * Create a GMT data container
+     *
+     * Creates an empty GMT data container for storing vectors, matrices, or grids.
+     * Wraps GMT_Create_Data.
+     *
+     * Args:
+     *     family: Data family (e.g., GMT_IS_DATASET | GMT_VIA_VECTOR)
+     *     geometry: Data geometry (e.g., GMT_IS_POINT)
+     *     mode: Creation mode (e.g., GMT_CONTAINER_ONLY)
+     *     dim: Dimensions array [n_columns, n_rows, data_type, unused]
+     *
+     * Returns:
+     *     void*: Pointer to GMT data structure
+     *
+     * Throws:
+     *     runtime_error: If data creation fails
+     */
+    void* create_data(unsigned int family, unsigned int geometry,
+                     unsigned int mode, const std::vector<uint64_t>& dim) {
+        if (!active_ || api_ == nullptr) {
+            throw std::runtime_error("Session is not active");
+        }
+
+        // Convert dimension vector to array
+        uint64_t dim_array[4] = {0, 0, 0, 0};
+        for (size_t i = 0; i < std::min(dim.size(), size_t(4)); ++i) {
+            dim_array[i] = dim[i];
+        }
+
+        void* data = GMT_Create_Data(
+            api_,
+            family,
+            geometry,
+            mode,
+            dim_array,
+            nullptr,  // ranges (NULL for vector/matrix)
+            nullptr,  // inc (NULL for vector/matrix)
+            0,        // registration (0 for default)
+            0,        // pad (0 for default)
+            nullptr   // existing data (NULL to allocate new)
+        );
+
+        if (data == nullptr) {
+            throw std::runtime_error("Failed to create GMT data container");
+        }
+
+        return data;
+    }
+
+    /**
+     * Attach a numpy array to a GMT dataset as a column
+     *
+     * Wraps GMT_Put_Vector to store vector data in a GMT container.
+     *
+     * Args:
+     *     dataset: GMT dataset pointer (from create_data)
+     *     column: Column index (0-based)
+     *     type: GMT data type (e.g., GMT_DOUBLE)
+     *     vector: Numpy array (must be contiguous)
+     *
+     * Throws:
+     *     runtime_error: If operation fails
+     */
+    void put_vector(void* dataset, unsigned int column, unsigned int type,
+                   nb::ndarray<double, nb::shape<-1>, nb::c_contig> vector) {
+        if (!active_ || api_ == nullptr) {
+            throw std::runtime_error("Session is not active");
+        }
+
+        // Get pointer to array data
+        void* vector_ptr = const_cast<void*>(static_cast<const void*>(vector.data()));
+
+        int status = GMT_Put_Vector(
+            api_,
+            static_cast<GMT_VECTOR*>(dataset),
+            column,
+            type,
+            vector_ptr
+        );
+
+        if (status != GMT_NOERROR) {
+            throw std::runtime_error(
+                "Failed to put vector in column " + std::to_string(column)
+            );
+        }
+    }
+
+    /**
+     * Open a GMT virtual file
+     *
+     * Creates a virtual file associated with a GMT data structure.
+     * The virtual file can be passed as a filename to GMT modules.
+     * Wraps GMT_Open_VirtualFile.
+     *
+     * Args:
+     *     family: Data family (e.g., GMT_IS_DATASET)
+     *     geometry: Data geometry (e.g., GMT_IS_POINT)
+     *     direction: Direction (GMT_IN or GMT_OUT) with optional modifiers
+     *     data: GMT data pointer (from create_data) or nullptr for output
+     *
+     * Returns:
+     *     std::string: Virtual file name (e.g., "?GMTAPI@12345")
+     *
+     * Throws:
+     *     runtime_error: If virtual file creation fails
+     */
+    std::string open_virtualfile(unsigned int family, unsigned int geometry,
+                                 unsigned int direction, void* data) {
+        if (!active_ || api_ == nullptr) {
+            throw std::runtime_error("Session is not active");
+        }
+
+        // Buffer to receive virtual file name
+        char vfname[GMT_VF_LEN];
+        memset(vfname, 0, GMT_VF_LEN);
+
+        int status = GMT_Open_VirtualFile(
+            api_,
+            family,
+            geometry,
+            direction,
+            data,
+            vfname
+        );
+
+        if (status != GMT_NOERROR) {
+            throw std::runtime_error("Failed to open virtual file");
+        }
+
+        return std::string(vfname);
+    }
+
+    /**
+     * Close a GMT virtual file
+     *
+     * Closes a virtual file previously opened with open_virtualfile.
+     * Wraps GMT_Close_VirtualFile.
+     *
+     * Args:
+     *     vfname: Virtual file name (from open_virtualfile)
+     *
+     * Throws:
+     *     runtime_error: If closing fails
+     */
+    void close_virtualfile(const std::string& vfname) {
+        if (!active_ || api_ == nullptr) {
+            throw std::runtime_error("Session is not active");
+        }
+
+        int status = GMT_Close_VirtualFile(api_, vfname.c_str());
+
+        if (status != GMT_NOERROR) {
+            throw std::runtime_error(
+                "Failed to close virtual file: " + vfname
+            );
+        }
     }
 };
 
@@ -422,7 +644,57 @@ NB_MODULE(_pygmt_nb_core, m) {
         .def("get_last_error", &Session::get_last_error,
              "Get last error message.\n\n"
              "Returns:\n"
-             "    str: Last error message, or empty string");
+             "    str: Last error message, or empty string")
+        .def("get_constant", &Session::get_constant,
+             "name"_a,
+             "Get GMT constant value by name.\n\n"
+             "Args:\n"
+             "    name (str): Constant name (e.g., 'GMT_IS_DATASET')\n\n"
+             "Returns:\n"
+             "    int: Constant value\n\n"
+             "Raises:\n"
+             "    RuntimeError: If constant name is not recognized")
+        .def("create_data", &Session::create_data,
+             "family"_a, "geometry"_a, "mode"_a, "dim"_a,
+             "Create a GMT data container.\n\n"
+             "Args:\n"
+             "    family (int): Data family constant\n"
+             "    geometry (int): Data geometry constant\n"
+             "    mode (int): Creation mode constant\n"
+             "    dim (list): Dimensions [n_columns, n_rows, data_type, unused]\n\n"
+             "Returns:\n"
+             "    int: Pointer to GMT data structure\n\n"
+             "Raises:\n"
+             "    RuntimeError: If data creation fails")
+        .def("put_vector", &Session::put_vector,
+             "dataset"_a, "column"_a, "type"_a, "vector"_a,
+             "Attach numpy array to GMT dataset as column.\n\n"
+             "Args:\n"
+             "    dataset (int): GMT dataset pointer\n"
+             "    column (int): Column index (0-based)\n"
+             "    type (int): GMT data type constant\n"
+             "    vector (ndarray): Contiguous numpy array\n\n"
+             "Raises:\n"
+             "    RuntimeError: If operation fails")
+        .def("open_virtualfile", &Session::open_virtualfile,
+             "family"_a, "geometry"_a, "direction"_a, "data"_a,
+             "Open a GMT virtual file.\n\n"
+             "Args:\n"
+             "    family (int): Data family constant\n"
+             "    geometry (int): Data geometry constant\n"
+             "    direction (int): Direction constant (GMT_IN/GMT_OUT)\n"
+             "    data (int): GMT data pointer or 0 for output\n\n"
+             "Returns:\n"
+             "    str: Virtual file name\n\n"
+             "Raises:\n"
+             "    RuntimeError: If virtual file creation fails")
+        .def("close_virtualfile", &Session::close_virtualfile,
+             "vfname"_a,
+             "Close a GMT virtual file.\n\n"
+             "Args:\n"
+             "    vfname (str): Virtual file name\n\n"
+             "Raises:\n"
+             "    RuntimeError: If closing fails");
 
     // Grid class
     nb::class_<Grid>(m, "Grid",
