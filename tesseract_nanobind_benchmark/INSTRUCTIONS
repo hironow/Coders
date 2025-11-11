@@ -10,7 +10,7 @@ Objective: Create a high-speed Tesseract OCR binding using `nanobind`.
 
 5. Build: The build system must support **dynamic linking** to user-installed `libtesseract` and `leptonica` libraries, allowing path specification.
 
-nits: already cloned repositories:
+Hints: already cloned repositories:
 
 * tesseract: ../external/tesseract
 * pytesseract: ../external/pytesseract
