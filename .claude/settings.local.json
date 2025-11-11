@@ -18,9 +18,31 @@
       "Bash(done)",
       "Bash(git mv:*)"
     ],
-    "deny": [],
+    "deny": [
+      "Bash(sudo:*)",
+      "Bash(rm -rf:*)",
+      "Bash(npm:*)",
+      "Bash(npx:*)",
+      "Bash(python3:*)",
+      "Bash(pip3:*)",
+      "Bash(pip:*)",
+      "Bash(git push:*)",
+      "Read(.env.keys)",
+      "Read(id_rsa)",
+      "Read(id_ed25519)",
+      "Read(**/*token*)",
+      "Read(**/*key*)",
+      "Read(**/private/**)",
+      "Write(.env.keys)",
+      "Write(**/secrets/**)",
+      "Write(**/private/**)",
+      "Bash(wget:*)",
+      "Bash(psql:*)",
+      "Bash(mysql:*)",
+      "Bash(mongod:*)"
+    ],
     "ask": [
-      "Bash(rm:*)"
+      "Bash(rm -f:*)"
     ]
   }
 }
