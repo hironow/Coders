@@ -13,7 +13,15 @@ PYTEST := "uv run pytest"
 # Tesseract nanobind benchmark
 
 tesseract-build:
-    cd tesseract_nanobind_benchmark && {{PIP}} install -e .
+    #!/usr/bin/env bash
+    set -euo pipefail
+    cd tesseract_nanobind_benchmark
+    # Use --system flag if not in a virtual environment (for CI compatibility)
+    if [ -n "${VIRTUAL_ENV:-}" ] || [ -d ".venv" ]; then
+        {{PIP}} install -e .
+    else
+        {{PIP}} install --system -e .
+    fi
 
 tesseract-check:
     {{UV}} tool install ruff
