@@ -1,13 +1,15 @@
 /**
  * PyGMT nanobind bindings - Real GMT API implementation
  *
- * This implementation uses actual GMT C API calls.
+ * This implementation uses actual GMT C API calls via nanobind.
  *
- * Build modes:
- * - Header-only mode (default): Compiles against GMT headers but doesn't link libgmt
- * - Full mode: Links against libgmt for full functionality
+ * Cross-platform support:
+ * - Linux: libgmt.so
+ * - macOS: libgmt.dylib
+ * - Windows: gmt.dll
  *
- * Runtime requirement: libgmt.so must be installed on the system
+ * Runtime requirement: GMT library must be installed and accessible
+ * Build requirement: GMT headers and library for linking
  */
 
 #include <nanobind/nanobind.h>
@@ -601,7 +603,7 @@ NB_MODULE(_pygmt_nb_core, m) {
               "using nanobind for improved performance over ctypes.\n\n"
               "Requirements:\n"
               "  - GMT 6.5.0 or later must be installed on your system\n"
-              "  - libgmt.so must be in your library path\n\n"
+              "  - GMT library must be accessible (libgmt.so/dylib/dll)\n\n"
               "Example:\n"
               "  >>> from pygmt_nb import Session\n"
               "  >>> with Session() as lib:\n"

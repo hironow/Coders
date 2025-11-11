@@ -20,9 +20,9 @@ The PyGMT nanobind implementation (`pygmt_nb`) has been **comprehensively valida
 
 ---
 
-## Validation Phases
+## Validation Stages
 
-### Phase 4A: Initial Validation (16 tests)
+### Initial Validation: Initial Validation (16 tests)
 
 **Result**: 14/16 passed (87.5%)
 
@@ -37,7 +37,7 @@ The PyGMT nanobind implementation (`pygmt_nb`) has been **comprehensively valida
 
 **Analysis**: Failures were due to test configuration (frame syntax), not implementation bugs.
 
-### Phase 4B: Retry with Fixes (4 tests)
+### Retry Validation: Retry with Fixes (4 tests)
 
 **Result**: 4/4 passed (100%)
 
@@ -224,7 +224,7 @@ Total:   ~976 KB (all tests)
 
 ## Performance & Compatibility Summary
 
-### Performance (from Phase 3)
+### Performance (from Benchmarking)
 
 | Metric | Result |
 |--------|--------|

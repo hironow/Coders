@@ -228,9 +228,9 @@ The pygmt_nb implementation:
 
 **Recommendation**: DEPLOY
 
-### Next Phase
+### Next Steps
 
-With core functionality proven, the next phase should focus on:
+With core functionality proven, the next steps should focus on:
 1. Data type bindings (GMT_GRID, etc.)
 2. Virtual file system
 3. NumPy integration

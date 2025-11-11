@@ -28,7 +28,9 @@ message(STATUS "Using GMT headers from: ${GMT_INCLUDE_DIR}")
 
 # Try to find GMT library
 # Search in user-specified path first, then common locations
-find_library(GMT_LIBRARY NAMES gmt
+# Support multiple library naming conventions (gmt, gmt6, libgmt)
+find_library(GMT_LIBRARY
+    NAMES gmt gmt6 libgmt
     PATHS
         ${GMT_LIBRARY_DIR}
         # macOS Homebrew paths
@@ -39,8 +41,18 @@ find_library(GMT_LIBRARY NAMES gmt
         # Linux standard paths
         /usr/lib
         /usr/lib/x86_64-linux-gnu
+        /usr/lib/aarch64-linux-gnu
         /lib
         /lib/x86_64-linux-gnu
+        # Windows paths (conda, vcpkg, OSGeo4W)
+        "$ENV{CONDA_PREFIX}/Library/lib"
+        "C:/Program Files/GMT/lib"
+        "C:/Program Files (x86)/GMT/lib"
+        "C:/OSGeo4W/lib"
+        "C:/OSGeo4W64/lib"
+    PATH_SUFFIXES
+        lib
+        lib64
 )
 
 if(NOT GMT_LIBRARY)
@@ -48,8 +60,11 @@ if(NOT GMT_LIBRARY)
         "GMT library not found. Please install GMT:\n"
         "  macOS (Homebrew): brew install gmt\n"
         "  Linux (apt): sudo apt-get install libgmt-dev\n"
+        "  Windows (conda): conda install -c conda-forge gmt\n"
+        "  Windows (vcpkg): vcpkg install gmt\n"
         "Or specify GMT_LIBRARY_DIR:\n"
-        "  cmake -DGMT_LIBRARY_DIR=/path/to/gmt/lib ..")
+        "  cmake -DGMT_LIBRARY_DIR=/path/to/gmt/lib ..\n"
+        "  set GMT_LIBRARY_DIR=C:\\path\\to\\gmt\\lib  (Windows)")
 endif()
 
 message(STATUS "Found GMT library: ${GMT_LIBRARY}")

@@ -314,7 +314,7 @@ But does NOT confirm:
 **Priority**: HIGH
 **Effort**: Medium (4-8 hours)
 
-**Phase 1: Create Reference Outputs**
+**Initial Architecture: Create Reference Outputs**
 ```bash
 # 1. Run PyGMT examples to generate reference images
 python scripts/generate_pygmt_references.py
@@ -325,7 +325,7 @@ python scripts/generate_pygmt_references.py
 # - Convert EPS to PNG for comparison
 ```
 
-**Phase 2: Run pygmt_nb Examples**
+**Complete Implementation: Run pygmt_nb Examples**
 ```bash
 # 2. Run same examples with pygmt_nb
 python scripts/generate_pygmt_nb_outputs.py
@@ -336,7 +336,7 @@ python scripts/generate_pygmt_nb_outputs.py
 # - Convert PS to PNG for comparison
 ```
 
-**Phase 3: Pixel Comparison**
+**Performance Benchmarking: Pixel Comparison**
 ```python
 # 3. Compare pixel-by-pixel
 from PIL import Image
@@ -359,7 +359,7 @@ def compare_images(ref_path, test_path, tolerance=0):
     return pixel_diff_pct < 0.01, f"Diff: {pixel_diff_pct:.4f}%"
 ```
 
-**Phase 4: Automated Test Suite**
+**Validation Testing: Automated Test Suite**
 ```python
 # tests/test_pixel_identity.py
 def test_basemap_pixel_identity():

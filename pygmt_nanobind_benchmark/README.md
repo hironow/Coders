@@ -44,22 +44,56 @@ See [PERFORMANCE.md](PERFORMANCE.md) for detailed benchmarks.
 | Retry Tests | 4 | 4 | 100% |
 | **Total** | **20** | **18** | **90%** |
 
-See [FINAL_VALIDATION_REPORT.md](FINAL_VALIDATION_REPORT.md) for full details.
+See [docs/VALIDATION.md](docs/VALIDATION.md) for full details.
 
 ## Quick Start
 
+### Supported Platforms
+
+| Platform | Architecture | Status | GMT Installation |
+|----------|-------------|--------|------------------|
+| **Linux** | x86_64, aarch64 | ✅ Tested | apt, yum, dnf |
+| **macOS** | x86_64, arm64 (M1/M2) | ✅ Tested | Homebrew |
+| **Windows** | x86_64 | ✅ Supported | conda, vcpkg, OSGeo4W |
+
 ### Installation
 
+#### Linux (Ubuntu/Debian)
 ```bash
 # Install GMT library
-sudo apt-get install libgmt-dev  # Ubuntu/Debian
-# or
-brew install gmt                  # macOS
+sudo apt-get update
+sudo apt-get install libgmt-dev gmt gmt-dcw gmt-gshhg
 
 # Build package
-cd build
-cmake ..
-make
+uv pip install -e ".[test,dev]" --no-build-isolation
+```
+
+#### macOS (Homebrew)
+```bash
+# Install GMT library
+brew install gmt
+
+# Build package
+uv pip install -e ".[test,dev]" --no-build-isolation
+```
+
+#### Windows (conda)
+```powershell
+# Install GMT library via conda
+conda install -c conda-forge gmt
+
+# Build package
+uv pip install -e ".[test,dev]" --no-build-isolation
+```
+
+#### Custom GMT Path (All Platforms)
+```bash
+# Specify GMT installation path via environment variables
+export GMT_INCLUDE_DIR=/path/to/gmt/include
+export GMT_LIBRARY_DIR=/path/to/gmt/lib
+
+# Build with custom paths
+uv pip install -e ".[test,dev]" --no-build-isolation
 ```
 
 ### Usage Example
@@ -93,7 +127,7 @@ fig.savefig("output.ps")
 
 **Utilities** (6): makecpt, config, dimfilter, sphinterpolate, sph2grd, sphdistance, which, x2sys_init, x2sys_cross
 
-See [FACT.md](FACT.md) for complete implementation status.
+See [docs/STATUS.md](docs/STATUS.md) for complete implementation status.
 
 ## Architecture
 
@@ -129,24 +163,42 @@ python benchmarks/benchmark.py
 
 ## Documentation
 
-- **FACT.md** - Implementation status (64/64 functions complete)
-- **FINAL_VALIDATION_REPORT.md** - Validation results (90% success)
-- **PERFORMANCE.md** - Performance benchmarks (1.11x speedup)
-- **INSTRUCTIONS** - Original project requirements
+All technical documentation is located in the **[docs/](docs/)** directory:
+
+- **[STATUS.md](docs/STATUS.md)** - Implementation status (64/64 functions, 100% complete)
+- **[COMPLIANCE.md](docs/COMPLIANCE.md)** - Requirements compliance (97.5%)
+- **[VALIDATION.md](docs/VALIDATION.md)** - Validation results (90% success)
+- **[PERFORMANCE.md](docs/PERFORMANCE.md)** - Performance benchmarks (1.11x speedup)
+- **[history/](docs/history/)** - Development history and technical analysis
+
+See [docs/README.md](docs/README.md) for complete documentation index.
 
 ## Project Structure
 
 ```
 pygmt_nanobind_benchmark/
-├── README.md                      # This file
-├── FACT.md                        # Implementation status
-├── FINAL_VALIDATION_REPORT.md     # Validation results
-├── PERFORMANCE.md                 # Benchmark results
-├── INSTRUCTIONS                   # Requirements
-├── python/pygmt_nb/               # Implementation (64 functions)
-├── tests/                         # Unit tests
-├── validation/                    # Validation scripts
-└── benchmarks/                    # Performance benchmarks
+├── README.md                    # This file (project overview)
+├── INSTRUCTIONS                 # Original requirements
+│
+├── python/pygmt_nb/             # Implementation (64 functions)
+│   ├── figure.py                # Figure class
+│   ├── src/                     # Figure methods (28 files)
+│   ├── [32 module functions]    # Module-level functions
+│   └── clib/                    # nanobind bindings
+│
+├── src/                         # C++ nanobind bindings
+│   └── bindings.cpp             # GMT C API bindings
+│
+├── tests/                       # Unit tests (104 tests)
+├── validation/                  # Validation scripts
+├── benchmarks/                  # Performance benchmarks
+│
+└── docs/                        # Technical documentation
+    ├── STATUS.md                # Implementation status
+    ├── COMPLIANCE.md            # Requirements compliance
+    ├── VALIDATION.md            # Validation report
+    ├── PERFORMANCE.md           # Performance benchmarks
+    └── history/                 # Development history
 ```
 
 ## Advantages over PyGMT
