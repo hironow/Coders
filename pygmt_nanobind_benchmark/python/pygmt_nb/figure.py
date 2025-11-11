@@ -174,7 +174,6 @@ class Figure:
         )
 
     # Import plotting methods from src/ (PyGMT pattern)
-    # Import plotting methods from src/ (PyGMT pattern)
     from pygmt_nb.src import (  # noqa: E402, F401
         basemap,
         coast,
@@ -186,6 +185,8 @@ class Figure:
         logo,
         legend,
         histogram,
+        image,
+        contour,
     )
 
 

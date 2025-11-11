@@ -15,6 +15,8 @@ from pygmt_nb.src.grdcontour import grdcontour
 from pygmt_nb.src.logo import logo
 from pygmt_nb.src.legend import legend
 from pygmt_nb.src.histogram import histogram
+from pygmt_nb.src.image import image
+from pygmt_nb.src.contour import contour
 
 __all__ = [
     "basemap",
@@ -27,4 +29,6 @@ __all__ = [
     "logo",
     "legend",
     "histogram",
+    "image",
+    "contour",
 ]

@@ -11,5 +11,6 @@ __version__ = "0.1.0"
 from pygmt_nb.clib import Session, Grid
 from pygmt_nb.figure import Figure
 from pygmt_nb.makecpt import makecpt
+from pygmt_nb.info import info
 
-__all__ = ["Session", "Grid", "Figure", "makecpt", "__version__"]
+__all__ = ["Session", "Grid", "Figure", "makecpt", "info", "__version__"]
