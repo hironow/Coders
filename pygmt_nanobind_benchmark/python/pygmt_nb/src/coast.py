@@ -72,7 +72,7 @@ def coast(
     if shorelines is not None:
         if isinstance(shorelines, bool) and shorelines:
             args.append("-W")
-        elif isinstance(shorelines, (str, int)):
+        elif isinstance(shorelines, str | int):
             args.append(f"-W{shorelines}")
 
     # Resolution

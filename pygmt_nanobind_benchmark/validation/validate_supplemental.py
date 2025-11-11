@@ -16,7 +16,7 @@ import numpy as np
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root / "python"))
 
-import pygmt_nb
+import pygmt_nb  # noqa: E402
 
 
 def analyze_ps_file(filepath):
@@ -203,13 +203,13 @@ class Test10_ModuleFunctions(ValidationTest):
 
     def run_pygmt_nb(self, output_path):
         # Test info
-        result1 = pygmt_nb.info(str(self.temp_data), per_column=True)
+        pygmt_nb.info(str(self.temp_data), per_column=True)
 
         # Test makecpt
-        result2 = pygmt_nb.makecpt(cmap="viridis", series=[0, 100])
+        pygmt_nb.makecpt(cmap="viridis", series=[0, 100])
 
         # Test select
-        result3 = pygmt_nb.select(str(self.temp_data), region=[2, 8, 2, 8])
+        pygmt_nb.select(str(self.temp_data), region=[2, 8, 2, 8])
 
         # Create a simple figure to generate PS output
         fig = pygmt_nb.Figure()

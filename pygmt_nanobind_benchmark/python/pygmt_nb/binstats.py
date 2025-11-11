@@ -205,7 +205,7 @@ def binstats(
     with Session() as session:
         # Handle data input
         if data is not None:
-            if isinstance(data, (str, Path)):
+            if isinstance(data, str | Path):
                 # File input
                 if output is not None:
                     session.call_module("gmtbinstats", f"{data} " + " ".join(args) + f" ->{output}")

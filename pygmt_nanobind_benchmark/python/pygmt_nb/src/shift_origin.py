@@ -71,7 +71,7 @@ def shift_origin(
 
     # X shift
     if xshift is not None:
-        if isinstance(xshift, (int, float)):
+        if isinstance(xshift, int | float):
             # Convert numeric to string with cm units
             args.append(f"-X{xshift}c")
         else:
@@ -79,7 +79,7 @@ def shift_origin(
 
     # Y shift
     if yshift is not None:
-        if isinstance(yshift, (int, float)):
+        if isinstance(yshift, int | float):
             # Convert numeric to string with cm units
             args.append(f"-Y{yshift}c")
         else:

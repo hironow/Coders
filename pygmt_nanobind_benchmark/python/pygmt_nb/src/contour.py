@@ -126,7 +126,7 @@ def contour(
 
     # Handle data input
     if data is not None:
-        if isinstance(data, (str, Path)):
+        if isinstance(data, str | Path):
             # File path
             args.append(str(data))
             self._session.call_module("contour", " ".join(args))

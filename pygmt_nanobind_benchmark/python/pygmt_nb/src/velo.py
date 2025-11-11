@@ -124,7 +124,7 @@ def velo(
     # Execute via session
     with Session() as session:
         if data is not None:
-            if isinstance(data, (str, Path)):
+            if isinstance(data, str | Path):
                 # File input
                 session.call_module("velo", f"{data} " + " ".join(args))
             else:

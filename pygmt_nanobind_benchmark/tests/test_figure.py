@@ -23,7 +23,7 @@ def ghostscript_available():
         if gs_path is None:
             return False
         subprocess.run(
-            [gs_path, "--version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True
+            [gs_path, "--version"], capture_output=True, check=True
         )
         return True
     except (subprocess.CalledProcessError, FileNotFoundError, PermissionError):
@@ -414,7 +414,7 @@ class TestFigureResourceManagement(unittest.TestCase):
 
         # Create figure
         fig = Figure()
-        fig_id = id(fig)
+        id(fig)
 
         # Use figure
         test_grid = Path(__file__).parent / "data" / "test_grid.nc"

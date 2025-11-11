@@ -145,61 +145,51 @@ tesseract-release:
 # Build the nanobind extension
 [group('gmt')]
 gmt-build:
-    cd pygmt_nanobind_benchmark && uv run python -m pip install -e . --no-build-isolation
+    #!/usr/bin/env bash
+    set -euo pipefail
+    cd pygmt_nanobind_benchmark
+    # Use --system flag if not in a virtual environment (for CI compatibility)
+    if [ -n "${VIRTUAL_ENV:-}" ] || [ -d ".venv" ]; then
+        {{PIP}} install -e .[test]
+    else
+        {{PIP}} install --system -e .[test]
+    fi
 
-# Install in development mode
+# Run code quality checks
 [group('gmt')]
-gmt-install:
-    cd pygmt_nanobind_benchmark && uv run python -m pip install -e .
+gmt-check:
+    {{UV}} tool install ruff
+    {{UV}} tool install semgrep
+    @echo "Installed tools:"
+    @{{UV}} tool list
+    {{UV}} tool run ruff check pygmt_nanobind_benchmark/
+    {{UV}} tool run semgrep --config=auto pygmt_nanobind_benchmark/
 
 # Run all tests
 [group('gmt')]
 gmt-test:
-    cd pygmt_nanobind_benchmark && uv run pytest tests/ -v
-
-# Run specific test
-[group('gmt')]
-gmt-test-file file:
-    cd pygmt_nanobind_benchmark && uv run pytest {{file}} -v
+    #!/usr/bin/env bash
+    set -euo pipefail
+    cd pygmt_nanobind_benchmark
+    # Use system python if not in a virtual environment (for CI compatibility)
+    if [ -n "${VIRTUAL_ENV:-}" ] || [ -d ".venv" ]; then
+        {{PYTEST}} tests/ -v
+    else
+        python -m pytest tests/ -v
+    fi
 
 # Run all benchmarks
 [group('gmt')]
 gmt-benchmark:
-    cd pygmt_nanobind_benchmark && python3 benchmarks/compare_with_pygmt.py
-
-# Run specific benchmark category
-[group('gmt')]
-gmt-benchmark-category category:
-    cd pygmt_nanobind_benchmark && python3 benchmarks/benchmark_{{category}}.py
-
-# Show benchmark results
-[group('gmt')]
-gmt-benchmark-results:
-    @cat pygmt_nanobind_benchmark/benchmarks/BENCHMARK_RESULTS.md
-
-# Run validation (pixel-perfect comparison)
-[group('gmt')]
-gmt-validate:
-    cd pygmt_nanobind_benchmark && uv run python validation/validate_examples.py
-
-# Format Python code
-[group('gmt')]
-gmt-format:
-    uv run ruff format pygmt_nanobind_benchmark/
-
-# Lint Python code
-[group('gmt')]
-gmt-lint:
-    uv run ruff check pygmt_nanobind_benchmark/
-
-# Type check with mypy
-[group('gmt')]
-gmt-typecheck:
-    cd pygmt_nanobind_benchmark && uv run mypy python/ tests/
-
-# Run all quality checks
-[group('gmt')]
-gmt-verify: gmt-format gmt-lint gmt-typecheck gmt-test
+    #!/usr/bin/env bash
+    set -euo pipefail
+    cd pygmt_nanobind_benchmark
+    # Use system python if not in a virtual environment (for CI compatibility)
+    if [ -n "${VIRTUAL_ENV:-}" ] || [ -d ".venv" ]; then
+        uv run --all-extras python benchmarks/compare_with_pygmt.py
+    else
+        python benchmarks/compare_with_pygmt.py
+    fi
 
 # Clean build artifacts
 [group('gmt')]

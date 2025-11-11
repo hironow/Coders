@@ -80,7 +80,7 @@ def info(
 
     # Handle data input
     with Session() as session:
-        if isinstance(data, (str, Path)):
+        if isinstance(data, str | Path):
             # File path - direct input
             cmd_args = f"{data} " + " ".join(args)
 

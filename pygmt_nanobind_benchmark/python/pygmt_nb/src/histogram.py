@@ -111,7 +111,7 @@ def histogram(
         args.append(f"-W{pen}")
 
     # Handle data input
-    if isinstance(data, (str, Path)):
+    if isinstance(data, str | Path):
         # File path
         args.append(str(data))
         self._session.call_module("histogram", " ".join(args))

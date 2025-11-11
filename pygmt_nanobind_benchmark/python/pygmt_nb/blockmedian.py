@@ -155,7 +155,7 @@ def blockmedian(
         with Session() as session:
             # Handle data input
             if data is not None:
-                if isinstance(data, (str, Path)):
+                if isinstance(data, str | Path):
                     # File input
                     session.call_module(
                         "blockmedian", f"{data} " + " ".join(args) + f" ->{outfile}"

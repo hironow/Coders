@@ -33,7 +33,7 @@ def grdimage(
     args = []
 
     # Grid file
-    if isinstance(grid, (str, Path)):
+    if isinstance(grid, str | Path):
         args.append(str(grid))
     elif isinstance(grid, Grid):
         # For Grid objects, we'd need to write to temp file

@@ -167,7 +167,7 @@ def grdview(
 
     # Shading (-I option)
     if shading is not None:
-        if isinstance(shading, (int, float)):
+        if isinstance(shading, int | float):
             args.append(f"-I+d{shading}")
         else:
             args.append(f"-I{shading}")

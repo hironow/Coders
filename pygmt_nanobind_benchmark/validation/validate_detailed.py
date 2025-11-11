@@ -20,7 +20,7 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root / "python"))
 
 try:
-    import pygmt
+    import pygmt  # noqa: F401
 
     PYGMT_AVAILABLE = True
     print("✓ PyGMT available")
@@ -29,7 +29,7 @@ except ImportError:
     print("✗ PyGMT not available")
     sys.exit(1)
 
-import pygmt_nb
+import pygmt_nb  # noqa: E402
 
 
 def analyze_ps_file(filepath):

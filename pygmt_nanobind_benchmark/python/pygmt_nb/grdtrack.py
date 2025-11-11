@@ -143,7 +143,7 @@ def grdtrack(
     try:
         with Session() as session:
             # Handle points input
-            if isinstance(points, (str, Path)):
+            if isinstance(points, str | Path):
                 # File input
                 session.call_module("grdtrack", f"{points} " + " ".join(args) + f" ->{outfile}")
             else:

@@ -86,7 +86,7 @@ def select(
 
     try:
         with Session() as session:
-            if isinstance(data, (str, Path)):
+            if isinstance(data, str | Path):
                 # File input
                 session.call_module("select", f"{data} " + " ".join(args) + f" ->{outfile}")
             else:

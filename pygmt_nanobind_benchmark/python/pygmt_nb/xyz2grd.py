@@ -107,7 +107,7 @@ def xyz2grd(
 
     # Execute via nanobind session
     with Session() as session:
-        if isinstance(data, (str, Path)):
+        if isinstance(data, str | Path):
             # File input
             session.call_module("xyz2grd", f"{data} " + " ".join(args))
         else:

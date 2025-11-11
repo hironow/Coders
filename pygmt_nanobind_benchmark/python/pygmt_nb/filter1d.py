@@ -163,7 +163,7 @@ def filter1d(
     try:
         with Session() as session:
             # Handle data input
-            if isinstance(data, (str, Path)):
+            if isinstance(data, str | Path):
                 # File input
                 session.call_module("filter1d", f"{data} " + " ".join(args) + f" ->{outfile}")
             else:

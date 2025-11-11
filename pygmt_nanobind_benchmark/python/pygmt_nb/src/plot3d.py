@@ -167,7 +167,7 @@ def plot3d(
 
     # Handle data input and call GMT
     if data is not None:
-        if isinstance(data, (str, Path)):
+        if isinstance(data, str | Path):
             # File input
             self._session.call_module("plot3d", f"{data} " + " ".join(args))
         else:

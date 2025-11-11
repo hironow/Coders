@@ -71,7 +71,7 @@ class TestModuleExecution:
         from pygmt_nb.clib import Session
 
         with Session() as session:
-            with pytest.raises(Exception):  # Will define specific exception later
+            with pytest.raises(Exception):  # noqa: B017 - Will define specific exception later
                 session.call_module("nonexistent_module", "")
 
 

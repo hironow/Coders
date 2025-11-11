@@ -48,7 +48,7 @@ except ImportError:
 
     PIL_AVAILABLE = True
 
-import pygmt_nb
+import pygmt_nb  # noqa: E402
 
 
 class PixelComparisonTest:

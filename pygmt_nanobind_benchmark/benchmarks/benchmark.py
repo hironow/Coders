@@ -35,7 +35,7 @@ except ImportError:
     PYGMT_AVAILABLE = False
     print("✗ PyGMT not available - will only benchmark pygmt_nb")
 
-import pygmt_nb
+import pygmt_nb  # noqa: E402
 
 
 # Benchmark utilities
@@ -266,10 +266,10 @@ class InfoBenchmark(Benchmark):
         np.savetxt(self.data_file, np.column_stack([x, y]))
 
     def run_pygmt(self):
-        result = pygmt.info(str(self.data_file), per_column=True)
+        _ = pygmt.info(str(self.data_file), per_column=True)
 
     def run_pygmt_nb(self):
-        result = pygmt_nb.info(str(self.data_file), per_column=True)
+        _ = pygmt_nb.info(str(self.data_file), per_column=True)
 
 
 class MakeCPTBenchmark(Benchmark):
@@ -279,10 +279,10 @@ class MakeCPTBenchmark(Benchmark):
         super().__init__("MakeCPT", "Create color palette table", "Priority-1 Module")
 
     def run_pygmt(self):
-        result = pygmt.makecpt(cmap="viridis", series=[0, 100])
+        _ = pygmt.makecpt(cmap="viridis", series=[0, 100])
 
     def run_pygmt_nb(self):
-        result = pygmt_nb.makecpt(cmap="viridis", series=[0, 100])
+        _ = pygmt_nb.makecpt(cmap="viridis", series=[0, 100])
 
 
 class SelectBenchmark(Benchmark):
@@ -296,10 +296,10 @@ class SelectBenchmark(Benchmark):
         np.savetxt(self.data_file, np.column_stack([x, y]))
 
     def run_pygmt(self):
-        result = pygmt.select(str(self.data_file), region=[2, 8, 2, 8])
+        pygmt.select(str(self.data_file), region=[2, 8, 2, 8])
 
     def run_pygmt_nb(self):
-        result = pygmt_nb.select(str(self.data_file), region=[2, 8, 2, 8])
+        pygmt_nb.select(str(self.data_file), region=[2, 8, 2, 8])
 
 
 # =============================================================================
@@ -316,12 +316,12 @@ class GrdFilterBenchmark(Benchmark):
         self.output_file = str(self.temp_dir / "filtered.nc")
 
     def run_pygmt(self):
-        result = pygmt.grdfilter(
+        pygmt.grdfilter(
             self.grid_file, filter="m5", distance="4", outgrid=self.output_file
         )
 
     def run_pygmt_nb(self):
-        result = pygmt_nb.grdfilter(
+        pygmt_nb.grdfilter(
             self.grid_file, filter="m5", distance="4", outgrid=self.output_file
         )
 
@@ -335,12 +335,12 @@ class GrdGradientBenchmark(Benchmark):
         self.output_file = str(self.temp_dir / "gradient.nc")
 
     def run_pygmt(self):
-        result = pygmt.grdgradient(
+        pygmt.grdgradient(
             self.grid_file, azimuth=45, normalize="e0.8", outgrid=self.output_file
         )
 
     def run_pygmt_nb(self):
-        result = pygmt_nb.grdgradient(
+        pygmt_nb.grdgradient(
             self.grid_file, azimuth=45, normalize="e0.8", outgrid=self.output_file
         )
 
@@ -362,12 +362,12 @@ class BlockMeanBenchmark(Benchmark):
         np.savetxt(self.data_file, np.column_stack([x, y, z]))
 
     def run_pygmt(self):
-        result = pygmt.blockmean(
+        pygmt.blockmean(
             str(self.data_file), region=[0, 10, 0, 10], spacing="1", summary="m"
         )
 
     def run_pygmt_nb(self):
-        result = pygmt_nb.blockmean(
+        pygmt_nb.blockmean(
             str(self.data_file), region=[0, 10, 0, 10], spacing="1", summary="m"
         )
 
@@ -381,10 +381,10 @@ class TriangulateBenchmark(Benchmark):
         self.y = np.random.uniform(0, 10, 100)
 
     def run_pygmt(self):
-        result = pygmt.triangulate(x=self.x, y=self.y, region=[0, 10, 0, 10])
+        pygmt.triangulate(x=self.x, y=self.y, region=[0, 10, 0, 10])
 
     def run_pygmt_nb(self):
-        result = pygmt_nb.triangulate(x=self.x, y=self.y, region=[0, 10, 0, 10])
+        pygmt_nb.triangulate(x=self.x, y=self.y, region=[0, 10, 0, 10])
 
 
 # =============================================================================
@@ -436,7 +436,7 @@ class GridProcessingWorkflow(Benchmark):
         pygmt.grdgradient(
             self.filtered_file, azimuth=45, normalize="e0.8", outgrid=self.gradient_file
         )
-        info = pygmt.grdinfo(self.gradient_file, per_column="n")
+        pygmt.grdinfo(self.gradient_file, per_column="n")
 
         # Visualization
         fig = pygmt.Figure()
@@ -456,7 +456,7 @@ class GridProcessingWorkflow(Benchmark):
         pygmt_nb.grdgradient(
             self.filtered_file, azimuth=45, normalize="e0.8", outgrid=self.gradient_file
         )
-        info = pygmt_nb.grdinfo(self.gradient_file, per_column="n")
+        pygmt_nb.grdinfo(self.gradient_file, per_column="n")
 
         # Visualization
         fig = pygmt_nb.Figure()

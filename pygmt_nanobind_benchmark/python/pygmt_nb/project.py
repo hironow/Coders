@@ -148,7 +148,7 @@ def project(
 
     try:
         with Session() as session:
-            if isinstance(data, (str, Path)):
+            if isinstance(data, str | Path):
                 # File input
                 session.call_module("project", f"{data} " + " ".join(args) + f" ->{outfile}")
             else:

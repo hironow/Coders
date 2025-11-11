@@ -26,7 +26,7 @@ except ImportError:
     print("✗ PyGMT not available")
     sys.exit(1)
 
-import pygmt_nb
+import pygmt_nb  # noqa: E402
 
 
 class ValidationTest:

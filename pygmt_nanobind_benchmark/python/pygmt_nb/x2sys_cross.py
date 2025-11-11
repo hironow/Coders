@@ -143,7 +143,7 @@ def x2sys_cross(
     # Handle track files
     if isinstance(tracks, str):
         track_list = [tracks]
-    elif isinstance(tracks, (list, tuple)):
+    elif isinstance(tracks, list | tuple):
         track_list = [str(t) for t in tracks]
     else:
         track_list = [str(tracks)]

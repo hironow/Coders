@@ -168,7 +168,7 @@ def sphinterpolate(
     with Session() as session:
         # Handle data input
         if data is not None:
-            if isinstance(data, (str, Path)):
+            if isinstance(data, str | Path):
                 # File input
                 session.call_module("sphinterpolate", f"{data} " + " ".join(args))
             else:

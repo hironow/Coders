@@ -67,7 +67,7 @@ class SubplotContext:
 
         # Figure size (-F option)
         if self._figsize is not None:
-            if isinstance(self._figsize, (list, tuple)):
+            if isinstance(self._figsize, list | tuple):
                 args.append(f"-F{'/'.join(str(x) for x in self._figsize)}")
             else:
                 args.append(f"-F{self._figsize}")
@@ -136,7 +136,7 @@ class SubplotContext:
             row = panel // self._ncols
             col = panel % self._ncols
             args.append(f"{row},{col}")
-        elif isinstance(panel, (tuple, list)):
+        elif isinstance(panel, tuple | list):
             args.append(f"{panel[0]},{panel[1]}")
         else:
             raise ValueError(f"Invalid panel specification: {panel}")

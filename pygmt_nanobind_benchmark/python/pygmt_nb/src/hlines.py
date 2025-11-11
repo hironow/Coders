@@ -71,7 +71,7 @@ def hlines(
     from pygmt_nb.clib import Session
 
     # Convert single value to list for uniform processing
-    if not isinstance(y, (list, tuple)):
+    if not isinstance(y, list | tuple):
         y = [y]
 
     # Build GMT command for each line

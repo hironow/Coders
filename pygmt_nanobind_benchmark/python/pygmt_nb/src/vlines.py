@@ -71,7 +71,7 @@ def vlines(
     from pygmt_nb.clib import Session
 
     # Convert single value to list for uniform processing
-    if not isinstance(x, (list, tuple)):
+    if not isinstance(x, list | tuple):
         x = [x]
 
     # Build GMT command for each line

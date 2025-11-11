@@ -150,7 +150,7 @@ def wiggle(
     # Execute via session
     with Session() as session:
         if data is not None:
-            if isinstance(data, (str, Path)):
+            if isinstance(data, str | Path):
                 # File input
                 session.call_module("wiggle", f"{data} " + " ".join(args))
             else:
