@@ -83,6 +83,7 @@ pygmt_nanobind_benchmark/
 - C++17 compiler (GCC ≥ 7, Clang ≥ 5, MSVC ≥ 19.14)
 - Python ≥ 3.11
 - GMT ≥ 6.5.0
+- Ghostscript (required for PNG/JPG/PDF output via GMT psconvert)
 - nanobind
 - NumPy ≥ 2.0
 - Pandas ≥ 2.2
@@ -91,7 +92,12 @@ pygmt_nanobind_benchmark/
 ## Building
 
 ```bash
-# Install dependencies
+# Install system dependencies (Ghostscript for image conversion)
+sudo apt-get install ghostscript  # Ubuntu/Debian
+# or
+brew install ghostscript           # macOS
+
+# Install Python dependencies
 uv pip install nanobind numpy pandas xarray
 
 # Build the package
@@ -106,6 +112,8 @@ just test
 # Run benchmarks
 just benchmark
 ```
+
+**Note**: Ghostscript is required for PNG/JPG/PDF output. Without it, only PostScript (.ps) and EPS (.eps) formats are available.
 
 ## Implementation Plan
 
