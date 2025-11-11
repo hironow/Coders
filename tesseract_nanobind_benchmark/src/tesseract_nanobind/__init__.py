@@ -4,4 +4,7 @@ __version__ = "0.1.0"
 
 from ._tesseract_nanobind import TesseractAPI
 
-__all__ = ["TesseractAPI", "__version__"]
+# Export compat module for tesserocr compatibility
+from . import compat
+
+__all__ = ["TesseractAPI", "compat", "__version__"]
