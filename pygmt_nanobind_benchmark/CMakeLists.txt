@@ -8,29 +8,51 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Find required packages
 find_package(Python 3.11 COMPONENTS Interpreter Development.Module REQUIRED)
 
-# Use GMT headers from external submodule
-set(GMT_SOURCE_DIR "${CMAKE_SOURCE_DIR}/../external/gmt")
-set(GMT_INCLUDE_DIR "${GMT_SOURCE_DIR}/src")
+# Allow user to specify GMT paths via CMake variables or environment
+set(GMT_INCLUDE_DIR "$ENV{GMT_INCLUDE_DIR}" CACHE PATH "GMT include directory")
+set(GMT_LIBRARY_DIR "$ENV{GMT_LIBRARY_DIR}" CACHE PATH "GMT library directory")
+
+# Fallback to external submodule if not specified
+if(NOT GMT_INCLUDE_DIR OR NOT EXISTS "${GMT_INCLUDE_DIR}/gmt.h")
+    set(GMT_SOURCE_DIR "${CMAKE_SOURCE_DIR}/../external/gmt")
+    set(GMT_INCLUDE_DIR "${GMT_SOURCE_DIR}/src")
+    message(STATUS "Using GMT headers from external submodule: ${GMT_INCLUDE_DIR}")
+endif()
 
 # Check if GMT source exists
 if(NOT EXISTS "${GMT_INCLUDE_DIR}/gmt.h")
-    message(FATAL_ERROR "GMT source not found at ${GMT_INCLUDE_DIR}. Did you initialize submodules?")
+    message(FATAL_ERROR "GMT headers not found at ${GMT_INCLUDE_DIR}. Please install GMT or specify GMT_INCLUDE_DIR.")
 endif()
 
 message(STATUS "Using GMT headers from: ${GMT_INCLUDE_DIR}")
 
 # Try to find GMT library
+# Search in user-specified path first, then common locations
 find_library(GMT_LIBRARY NAMES gmt
-    PATHS /lib /usr/lib /usr/local/lib /lib/x86_64-linux-gnu /usr/lib/x86_64-linux-gnu
+    PATHS
+        ${GMT_LIBRARY_DIR}
+        # macOS Homebrew paths
+        /opt/homebrew/lib
+        /opt/homebrew/Cellar/gmt/*/lib
+        /usr/local/lib
+        /usr/local/Cellar/gmt/*/lib
+        # Linux standard paths
+        /usr/lib
+        /usr/lib/x86_64-linux-gnu
+        /lib
+        /lib/x86_64-linux-gnu
 )
 
-if(GMT_LIBRARY)
-    message(STATUS "Found GMT library: ${GMT_LIBRARY}")
-    set(LINK_GMT TRUE)
-else()
-    message(STATUS "GMT library not found - building header-only (runtime linking required)")
-    set(LINK_GMT FALSE)
+if(NOT GMT_LIBRARY)
+    message(FATAL_ERROR
+        "GMT library not found. Please install GMT:\n"
+        "  macOS (Homebrew): brew install gmt\n"
+        "  Linux (apt): sudo apt-get install libgmt-dev\n"
+        "Or specify GMT_LIBRARY_DIR:\n"
+        "  cmake -DGMT_LIBRARY_DIR=/path/to/gmt/lib ..")
 endif()
+
+message(STATUS "Found GMT library: ${GMT_LIBRARY}")
 
 # Fetch nanobind
 include(FetchContent)
@@ -52,21 +74,9 @@ nanobind_add_module(
 # Include GMT headers for type definitions and function declarations
 target_include_directories(_pygmt_nb_core PRIVATE ${GMT_INCLUDE_DIR})
 
-# Add compile definitions
-target_compile_definitions(_pygmt_nb_core PRIVATE
-    GMT_RUNTIME_LOADING=1
-)
-
-# Link against GMT library if found
-if(LINK_GMT)
-    target_link_libraries(_pygmt_nb_core PRIVATE ${GMT_LIBRARY})
-    message(STATUS "Linking against GMT library")
-else()
-    # On Linux, we need libdl for dlopen/dlsym (future dynamic loading)
-    if(UNIX AND NOT APPLE)
-        target_link_libraries(_pygmt_nb_core PRIVATE ${CMAKE_DL_LIBS})
-    endif()
-endif()
+# Link against GMT library
+target_link_libraries(_pygmt_nb_core PRIVATE ${GMT_LIBRARY})
+message(STATUS "Linking against GMT library")
 
 # Install the extension module
 install(TARGETS _pygmt_nb_core LIBRARY DESTINATION pygmt_nb/clib)
