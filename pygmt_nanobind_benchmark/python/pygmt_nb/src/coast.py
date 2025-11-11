@@ -5,8 +5,6 @@ Modern mode implementation using nanobind.
 """
 
 
-
-
 def coast(
     self,
     region: str | list[float] | None = None,

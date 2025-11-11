@@ -22,9 +22,7 @@ def ghostscript_available():
         gs_path = shutil.which("gs")
         if gs_path is None:
             return False
-        subprocess.run(
-            [gs_path, "--version"], capture_output=True, check=True
-        )
+        subprocess.run([gs_path, "--version"], capture_output=True, check=True)
         return True
     except (subprocess.CalledProcessError, FileNotFoundError, PermissionError):
         return False

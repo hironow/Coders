@@ -5,7 +5,6 @@ Module-level function (not a Figure method).
 """
 
 
-
 def which(fname: str | list[str], **kwargs):
     """
     Find full path to specified files.

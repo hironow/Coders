@@ -5,8 +5,6 @@ Modern mode implementation using nanobind.
 """
 
 
-
-
 def colorbar(
     self,
     position: str | None = None,

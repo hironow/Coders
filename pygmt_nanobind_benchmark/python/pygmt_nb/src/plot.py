@@ -4,7 +4,6 @@ plot - PyGMT-compatible plotting method.
 Modern mode implementation using nanobind.
 """
 
-
 import numpy as np
 
 

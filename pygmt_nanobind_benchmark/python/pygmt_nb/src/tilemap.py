@@ -5,7 +5,6 @@ Figure method (not a standalone module function).
 """
 
 
-
 def tilemap(
     self,
     region: str | list[float],

@@ -5,7 +5,6 @@ Module-level function (not a Figure method).
 """
 
 
-
 def x2sys_init(
     tag: str,
     suffix: str,

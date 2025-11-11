@@ -8,8 +8,8 @@ Validates that pygmt_nb produces compatible outputs with PyGMT through:
 3. Basic Validation - Core functionality tests
 """
 
-import sys
 import subprocess
+import sys
 import time
 from pathlib import Path
 
@@ -25,6 +25,7 @@ output_root.mkdir(parents=True, exist_ok=True)
 
 try:
     import pygmt
+
     PYGMT_AVAILABLE = True
     print("✓ PyGMT available")
 except ImportError:
@@ -33,7 +34,6 @@ except ImportError:
     sys.exit(1)
 
 import pygmt_nb  # noqa: E402
-
 
 # =============================================================================
 # Validation Utilities
@@ -57,9 +57,9 @@ def check_postscript_file(ps_file: Path, expected_min_size: int = 1000):
     with open(ps_file, "rb") as f:
         header = f.read(20)
         if not header.startswith(b"%!PS-Adobe"):
-            print(f"  ✗ Not a valid PostScript file!")
+            print("  ✗ Not a valid PostScript file!")
             return False
-        print(f"  ✓ Valid PostScript header")
+        print("  ✓ Valid PostScript header")
 
     return True
 
@@ -70,16 +70,16 @@ def compare_file_sizes(file1: Path, file2: Path):
     size2 = file2.stat().st_size
     ratio = size1 / size2
 
-    print(f"\n[Comparing file sizes]")
+    print("\n[Comparing file sizes]")
     print(f"  pygmt_nb: {size1:,} bytes")
     print(f"  PyGMT:    {size2:,} bytes")
     print(f"  Ratio:    {ratio:.3f}x")
 
     if 0.9 <= ratio <= 1.1:
-        print(f"  ✓ File sizes are similar")
+        print("  ✓ File sizes are similar")
         return True
     else:
-        print(f"  ⚠️  File sizes differ significantly")
+        print("  ⚠️  File sizes differ significantly")
         return False
 
 
@@ -92,18 +92,18 @@ def compare_images_with_imagemagick(img1: Path, img2: Path):
             text=True,
         )
         rmse = result.stderr.strip()
-        print(f"\n[ImageMagick comparison]")
+        print("\n[ImageMagick comparison]")
         print(f"  RMSE: {rmse}")
 
         if rmse.startswith("0 "):
-            print(f"  ✅ Images are identical!")
+            print("  ✅ Images are identical!")
             return True
         else:
-            print(f"  ⚠️  Images have differences")
-            print(f"  Difference map: /tmp/diff.png")
+            print("  ⚠️  Images have differences")
+            print("  Difference map: /tmp/diff.png")
             return False
     except FileNotFoundError:
-        print(f"\n  ⚠️  ImageMagick 'compare' not found - skipping pixel comparison")
+        print("\n  ⚠️  ImageMagick 'compare' not found - skipping pixel comparison")
         return None
 
 
@@ -228,7 +228,7 @@ def compare_info_operation():
     np.savetxt(data_file, np.column_stack([x, y]))
 
     print(f"\nTest data: {data_file}")
-    print(f"  1000 random points in [0, 10] × [0, 10]")
+    print("  1000 random points in [0, 10] × [0, 10]")
 
     # pygmt_nb
     print("\n[pygmt_nb]")
@@ -253,10 +253,10 @@ def compare_info_operation():
     print(f"  Speedup: {time_pygmt / time_nb:.2f}x")
 
     if result_nb.strip() == result_pygmt.strip():
-        print(f"  ✅ Results are identical")
+        print("  ✅ Results are identical")
         return True
     else:
-        print(f"  ⚠️  Results differ!")
+        print("  ⚠️  Results differ!")
         return False
 
 
@@ -273,7 +273,7 @@ def compare_select_operation():
     np.savetxt(data_file, np.column_stack([x, y]))
 
     print(f"\nTest data: {data_file}")
-    print(f"  1000 random points, selecting region [2, 8, 2, 8]")
+    print("  1000 random points, selecting region [2, 8, 2, 8]")
 
     # pygmt_nb
     print("\n[pygmt_nb]")
@@ -291,7 +291,11 @@ def compare_select_operation():
     result_pygmt = pygmt.select(data_file, region=[2, 8, 2, 8])
     time_pygmt = (time.perf_counter() - start) * 1000
 
-    lines_pygmt = len(result_pygmt.strip().split("\n")) if isinstance(result_pygmt, str) and result_pygmt else 0
+    lines_pygmt = (
+        len(result_pygmt.strip().split("\n"))
+        if isinstance(result_pygmt, str) and result_pygmt
+        else 0
+    )
     print(f"  Time: {time_pygmt:.2f} ms")
     print(f"  Selected: {lines_pygmt} points")
 
@@ -300,10 +304,10 @@ def compare_select_operation():
     print(f"  Speedup: {time_pygmt / time_nb:.2f}x")
 
     if lines_nb == lines_pygmt:
-        print(f"  ✅ Same number of points selected")
+        print("  ✅ Same number of points selected")
         return True
     else:
-        print(f"  ⚠️  Different number of points!")
+        print("  ⚠️  Different number of points!")
         return False
 
 
@@ -321,15 +325,13 @@ def compare_blockmean_operation():
     np.savetxt(data_file, np.column_stack([x, y, z]))
 
     print(f"\nTest data: {data_file}")
-    print(f"  1000 random points with z-values")
-    print(f"  Block averaging with spacing=1")
+    print("  1000 random points with z-values")
+    print("  Block averaging with spacing=1")
 
     # pygmt_nb
     print("\n[pygmt_nb]")
     start = time.perf_counter()
-    result_nb = pygmt_nb.blockmean(
-        data_file, region=[0, 10, 0, 10], spacing="1", summary="m"
-    )
+    result_nb = pygmt_nb.blockmean(data_file, region=[0, 10, 0, 10], spacing="1", summary="m")
     time_nb = (time.perf_counter() - start) * 1000
 
     lines_nb = len(result_nb.strip().split("\n")) if isinstance(result_nb, str) and result_nb else 0
@@ -339,12 +341,14 @@ def compare_blockmean_operation():
     # PyGMT
     print("\n[PyGMT]")
     start = time.perf_counter()
-    result_pygmt = pygmt.blockmean(
-        data_file, region=[0, 10, 0, 10], spacing="1", summary="m"
-    )
+    result_pygmt = pygmt.blockmean(data_file, region=[0, 10, 0, 10], spacing="1", summary="m")
     time_pygmt = (time.perf_counter() - start) * 1000
 
-    lines_pygmt = len(result_pygmt.strip().split("\n")) if isinstance(result_pygmt, str) and result_pygmt else 0
+    lines_pygmt = (
+        len(result_pygmt.strip().split("\n"))
+        if isinstance(result_pygmt, str) and result_pygmt
+        else 0
+    )
     print(f"  Time: {time_pygmt:.2f} ms")
     print(f"  Output: {lines_pygmt} blocks")
 
@@ -353,10 +357,10 @@ def compare_blockmean_operation():
     print(f"  Speedup: {time_pygmt / time_nb:.2f}x")
 
     if lines_nb == lines_pygmt:
-        print(f"  ✅ Same number of blocks")
+        print("  ✅ Same number of blocks")
         return True
     else:
-        print(f"  ⚠️  Different number of blocks!")
+        print("  ⚠️  Different number of blocks!")
         return False
 
 
@@ -384,7 +388,11 @@ def compare_makecpt_operation():
     result_pygmt = pygmt.makecpt(cmap="viridis", series=[0, 100])
     time_pygmt = (time.perf_counter() - start) * 1000
 
-    lines_pygmt = len(result_pygmt.strip().split("\n")) if isinstance(result_pygmt, str) and result_pygmt else 0
+    lines_pygmt = (
+        len(result_pygmt.strip().split("\n"))
+        if isinstance(result_pygmt, str) and result_pygmt
+        else 0
+    )
     print(f"  Time: {time_pygmt:.2f} ms")
     print(f"  Output: {lines_pygmt} lines")
 
@@ -393,10 +401,10 @@ def compare_makecpt_operation():
     print(f"  Speedup: {time_pygmt / time_nb:.2f}x")
 
     if lines_nb == lines_pygmt:
-        print(f"  ✅ Same output length")
+        print("  ✅ Same output length")
         return True
     else:
-        print(f"  ⚠️  Different output lengths!")
+        print("  ⚠️  Different output lengths!")
         return False
 
 
@@ -459,7 +467,7 @@ def print_summary(output_results, operation_results):
     for name, success in output_results:
         status = "✅ PASS" if success else "❌ FAIL"
         print(f"  {name:<20} {status}")
-    print(f"\n  Passed: {passed}/{total} ({passed/total*100:.0f}%)")
+    print(f"\n  Passed: {passed}/{total} ({passed / total * 100:.0f}%)")
 
     print("\nOperation Comparison:")
     print("-" * 70)
@@ -468,7 +476,7 @@ def print_summary(output_results, operation_results):
     for name, success in operation_results:
         status = "✅ PASS" if success else "❌ FAIL"
         print(f"  {name:<20} {status}")
-    print(f"\n  Passed: {passed}/{total} ({passed/total*100:.0f}%)")
+    print(f"\n  Passed: {passed}/{total} ({passed / total * 100:.0f}%)")
 
     # Overall
     all_passed = sum(1 for _, success in output_results + operation_results if success)
@@ -477,7 +485,7 @@ def print_summary(output_results, operation_results):
     print("\n" + "=" * 70)
     print("OVERALL RESULTS")
     print("=" * 70)
-    print(f"\n✅ Total Passed: {all_passed}/{all_total} ({all_passed/all_total*100:.0f}%)")
+    print(f"\n✅ Total Passed: {all_passed}/{all_total} ({all_passed / all_total * 100:.0f}%)")
     print(f"📁 Output Directory: {output_root}")
 
     if all_passed == all_total:

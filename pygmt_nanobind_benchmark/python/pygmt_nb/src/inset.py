@@ -5,7 +5,6 @@ Figure method (imported into Figure class).
 """
 
 
-
 class InsetContext:
     """
     Context manager for creating inset maps.

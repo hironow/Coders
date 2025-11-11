@@ -11,7 +11,6 @@ Includes:
 import sys
 import tempfile
 import time
-import multiprocessing as mp
 from pathlib import Path
 
 import numpy as np
@@ -35,7 +34,6 @@ except ImportError:
     print("✗ PyGMT not available - will only benchmark pygmt_nb")
 
 import pygmt_nb  # noqa: E402
-
 
 # =============================================================================
 # Benchmark Utilities
@@ -285,14 +283,10 @@ class BlockMeanBenchmark(Benchmark):
         np.savetxt(self.data_file, np.column_stack([x, y, z]))
 
     def run_pygmt(self):
-        pygmt.blockmean(
-            str(self.data_file), region=[0, 10, 0, 10], spacing="1", summary="m"
-        )
+        pygmt.blockmean(str(self.data_file), region=[0, 10, 0, 10], spacing="1", summary="m")
 
     def run_pygmt_nb(self):
-        pygmt_nb.blockmean(
-            str(self.data_file), region=[0, 10, 0, 10], spacing="1", summary="m"
-        )
+        pygmt_nb.blockmean(str(self.data_file), region=[0, 10, 0, 10], spacing="1", summary="m")
 
 
 # =============================================================================
@@ -307,7 +301,7 @@ class AnimationWorkflow(Benchmark):
         super().__init__(
             f"Animation ({num_frames} frames)",
             "Generate animation frames with rotating data",
-            "Real-World Workflows"
+            "Real-World Workflows",
         )
         self.num_frames = num_frames
         self.output_dir = output_root / "animation"
@@ -347,7 +341,7 @@ class BatchProcessingWorkflow(Benchmark):
         super().__init__(
             f"Batch Processing ({num_datasets} datasets)",
             "Process multiple datasets in sequence",
-            "Real-World Workflows"
+            "Real-World Workflows",
         )
         self.num_datasets = num_datasets
         self.output_dir = output_root / "batch"
@@ -363,14 +357,14 @@ class BatchProcessingWorkflow(Benchmark):
             self.datasets.append((x, y, z))
 
     def run_pygmt(self):
-        for i, (x, y, z) in enumerate(self.datasets):
+        for i, (x, y, _z) in enumerate(self.datasets):
             fig = pygmt.Figure()
             fig.basemap(region=[0, 10, 0, 10], projection="X10c", frame="afg")
             fig.plot(x=x, y=y, style="c0.2c", fill="blue")
             fig.savefig(str(self.output_dir / f"dataset_pygmt_{i:02d}.eps"))
 
     def run_pygmt_nb(self):
-        for i, (x, y, z) in enumerate(self.datasets):
+        for i, (x, y, _z) in enumerate(self.datasets):
             fig = pygmt_nb.Figure()
             fig.basemap(region=[0, 10, 0, 10], projection="X10c", frame="afg")
             fig.plot(x=x, y=y, style="c0.2c", color="blue")

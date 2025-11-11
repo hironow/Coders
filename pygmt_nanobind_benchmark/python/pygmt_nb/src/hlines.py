@@ -5,7 +5,6 @@ Figure method (not a standalone module function).
 """
 
 
-
 def hlines(
     self,
     y: float | list[float],

@@ -5,7 +5,6 @@ Figure method (imported into Figure class).
 """
 
 
-
 def psconvert(
     self,
     prefix: str | None = None,

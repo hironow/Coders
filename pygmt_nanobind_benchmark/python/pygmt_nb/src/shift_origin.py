@@ -5,7 +5,6 @@ Figure method (imported into Figure class).
 """
 
 
-
 def shift_origin(
     self,
     xshift: str | float | None = None,

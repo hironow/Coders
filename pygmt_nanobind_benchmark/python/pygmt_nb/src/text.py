@@ -5,8 +5,6 @@ Modern mode implementation using nanobind.
 """
 
 
-
-
 def text(
     self,
     x=None,

@@ -4,7 +4,6 @@ config - Get and set GMT parameters.
 Module-level function (not a Figure method).
 """
 
-
 from pygmt_nb.clib import Session
 
 

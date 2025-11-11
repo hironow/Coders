@@ -5,7 +5,6 @@ Modern mode implementation using nanobind for direct GMT C API access.
 """
 
 
-
 def basemap(
     self,
     region: str | list[float] | None = None,

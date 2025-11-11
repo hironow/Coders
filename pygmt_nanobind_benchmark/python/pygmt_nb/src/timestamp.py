@@ -5,7 +5,6 @@ Figure method (not a standalone module function).
 """
 
 
-
 def timestamp(
     self,
     text: str | None = None,

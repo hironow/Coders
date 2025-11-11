@@ -5,7 +5,6 @@ Figure method (not a standalone module function).
 """
 
 
-
 def vlines(
     self,
     x: float | list[float],

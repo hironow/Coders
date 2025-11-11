@@ -5,7 +5,6 @@ Figure method (imported into Figure class).
 """
 
 
-
 class SubplotContext:
     """
     Context manager for creating subplot layouts.

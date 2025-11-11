@@ -5,7 +5,6 @@ Figure method (not a standalone module function).
 """
 
 
-
 def solar(
     self,
     terminator: str | None = None,
