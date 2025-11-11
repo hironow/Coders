@@ -27,5 +27,8 @@ from pygmt_nb.nearneighbor import nearneighbor
 from pygmt_nb.grdproject import grdproject
 from pygmt_nb.grdtrack import grdtrack
 from pygmt_nb.filter1d import filter1d
+from pygmt_nb.grdclip import grdclip
+from pygmt_nb.grdfill import grdfill
+from pygmt_nb.blockmean import blockmean
 
-__all__ = ["Session", "Grid", "Figure", "makecpt", "info", "grdinfo", "select", "grdcut", "grd2xyz", "xyz2grd", "grdfilter", "project", "triangulate", "surface", "grdgradient", "grdsample", "nearneighbor", "grdproject", "grdtrack", "filter1d", "__version__"]
+__all__ = ["Session", "Grid", "Figure", "makecpt", "info", "grdinfo", "select", "grdcut", "grd2xyz", "xyz2grd", "grdfilter", "project", "triangulate", "surface", "grdgradient", "grdsample", "nearneighbor", "grdproject", "grdtrack", "filter1d", "grdclip", "grdfill", "blockmean", "__version__"]
