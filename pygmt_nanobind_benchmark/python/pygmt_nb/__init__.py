@@ -15,5 +15,8 @@ from pygmt_nb.info import info
 from pygmt_nb.grdinfo import grdinfo
 from pygmt_nb.select import select
 from pygmt_nb.grdcut import grdcut
+from pygmt_nb.grd2xyz import grd2xyz
+from pygmt_nb.xyz2grd import xyz2grd
+from pygmt_nb.grdfilter import grdfilter
 
-__all__ = ["Session", "Grid", "Figure", "makecpt", "info", "grdinfo", "select", "grdcut", "__version__"]
+__all__ = ["Session", "Grid", "Figure", "makecpt", "info", "grdinfo", "select", "grdcut", "grd2xyz", "xyz2grd", "grdfilter", "__version__"]
