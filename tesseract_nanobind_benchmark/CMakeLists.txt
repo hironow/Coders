@@ -38,7 +38,7 @@ endif()
 # Find Leptonica
 if(LEPTONICA_INCLUDE_DIR AND LEPTONICA_LIB_DIR)
   set(Leptonica_INCLUDE_DIRS ${LEPTONICA_INCLUDE_DIR})
-  find_library(Leptonica_LIBRARIES 
+  find_library(Leptonica_LIBRARIES
     NAMES lept liblept
     PATHS ${LEPTONICA_LIB_DIR}
     NO_DEFAULT_PATH
@@ -47,6 +47,9 @@ else()
   find_package(PkgConfig)
   if(PKG_CONFIG_FOUND)
     pkg_check_modules(Leptonica REQUIRED lept)
+    # Fix for Homebrew's leptonica pkg-config which includes /leptonica in path
+    # We need the parent directory since we use #include <leptonica/allheaders.h>
+    list(TRANSFORM Leptonica_INCLUDE_DIRS REPLACE "/leptonica$" "")
   else()
     # Fallback: try to find leptonica in standard locations
     find_path(Leptonica_INCLUDE_DIRS leptonica/allheaders.h)
@@ -61,13 +64,21 @@ nanobind_add_module(_tesseract_nanobind
 )
 
 # Include directories
-target_include_directories(_tesseract_nanobind PRIVATE 
+target_include_directories(_tesseract_nanobind PRIVATE
   ${Tesseract_INCLUDE_DIRS}
   ${Leptonica_INCLUDE_DIRS}
 )
 
+# Link directories (required for pkg-config on macOS)
+if(Tesseract_LIBRARY_DIRS)
+  target_link_directories(_tesseract_nanobind PRIVATE ${Tesseract_LIBRARY_DIRS})
+endif()
+if(Leptonica_LIBRARY_DIRS)
+  target_link_directories(_tesseract_nanobind PRIVATE ${Leptonica_LIBRARY_DIRS})
+endif()
+
 # Link libraries
-target_link_libraries(_tesseract_nanobind PRIVATE 
+target_link_libraries(_tesseract_nanobind PRIVATE
   ${Tesseract_LIBRARIES}
   ${Leptonica_LIBRARIES}
 )

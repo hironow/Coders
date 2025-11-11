@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(uv sync)",
+      "Bash(brew --prefix)",
+      "Bash(brew list:*)",
+      "Bash(pkg-config:*)",
+      "Bash(brew install:*)",
+      "Bash(test:*)",
+      "Bash(uv run pytest:*)",
+      "Bash(uv sync:*)",
+      "Bash(git restore:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
