@@ -39,5 +39,7 @@ from pygmt_nb.grdlandmask import grdlandmask
 from pygmt_nb.grdvolume import grdvolume
 from pygmt_nb.dimfilter import dimfilter
 from pygmt_nb.binstats import binstats
+from pygmt_nb.sphinterpolate import sphinterpolate
+from pygmt_nb.sph2grd import sph2grd
 
-__all__ = ["Session", "Grid", "Figure", "makecpt", "info", "grdinfo", "select", "grdcut", "grd2xyz", "xyz2grd", "grdfilter", "project", "triangulate", "surface", "grdgradient", "grdsample", "nearneighbor", "grdproject", "grdtrack", "filter1d", "grdclip", "grdfill", "blockmean", "blockmedian", "blockmode", "grd2cpt", "sphdistance", "grdhisteq", "grdlandmask", "grdvolume", "dimfilter", "binstats", "__version__"]
+__all__ = ["Session", "Grid", "Figure", "makecpt", "info", "grdinfo", "select", "grdcut", "grd2xyz", "xyz2grd", "grdfilter", "project", "triangulate", "surface", "grdgradient", "grdsample", "nearneighbor", "grdproject", "grdtrack", "filter1d", "grdclip", "grdfill", "blockmean", "blockmedian", "blockmode", "grd2cpt", "sphdistance", "grdhisteq", "grdlandmask", "grdvolume", "dimfilter", "binstats", "sphinterpolate", "sph2grd", "__version__"]
