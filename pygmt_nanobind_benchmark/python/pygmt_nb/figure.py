@@ -43,6 +43,10 @@ class Figure:
         # Use gmtset to configure session for PostScript output
         self._ps_name = "gmt_figure"  # Base name for PS file
 
+        # Store region and projection for reuse across methods (classic mode)
+        self._region = None
+        self._projection = None
+
     def __del__(self):
         """Clean up resources when Figure is destroyed."""
         self._cleanup()
@@ -206,6 +210,10 @@ class Figure:
             raise ValueError("region parameter is required for basemap()")
         if projection is None:
             raise ValueError("projection parameter is required for basemap()")
+
+        # Store region and projection for reuse in other methods (classic mode)
+        self._region = region
+        self._projection = projection
 
         # Build GMT basemap command
         args = []
@@ -1133,6 +1141,131 @@ class Figure:
         except subprocess.CalledProcessError as e:
             raise RuntimeError(
                 f"GMT grdcontour failed: {e.stderr}"
+            ) from e
+
+    def logo(
+        self,
+        position: Optional[str] = None,
+        box: bool = False,
+        style: Optional[str] = None,
+        projection: Optional[str] = None,
+        region: Optional[Union[str, List[float]]] = None,
+        transparency: Optional[Union[int, float]] = None,
+        **kwargs
+    ):
+        """
+        Add the GMT logo to the figure.
+
+        By default, the GMT logo is 2 inches wide and 1 inch high and
+        will be positioned relative to the current plot origin.
+        Use various options to change this and to place a transparent or
+        opaque rectangular map panel behind the GMT logo.
+
+        Parameters:
+            position (str, optional): Position specification.
+                Format: [g|j|J|n|x]refpoint+w<width>[+j<justify>][+o<dx>[/<dy>]]
+                Examples:
+                - "x5c/5c+w5c" - absolute position at 5cm,5cm with 5cm width
+                - "jTR+o0.5c+w5c" - justified at top-right, offset 0.5cm, width 5cm
+            box (bool): Draw a rectangular border around the logo. Default is False.
+            style (str, optional): Control what is written beneath the logo:
+                - "standard" or "l": The text label "The Generic Mapping Tools"
+                - "url" or "u": The URL to the GMT website
+                - "no_label" or "n": Skip the text label
+            projection (str, optional): GMT projection string (e.g., "M10c").
+            region (str or list, optional): Map region in format [west, east, south, north]
+                or region code (e.g., "JP" for Japan).
+            transparency (int or float, optional): Transparency level (0-100).
+                0 is opaque, 100 is fully transparent.
+            **kwargs: Additional GMT options.
+
+        Examples:
+            >>> fig = Figure()
+            >>> fig.logo()
+            >>> fig.savefig("logo.ps")
+
+            >>> fig = Figure()
+            >>> fig.basemap(region=[0, 10, 0, 10], projection="X10c", frame=True)
+            >>> fig.logo(position="jTR+o0.5c+w5c", box=True)
+            >>> fig.savefig("map_with_logo.ps")
+        """
+        # Build GMT arguments
+        args = []
+
+        # Position (GMT -D option)
+        if position:
+            args.append(f"-D{position}")
+
+        # Box (GMT -F option)
+        if box:
+            args.append("-F+p1p+gwhite")
+
+        # Style (GMT -S option)
+        if style:
+            # Map style names to GMT codes
+            style_map = {
+                "standard": "l",
+                "url": "u",
+                "no_label": "n",
+                "l": "l",
+                "u": "u",
+                "n": "n"
+            }
+            style_code = style_map.get(style, style)
+            args.append(f"-S{style_code}")
+
+        # For justified positions (jXX), we need -R and -J
+        # If not provided, use stored values from basemap()
+        needs_region_projection = position and position.startswith('j')
+
+        # Projection (GMT -J option)
+        if projection:
+            args.append(f"-J{projection}")
+        elif needs_region_projection and self._projection:
+            args.append(f"-J{self._projection}")
+
+        # Region (GMT -R option)
+        if region:
+            if isinstance(region, str):
+                args.append(f"-R{region}")
+            elif isinstance(region, list):
+                args.append(f"-R{'/'.join(map(str, region))}")
+        elif needs_region_projection and self._region:
+            region_str = '/'.join(map(str, self._region))
+            args.append(f"-R{region_str}")
+
+        # Transparency (GMT -t option)
+        if transparency is not None:
+            args.append(f"-t{transparency}")
+
+        # Output to PostScript
+        psfile = self._get_psfile_path()
+        if self._activated:
+            # Append to existing PS
+            args.append("-O")
+            args.append("-K")
+        else:
+            # Start new PS
+            args.append("-K")
+            self._activated = True
+
+        # Execute GMT gmtlogo via subprocess
+        cmd = ["gmt", "gmtlogo"] + args
+
+        try:
+            # Open file in appropriate mode
+            mode = "ab" if self._activated and os.path.exists(psfile) and os.path.getsize(psfile) > 0 else "wb"
+            with open(psfile, mode) as f:
+                result = subprocess.run(
+                    cmd,
+                    stdout=f,
+                    stderr=subprocess.PIPE,
+                    check=True,
+                    text=True
+                )
+        except subprocess.CalledProcessError as e:
+            raise RuntimeError(
+                f"GMT gmtlogo failed: {e.stderr}"
             ) from e
 
     def show(self, **kwargs):
