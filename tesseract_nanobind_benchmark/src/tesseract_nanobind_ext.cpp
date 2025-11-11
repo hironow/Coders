@@ -1,7 +1,9 @@
 #include <nanobind/nanobind.h>
 #include <nanobind/ndarray.h>
 #include <nanobind/stl/string.h>
+#include <nanobind/stl/list.h>
 #include <tesseract/baseapi.h>
+#include <tesseract/resultiterator.h>
 #include <leptonica/allheaders.h>
 #include <memory>
 
@@ -61,6 +63,46 @@ public:
         return api_->Recognize(nullptr);
     }
     
+    // Get mean confidence score
+    int get_mean_confidence() {
+        return api_->MeanTextConf();
+    }
+    
+    // Get bounding boxes with text and confidence for each word
+    nb::list get_bounding_boxes() {
+        nb::list result;
+        
+        tesseract::ResultIterator* ri = api_->GetIterator();
+        if (!ri) {
+            return result;
+        }
+        
+        tesseract::PageIteratorLevel level = tesseract::RIL_WORD;
+        
+        do {
+            const char* word = ri->GetUTF8Text(level);
+            if (!word) continue;
+            
+            float conf = ri->Confidence(level);
+            int x1, y1, x2, y2;
+            ri->BoundingBox(level, &x1, &y1, &x2, &y2);
+            
+            nb::dict box;
+            box["text"] = std::string(word);
+            box["left"] = x1;
+            box["top"] = y1;
+            box["width"] = x2 - x1;
+            box["height"] = y2 - y1;
+            box["confidence"] = conf;
+            
+            result.append(box);
+            delete[] word;
+        } while (ri->Next(level));
+        
+        delete ri;
+        return result;
+    }
+    
     // Get Tesseract version
     static std::string version() {
         return tesseract::TessBaseAPI::Version();
@@ -85,6 +127,10 @@ NB_MODULE(_tesseract_nanobind, m) {
              "Get OCR result as UTF-8 text")
         .def("recognize", &TesseractAPI::recognize,
              "Recognize the image")
+        .def("get_mean_confidence", &TesseractAPI::get_mean_confidence,
+             "Get mean confidence score (0-100)")
+        .def("get_bounding_boxes", &TesseractAPI::get_bounding_boxes,
+             "Get bounding boxes with text and confidence for each word")
         .def_static("version", &TesseractAPI::version,
                    "Get Tesseract version");
 }
