@@ -193,6 +193,8 @@ class Figure:
         subplot,
         shift_origin,
         psconvert,
+        hlines,
+        vlines,
     )
 
 

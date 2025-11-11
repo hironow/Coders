@@ -23,6 +23,8 @@ from pygmt_nb.src.inset import inset
 from pygmt_nb.src.subplot import subplot
 from pygmt_nb.src.shift_origin import shift_origin
 from pygmt_nb.src.psconvert import psconvert
+from pygmt_nb.src.hlines import hlines
+from pygmt_nb.src.vlines import vlines
 
 __all__ = [
     "basemap",
@@ -43,4 +45,6 @@ __all__ = [
     "subplot",
     "shift_origin",
     "psconvert",
+    "hlines",
+    "vlines",
 ]
