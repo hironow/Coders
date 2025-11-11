@@ -1,37 +1,26 @@
 {
   "permissions": {
     "allow": [
-      "Bash(uv sync)",
+      "Bash(uv:*)",
       "Bash(brew --prefix)",
       "Bash(brew list:*)",
       "Bash(pkg-config:*)",
       "Bash(brew install:*)",
       "Bash(test:*)",
-      "Bash(uv run pytest:*)",
-      "Bash(uv sync:*)",
+      "Bash(just:*)",
       "Bash(git restore:*)",
       "WebSearch",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:raw.githubusercontent.com)",
-      "Bash(uv pip install:*)",
-      "Bash(uv run python:*)",
       "Bash(brew --prefix:*)",
-      "Bash(just help:*)",
-      "Bash(just tesseract-build:*)",
-      "Bash(just tesseract-check)",
-      "Bash(uv tool run ruff:*)",
       "Bash(find:*)",
-      "Bash(uv tool run semgrep:*)",
-      "Bash(just tesseract-test:*)",
-      "Bash(just tesseract-benchmark)",
-      "Bash(just tesseract-clean:*)",
-      "Bash(for file in /Users/nino/Coders/tesseract_nanobind_benchmark/tests/test_phase*.py)",
-      "Bash(do echo \"=== $file ===\")",
       "Bash(head:*)",
       "Bash(done)",
       "Bash(git mv:*)"
     ],
     "deny": [],
-    "ask": []
+    "ask": [
+      "Bash(rm:*)"
+    ]
   }
 }
