@@ -20,7 +20,8 @@
       "Bash(mise exec:*)",
       "Bash(just gmt-install:*)",
       "Bash(just gmt-test:*)",
-      "Bash(uv run ruff:*)"
+      "Bash(uv run ruff:*)",
+      "Bash(uv run python:*)"
     ],
     "deny": [
       "Bash(sudo:*)",
