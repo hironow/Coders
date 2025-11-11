@@ -229,18 +229,23 @@ class PyTessBaseAPI:
     
     def Recognize(self, timeout=0):
         """Recognize the image.
-        
+
         Args:
             timeout: Timeout in milliseconds (ignored in this implementation)
-        
+
         Returns:
             bool: True on success
+
+        Raises:
+            RuntimeError: If API not initialized or recognition fails
         """
         if not self._initialized:
-            return False
-        
+            raise RuntimeError("API not initialized. Call Init() first.")
+
         result = self._api.recognize()
-        return result == 0
+        if result != 0:
+            raise RuntimeError(f"Recognition failed with error code: {result}")
+        return True
     
     def GetIterator(self):
         """Get result iterator (not fully implemented).

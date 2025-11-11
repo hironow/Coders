@@ -6,6 +6,7 @@
 #include <tesseract/resultiterator.h>
 #include <leptonica/allheaders.h>
 #include <memory>
+#include <iostream>
 
 namespace nb = nanobind;
 using namespace nb::literals;
@@ -81,7 +82,12 @@ public:
         
         do {
             const char* word = ri->GetUTF8Text(level);
-            if (!word) continue;
+            if (!word) {
+                #ifndef NDEBUG
+                std::cerr << "Debug: Skipped null word during bounding box iteration" << std::endl;
+                #endif
+                continue;
+            }
             
             float conf = ri->Confidence(level);
             int x1, y1, x2, y2;

@@ -430,17 +430,15 @@ def test_set_image_without_init():
 
 
 def test_recognize_without_init():
-    """Test Recognize without initialization returns False."""
+    """Test Recognize without initialization raises RuntimeError."""
     from tesseract_nanobind.compat import PyTessBaseAPI
 
     # given: uninitialized API
     api = PyTessBaseAPI(init=False)
 
-    # when: calling Recognize
-    result = api.Recognize()
-
-    # then: should return False
-    assert result is False
+    # when/then: calling Recognize should raise RuntimeError
+    with pytest.raises(RuntimeError, match="API not initialized"):
+        api.Recognize()
 
 
 def test_mean_text_conf_without_init():
