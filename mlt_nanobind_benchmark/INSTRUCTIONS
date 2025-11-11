@@ -10,7 +10,7 @@ Objective: Create a high-performance Python binding for the MLT framework using 
 
 5. Build: The build system must support dynamic linking to user-installed `libmlt` (and its dependencies), allowing path specification.
 
-nits: already cloned repositories:
+Hints: already cloned repositories:
 
 * mlt: ../external/mlt
 * mlt-python: ../external/mlt/src/swig/python
