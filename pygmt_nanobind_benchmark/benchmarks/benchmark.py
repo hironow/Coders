@@ -15,18 +15,20 @@ Benchmarks include:
 """
 
 import sys
-import time
 import tempfile
+import time
 from pathlib import Path
+
 import numpy as np
 
 # Add pygmt_nb to path (dynamically resolve project root)
 project_root = Path(__file__).parent.parent
-sys.path.insert(0, str(project_root / 'python'))
+sys.path.insert(0, str(project_root / "python"))
 
 # Check PyGMT availability
 try:
     import pygmt
+
     PYGMT_AVAILABLE = True
     print("✓ PyGMT found")
 except ImportError:
@@ -34,6 +36,7 @@ except ImportError:
     print("✗ PyGMT not available - will only benchmark pygmt_nb")
 
 import pygmt_nb
+
 
 # Benchmark utilities
 def timeit(func, iterations=10):
@@ -54,11 +57,11 @@ def timeit(func, iterations=10):
 def format_time(ms):
     """Format time in ms to readable string."""
     if ms < 1:
-        return f"{ms*1000:.2f} μs"
+        return f"{ms * 1000:.2f} μs"
     elif ms < 1000:
         return f"{ms:.2f} ms"
     else:
-        return f"{ms/1000:.2f} s"
+        return f"{ms / 1000:.2f} s"
 
 
 class Benchmark:
@@ -80,10 +83,10 @@ class Benchmark:
 
     def run(self):
         """Run benchmark and return results."""
-        print(f"\n{'='*70}")
+        print(f"\n{'=' * 70}")
         print(f"[{self.category}] {self.name}")
         print(f"Description: {self.description}")
-        print(f"{'='*70}")
+        print(f"{'=' * 70}")
 
         results = {}
 
@@ -91,30 +94,30 @@ class Benchmark:
         print("\n[pygmt_nb modern mode + nanobind]")
         try:
             avg, min_t, max_t = timeit(self.run_pygmt_nb, iterations=10)
-            results['pygmt_nb'] = {'avg': avg, 'min': min_t, 'max': max_t}
+            results["pygmt_nb"] = {"avg": avg, "min": min_t, "max": max_t}
             print(f"  Average: {format_time(avg)}")
             print(f"  Range: {format_time(min_t)} - {format_time(max_t)}")
         except Exception as e:
             print(f"  ❌ Error: {e}")
-            results['pygmt_nb'] = None
+            results["pygmt_nb"] = None
 
         # Benchmark PyGMT if available
         if PYGMT_AVAILABLE:
             print("\n[PyGMT official]")
             try:
                 avg, min_t, max_t = timeit(self.run_pygmt, iterations=10)
-                results['pygmt'] = {'avg': avg, 'min': min_t, 'max': max_t}
+                results["pygmt"] = {"avg": avg, "min": min_t, "max": max_t}
                 print(f"  Average: {format_time(avg)}")
                 print(f"  Range: {format_time(min_t)} - {format_time(max_t)}")
             except Exception as e:
                 print(f"  ❌ Error: {e}")
-                results['pygmt'] = None
+                results["pygmt"] = None
         else:
-            results['pygmt'] = None
+            results["pygmt"] = None
 
         # Calculate speedup
-        if results['pygmt_nb'] and results['pygmt']:
-            speedup = results['pygmt']['avg'] / results['pygmt_nb']['avg']
+        if results["pygmt_nb"] and results["pygmt"]:
+            speedup = results["pygmt"]["avg"] / results["pygmt_nb"]["avg"]
             print(f"\n🚀 Speedup: {speedup:.2f}x faster with pygmt_nb")
 
         return results
@@ -124,8 +127,10 @@ class Benchmark:
 # Priority-1 Figure Methods
 # =============================================================================
 
+
 class BasemapBenchmark(Benchmark):
     """Priority-1: Basemap creation."""
+
     def __init__(self):
         super().__init__("Basemap", "Create basic map frame", "Priority-1 Figure")
 
@@ -142,6 +147,7 @@ class BasemapBenchmark(Benchmark):
 
 class CoastBenchmark(Benchmark):
     """Priority-1: Coast plotting."""
+
     def __init__(self):
         super().__init__("Coast", "Coastal features with land/water", "Priority-1 Figure")
 
@@ -160,6 +166,7 @@ class CoastBenchmark(Benchmark):
 
 class PlotBenchmark(Benchmark):
     """Priority-1: Data plotting."""
+
     def __init__(self):
         super().__init__("Plot", "Plot 100 data points", "Priority-1 Figure")
         self.x = np.linspace(0, 10, 100)
@@ -180,40 +187,64 @@ class PlotBenchmark(Benchmark):
 
 class HistogramBenchmark(Benchmark):
     """Priority-1: Histogram plotting."""
+
     def __init__(self):
         super().__init__("Histogram", "Create histogram from 1000 values", "Priority-1 Figure")
         self.data = np.random.randn(1000)
 
     def run_pygmt(self):
         fig = pygmt.Figure()
-        fig.histogram(data=self.data, projection="X15c/10c", frame="afg",
-                     series="-4/4/0.5", pen="1p,black", fill="skyblue")
+        fig.histogram(
+            data=self.data,
+            projection="X15c/10c",
+            frame="afg",
+            series="-4/4/0.5",
+            pen="1p,black",
+            fill="skyblue",
+        )
         fig.savefig(str(self.temp_dir / "pygmt_histogram.ps"))
 
     def run_pygmt_nb(self):
         fig = pygmt_nb.Figure()
-        fig.histogram(data=self.data, projection="X15c/10c", frame="afg",
-                     series="-4/4/0.5", pen="1p,black", fill="skyblue")
+        fig.histogram(
+            data=self.data,
+            projection="X15c/10c",
+            frame="afg",
+            series="-4/4/0.5",
+            pen="1p,black",
+            fill="skyblue",
+        )
         fig.savefig(str(self.temp_dir / "pygmt_nb_histogram.ps"))
 
 
 class GridImageBenchmark(Benchmark):
     """Priority-1: Grid visualization."""
+
     def __init__(self):
         super().__init__("GrdImage", "Display grid with colorbar", "Priority-1 Figure")
         self.grid_file = "/home/user/Coders/pygmt_nanobind_benchmark/tests/data/test.nc"
 
     def run_pygmt(self):
         fig = pygmt.Figure()
-        fig.grdimage(self.grid_file, region=[-20, 20, -20, 20],
-                     projection="M15c", frame="afg", cmap="viridis")
+        fig.grdimage(
+            self.grid_file,
+            region=[-20, 20, -20, 20],
+            projection="M15c",
+            frame="afg",
+            cmap="viridis",
+        )
         fig.colorbar(frame="af")
         fig.savefig(str(self.temp_dir / "pygmt_grid.ps"))
 
     def run_pygmt_nb(self):
         fig = pygmt_nb.Figure()
-        fig.grdimage(self.grid_file, region=[-20, 20, -20, 20],
-                     projection="M15c", frame="afg", cmap="viridis")
+        fig.grdimage(
+            self.grid_file,
+            region=[-20, 20, -20, 20],
+            projection="M15c",
+            frame="afg",
+            cmap="viridis",
+        )
         fig.colorbar(frame="af")
         fig.savefig(str(self.temp_dir / "pygmt_nb_grid.ps"))
 
@@ -222,8 +253,10 @@ class GridImageBenchmark(Benchmark):
 # Priority-1 Module Functions
 # =============================================================================
 
+
 class InfoBenchmark(Benchmark):
     """Priority-1: Data info."""
+
     def __init__(self):
         super().__init__("Info", "Get data bounds from 1000 points", "Priority-1 Module")
         # Create temporary data file
@@ -241,6 +274,7 @@ class InfoBenchmark(Benchmark):
 
 class MakeCPTBenchmark(Benchmark):
     """Priority-1: Color palette creation."""
+
     def __init__(self):
         super().__init__("MakeCPT", "Create color palette table", "Priority-1 Module")
 
@@ -253,6 +287,7 @@ class MakeCPTBenchmark(Benchmark):
 
 class SelectBenchmark(Benchmark):
     """Priority-1: Data selection."""
+
     def __init__(self):
         super().__init__("Select", "Select data within region", "Priority-1 Module")
         self.data_file = self.temp_dir / "data.txt"
@@ -271,44 +306,53 @@ class SelectBenchmark(Benchmark):
 # Priority-2 Grid Operations
 # =============================================================================
 
+
 class GrdFilterBenchmark(Benchmark):
     """Priority-2: Grid filtering."""
+
     def __init__(self):
         super().__init__("GrdFilter", "Apply median filter to grid", "Priority-2 Grid")
         self.grid_file = "/home/user/Coders/pygmt_nanobind_benchmark/tests/data/test.nc"
         self.output_file = str(self.temp_dir / "filtered.nc")
 
     def run_pygmt(self):
-        result = pygmt.grdfilter(self.grid_file, filter="m5", distance="4",
-                                outgrid=self.output_file)
+        result = pygmt.grdfilter(
+            self.grid_file, filter="m5", distance="4", outgrid=self.output_file
+        )
 
     def run_pygmt_nb(self):
-        result = pygmt_nb.grdfilter(self.grid_file, filter="m5", distance="4",
-                                   outgrid=self.output_file)
+        result = pygmt_nb.grdfilter(
+            self.grid_file, filter="m5", distance="4", outgrid=self.output_file
+        )
 
 
 class GrdGradientBenchmark(Benchmark):
     """Priority-2: Grid gradient."""
+
     def __init__(self):
         super().__init__("GrdGradient", "Compute grid gradients", "Priority-2 Grid")
         self.grid_file = "/home/user/Coders/pygmt_nanobind_benchmark/tests/data/test.nc"
         self.output_file = str(self.temp_dir / "gradient.nc")
 
     def run_pygmt(self):
-        result = pygmt.grdgradient(self.grid_file, azimuth=45, normalize="e0.8",
-                                  outgrid=self.output_file)
+        result = pygmt.grdgradient(
+            self.grid_file, azimuth=45, normalize="e0.8", outgrid=self.output_file
+        )
 
     def run_pygmt_nb(self):
-        result = pygmt_nb.grdgradient(self.grid_file, azimuth=45, normalize="e0.8",
-                                     outgrid=self.output_file)
+        result = pygmt_nb.grdgradient(
+            self.grid_file, azimuth=45, normalize="e0.8", outgrid=self.output_file
+        )
 
 
 # =============================================================================
 # Priority-2 Data Processing
 # =============================================================================
 
+
 class BlockMeanBenchmark(Benchmark):
     """Priority-2: Block averaging."""
+
     def __init__(self):
         super().__init__("BlockMean", "Block average 1000 points", "Priority-2 Data")
         self.data_file = self.temp_dir / "data.txt"
@@ -318,16 +362,19 @@ class BlockMeanBenchmark(Benchmark):
         np.savetxt(self.data_file, np.column_stack([x, y, z]))
 
     def run_pygmt(self):
-        result = pygmt.blockmean(str(self.data_file), region=[0, 10, 0, 10],
-                                spacing="1", summary="m")
+        result = pygmt.blockmean(
+            str(self.data_file), region=[0, 10, 0, 10], spacing="1", summary="m"
+        )
 
     def run_pygmt_nb(self):
-        result = pygmt_nb.blockmean(str(self.data_file), region=[0, 10, 0, 10],
-                                   spacing="1", summary="m")
+        result = pygmt_nb.blockmean(
+            str(self.data_file), region=[0, 10, 0, 10], spacing="1", summary="m"
+        )
 
 
 class TriangulateBenchmark(Benchmark):
     """Priority-2: Triangulation."""
+
     def __init__(self):
         super().__init__("Triangulate", "Delaunay triangulation of 100 points", "Priority-2 Data")
         self.x = np.random.uniform(0, 10, 100)
@@ -344,12 +391,12 @@ class TriangulateBenchmark(Benchmark):
 # Complete Workflows
 # =============================================================================
 
+
 class SimpleMapWorkflow(Benchmark):
     """Workflow: Simple map with multiple features."""
+
     def __init__(self):
-        super().__init__("Simple Map Workflow",
-                        "Basemap + coast + plot + text + logo",
-                        "Workflow")
+        super().__init__("Simple Map Workflow", "Basemap + coast + plot + text + logo", "Workflow")
         self.x = np.array([135, 140, 145])
         self.y = np.array([35, 37, 39])
 
@@ -374,55 +421,66 @@ class SimpleMapWorkflow(Benchmark):
 
 class GridProcessingWorkflow(Benchmark):
     """Workflow: Grid processing pipeline."""
+
     def __init__(self):
-        super().__init__("Grid Processing Workflow",
-                        "Load + filter + gradient + clip + visualize",
-                        "Workflow")
+        super().__init__(
+            "Grid Processing Workflow", "Load + filter + gradient + clip + visualize", "Workflow"
+        )
         self.grid_file = "/home/user/Coders/pygmt_nanobind_benchmark/tests/data/test.nc"
         self.filtered_file = str(self.temp_dir / "filtered.nc")
         self.gradient_file = str(self.temp_dir / "gradient.nc")
 
     def run_pygmt(self):
         # Grid processing pipeline
-        pygmt.grdfilter(self.grid_file, filter="m5", distance="4",
-                       outgrid=self.filtered_file)
-        pygmt.grdgradient(self.filtered_file, azimuth=45, normalize="e0.8",
-                         outgrid=self.gradient_file)
+        pygmt.grdfilter(self.grid_file, filter="m5", distance="4", outgrid=self.filtered_file)
+        pygmt.grdgradient(
+            self.filtered_file, azimuth=45, normalize="e0.8", outgrid=self.gradient_file
+        )
         info = pygmt.grdinfo(self.gradient_file, per_column="n")
 
         # Visualization
         fig = pygmt.Figure()
-        fig.grdimage(self.gradient_file, region=[-20, 20, -20, 20],
-                    projection="M15c", frame="afg", cmap="gray")
+        fig.grdimage(
+            self.gradient_file,
+            region=[-20, 20, -20, 20],
+            projection="M15c",
+            frame="afg",
+            cmap="gray",
+        )
         fig.colorbar(frame="af")
         fig.savefig(str(self.temp_dir / "pygmt_gridflow.ps"))
 
     def run_pygmt_nb(self):
         # Grid processing pipeline
-        pygmt_nb.grdfilter(self.grid_file, filter="m5", distance="4",
-                          outgrid=self.filtered_file)
-        pygmt_nb.grdgradient(self.filtered_file, azimuth=45, normalize="e0.8",
-                            outgrid=self.gradient_file)
+        pygmt_nb.grdfilter(self.grid_file, filter="m5", distance="4", outgrid=self.filtered_file)
+        pygmt_nb.grdgradient(
+            self.filtered_file, azimuth=45, normalize="e0.8", outgrid=self.gradient_file
+        )
         info = pygmt_nb.grdinfo(self.gradient_file, per_column="n")
 
         # Visualization
         fig = pygmt_nb.Figure()
-        fig.grdimage(self.gradient_file, region=[-20, 20, -20, 20],
-                    projection="M15c", frame="afg", cmap="gray")
+        fig.grdimage(
+            self.gradient_file,
+            region=[-20, 20, -20, 20],
+            projection="M15c",
+            frame="afg",
+            cmap="gray",
+        )
         fig.colorbar(frame="af")
         fig.savefig(str(self.temp_dir / "pygmt_nb_gridflow.ps"))
 
 
 def main():
     """Run comprehensive benchmark suite."""
-    print("="*70)
+    print("=" * 70)
     print("COMPREHENSIVE PyGMT vs pygmt_nb Benchmark Suite")
     print("Testing all 64 implemented functions")
-    print("="*70)
-    print(f"\nConfiguration:")
-    print(f"  - pygmt_nb: Modern mode + nanobind (direct GMT C API)")
+    print("=" * 70)
+    print("\nConfiguration:")
+    print("  - pygmt_nb: Modern mode + nanobind (direct GMT C API)")
     print(f"  - PyGMT: {'Available' if PYGMT_AVAILABLE else 'Not available'}")
-    print(f"  - Iterations per benchmark: 10")
+    print("  - Iterations per benchmark: 10")
 
     # Define all benchmarks
     benchmarks = [
@@ -432,20 +490,16 @@ def main():
         PlotBenchmark(),
         HistogramBenchmark(),
         GridImageBenchmark(),
-
         # Priority-1 Module Functions
         InfoBenchmark(),
         MakeCPTBenchmark(),
         SelectBenchmark(),
-
         # Priority-2 Grid Operations
         GrdFilterBenchmark(),
         GrdGradientBenchmark(),
-
         # Priority-2 Data Processing
         BlockMeanBenchmark(),
         TriangulateBenchmark(),
-
         # Complete Workflows
         SimpleMapWorkflow(),
         GridProcessingWorkflow(),
@@ -458,9 +512,9 @@ def main():
         all_results.append((benchmark.name, benchmark.category, results))
 
     # Summary by category
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("SUMMARY BY CATEGORY")
-    print("="*70)
+    print("=" * 70)
 
     categories = {}
     for name, category, results in all_results:
@@ -472,14 +526,14 @@ def main():
 
     for category in sorted(categories.keys()):
         print(f"\n{category}")
-        print("-"*70)
+        print("-" * 70)
         print(f"{'Benchmark':<30} {'pygmt_nb':<15} {'PyGMT':<15} {'Speedup'}")
-        print("-"*70)
+        print("-" * 70)
 
         category_speedups = []
         for name, results in categories[category]:
-            pygmt_nb_time = results.get('pygmt_nb', {}).get('avg', 0)
-            pygmt_time = results.get('pygmt', {}).get('avg', 0)
+            pygmt_nb_time = results.get("pygmt_nb", {}).get("avg", 0)
+            pygmt_time = results.get("pygmt", {}).get("avg", 0)
 
             pygmt_nb_str = format_time(pygmt_nb_time) if pygmt_nb_time else "N/A"
             pygmt_str = format_time(pygmt_time) if pygmt_time else "N/A"
@@ -504,19 +558,19 @@ def main():
         min_speedup = min(overall_speedups)
         max_speedup = max(overall_speedups)
 
-        print("\n" + "="*70)
+        print("\n" + "=" * 70)
         print("OVERALL SUMMARY")
-        print("="*70)
+        print("=" * 70)
         print(f"\n🚀 Average Speedup: {avg_speedup:.2f}x faster with pygmt_nb")
         print(f"   Range: {min_speedup:.2f}x - {max_speedup:.2f}x")
         print(f"   Benchmarks: {len(overall_speedups)} tests")
 
-        print(f"\n💡 Key Insights:")
+        print("\n💡 Key Insights:")
         print(f"   - nanobind provides {avg_speedup:.1f}x average performance improvement")
-        print(f"   - Modern mode eliminates subprocess overhead")
-        print(f"   - Direct GMT C API calls via Session.call_module")
-        print(f"   - Consistent speedup across all function categories")
-        print(f"   - All 64 PyGMT functions now implemented and benchmarked")
+        print("   - Modern mode eliminates subprocess overhead")
+        print("   - Direct GMT C API calls via Session.call_module")
+        print("   - Consistent speedup across all function categories")
+        print("   - All 64 PyGMT functions now implemented and benchmarked")
 
     if not PYGMT_AVAILABLE:
         print("\n⚠️  Note: PyGMT not installed - only pygmt_nb was benchmarked")

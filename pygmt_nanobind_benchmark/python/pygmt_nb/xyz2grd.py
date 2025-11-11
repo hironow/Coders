@@ -4,20 +4,20 @@ xyz2grd - Convert table data to a grid.
 Module-level function (not a Figure method).
 """
 
-from typing import Union, Optional, List
 from pathlib import Path
+
 import numpy as np
 
 from pygmt_nb.clib import Session
 
 
 def xyz2grd(
-    data: Union[np.ndarray, List, str, Path],
-    outgrid: Union[str, Path],
-    region: Optional[Union[str, List[float]]] = None,
-    spacing: Optional[Union[str, List[float]]] = None,
-    registration: Optional[str] = None,
-    **kwargs
+    data: np.ndarray | list | str | Path,
+    outgrid: str | Path,
+    region: str | list[float] | None = None,
+    spacing: str | list[float] | None = None,
+    registration: str | None = None,
+    **kwargs,
 ):
     """
     Convert table data to a grid file.

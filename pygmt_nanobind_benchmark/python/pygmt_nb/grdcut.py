@@ -4,18 +4,17 @@ grdcut - Extract subregion from a grid.
 Module-level function (not a Figure method).
 """
 
-from typing import Union, Optional, List
 from pathlib import Path
 
 from pygmt_nb.clib import Session
 
 
 def grdcut(
-    grid: Union[str, Path],
-    outgrid: Union[str, Path],
-    region: Optional[Union[str, List[float]]] = None,
-    projection: Optional[str] = None,
-    **kwargs
+    grid: str | Path,
+    outgrid: str | Path,
+    region: str | list[float] | None = None,
+    projection: str | None = None,
+    **kwargs,
 ):
     """
     Extract subregion from a grid or image.

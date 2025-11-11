@@ -4,27 +4,27 @@ project - Project data onto lines or great circles.
 Module-level function (not a Figure method).
 """
 
-from typing import Union, Optional, List
-from pathlib import Path
-import numpy as np
-import tempfile
 import os
+import tempfile
+from pathlib import Path
+
+import numpy as np
 
 from pygmt_nb.clib import Session
 
 
 def project(
-    data: Union[np.ndarray, List, str, Path],
-    center: Optional[Union[str, List[float]]] = None,
-    endpoint: Optional[Union[str, List[float]]] = None,
-    azimuth: Optional[float] = None,
-    length: Optional[float] = None,
-    width: Optional[float] = None,
-    unit: Optional[str] = None,
-    convention: Optional[str] = None,
-    output: Optional[Union[str, Path]] = None,
-    **kwargs
-) -> Union[np.ndarray, None]:
+    data: np.ndarray | list | str | Path,
+    center: str | list[float] | None = None,
+    endpoint: str | list[float] | None = None,
+    azimuth: float | None = None,
+    length: float | None = None,
+    width: float | None = None,
+    unit: str | None = None,
+    convention: str | None = None,
+    output: str | Path | None = None,
+    **kwargs,
+) -> np.ndarray | None:
     """
     Project data onto lines or great circles, or generate tracks.
 
@@ -142,7 +142,7 @@ def project(
         return_array = False
     else:
         # Temp file for array output
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
             outfile = f.name
         return_array = True
 

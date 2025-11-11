@@ -8,12 +8,12 @@ This benchmark compares the performance of calling GMT commands via:
 Goal: Determine if nanobind provides significant speed advantage for Figure methods.
 """
 
-import sys
-import time
-import subprocess
-import tempfile
-from pathlib import Path
 import statistics
+import subprocess
+import sys
+import tempfile
+import time
+from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "python"))
 from pygmt_nb import Session
@@ -44,11 +44,7 @@ def benchmark_subprocess(iterations=100):
     for i in range(iterations):
         start = time.perf_counter()
         # Same command via subprocess
-        subprocess.run(
-            ["gmt", "gmtset", "PS_MEDIA", "A4"],
-            capture_output=True,
-            check=True
-        )
+        subprocess.run(["gmt", "gmtset", "PS_MEDIA", "A4"], capture_output=True, check=True)
         end = time.perf_counter()
 
         times.append(end - start)
@@ -80,6 +76,7 @@ def benchmark_complex_command_nanobind(iterations=50):
             del session
     finally:
         import shutil
+
         shutil.rmtree(temp_dir)
 
     return times
@@ -100,13 +97,14 @@ def benchmark_complex_command_subprocess(iterations=50):
                     ["gmt", "psbasemap", "-R0/10/0/10", "-JX10c", "-Ba", "-K"],
                     stdout=f,
                     stderr=subprocess.PIPE,
-                    check=True
+                    check=True,
                 )
             end = time.perf_counter()
 
             times.append(end - start)
     finally:
         import shutil
+
         shutil.rmtree(temp_dir)
 
     return times
@@ -121,12 +119,12 @@ def print_stats(name, times):
     max_time = max(times)
 
     print(f"\n{name}")
-    print(f"  Mean:   {mean*1000:.3f} ms")
-    print(f"  Median: {median*1000:.3f} ms")
-    print(f"  StdDev: {stdev*1000:.3f} ms")
-    print(f"  Min:    {min_time*1000:.3f} ms")
-    print(f"  Max:    {max_time*1000:.3f} ms")
-    print(f"  Throughput: {1/mean:.1f} ops/sec")
+    print(f"  Mean:   {mean * 1000:.3f} ms")
+    print(f"  Median: {median * 1000:.3f} ms")
+    print(f"  StdDev: {stdev * 1000:.3f} ms")
+    print(f"  Min:    {min_time * 1000:.3f} ms")
+    print(f"  Max:    {max_time * 1000:.3f} ms")
+    print(f"  Throughput: {1 / mean:.1f} ops/sec")
 
     return mean
 
@@ -163,24 +161,26 @@ def main():
     subprocess_mean_complex = print_stats("subprocess.run() + file I/O", subprocess_times_complex)
 
     # Note: This comparison is not fair because nanobind version doesn't include file I/O
-    print(f"\n⚠ Note: Subprocess includes file I/O overhead, nanobind does not")
-    print(f"   Subprocess time: {subprocess_mean_complex*1000:.3f} ms")
-    print(f"   Nanobind time:   {nanobind_mean_complex*1000:.3f} ms")
-    print(f"   File I/O overhead: ~{(subprocess_mean_complex - nanobind_mean_complex)*1000:.3f} ms")
+    print("\n⚠ Note: Subprocess includes file I/O overhead, nanobind does not")
+    print(f"   Subprocess time: {subprocess_mean_complex * 1000:.3f} ms")
+    print(f"   Nanobind time:   {nanobind_mean_complex * 1000:.3f} ms")
+    print(
+        f"   File I/O overhead: ~{(subprocess_mean_complex - nanobind_mean_complex) * 1000:.3f} ms"
+    )
 
     print("\n" + "=" * 70)
     print("\n### Summary ###")
     print(f"Simple command speedup: {speedup_simple:.2f}x")
-    print(f"\nConclusion:")
+    print("\nConclusion:")
     if speedup_simple > 2.0:
         print(f"  ✅ nanobind provides significant speedup ({speedup_simple:.2f}x)")
-        print(f"  ✅ Recommendation: Migrate to nanobind-based architecture")
+        print("  ✅ Recommendation: Migrate to nanobind-based architecture")
     elif speedup_simple > 1.5:
         print(f"  ✓ nanobind provides moderate speedup ({speedup_simple:.2f}x)")
-        print(f"  ✓ Recommendation: Consider migration if architecture allows")
+        print("  ✓ Recommendation: Consider migration if architecture allows")
     else:
         print(f"  ⚠ nanobind provides minimal speedup ({speedup_simple:.2f}x)")
-        print(f"  ⚠ Recommendation: Subprocess may be acceptable")
+        print("  ⚠ Recommendation: Subprocess may be acceptable")
 
     print("\n" + "=" * 70)
 

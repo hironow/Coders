@@ -4,26 +4,26 @@ nearneighbor - Grid table data using a nearest neighbor algorithm.
 Module-level function (not a Figure method).
 """
 
-from typing import Union, Optional, List
 from pathlib import Path
+
 import numpy as np
 
 from pygmt_nb.clib import Session
 
 
 def nearneighbor(
-    data: Optional[Union[np.ndarray, List, str, Path]] = None,
-    x: Optional[np.ndarray] = None,
-    y: Optional[np.ndarray] = None,
-    z: Optional[np.ndarray] = None,
-    outgrid: Union[str, Path] = "nearneighbor_output.nc",
-    search_radius: Optional[Union[str, float]] = None,
-    region: Optional[Union[str, List[float]]] = None,
-    spacing: Optional[Union[str, List[float]]] = None,
-    sectors: Optional[Union[int, str]] = None,
-    min_sectors: Optional[int] = None,
-    empty: Optional[float] = None,
-    **kwargs
+    data: np.ndarray | list | str | Path | None = None,
+    x: np.ndarray | None = None,
+    y: np.ndarray | None = None,
+    z: np.ndarray | None = None,
+    outgrid: str | Path = "nearneighbor_output.nc",
+    search_radius: str | float | None = None,
+    region: str | list[float] | None = None,
+    spacing: str | list[float] | None = None,
+    sectors: int | str | None = None,
+    min_sectors: int | None = None,
+    empty: float | None = None,
+    **kwargs,
 ):
     """
     Grid table data using a nearest neighbor algorithm.

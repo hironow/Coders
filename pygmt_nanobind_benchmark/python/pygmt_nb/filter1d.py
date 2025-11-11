@@ -4,25 +4,25 @@ filter1d - Time domain filtering of 1-D data tables.
 Module-level function (not a Figure method).
 """
 
-from typing import Union, Optional, List
-from pathlib import Path
-import numpy as np
-import tempfile
 import os
+import tempfile
+from pathlib import Path
+
+import numpy as np
 
 from pygmt_nb.clib import Session
 
 
 def filter1d(
-    data: Union[np.ndarray, List, str, Path],
-    output: Optional[Union[str, Path]] = None,
-    filter_type: Optional[str] = None,
-    filter_width: Optional[Union[float, str]] = None,
-    high_pass: Optional[float] = None,
-    low_pass: Optional[float] = None,
+    data: np.ndarray | list | str | Path,
+    output: str | Path | None = None,
+    filter_type: str | None = None,
+    filter_width: float | str | None = None,
+    high_pass: float | None = None,
+    low_pass: float | None = None,
     time_col: int = 0,
-    **kwargs
-) -> Union[np.ndarray, None]:
+    **kwargs,
+) -> np.ndarray | None:
     """
     Time domain filtering of 1-D data tables.
 
@@ -156,7 +156,7 @@ def filter1d(
         return_array = False
     else:
         # Temp file for array output
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
             outfile = f.name
         return_array = True
 

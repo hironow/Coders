@@ -4,8 +4,7 @@ plot - PyGMT-compatible plotting method.
 Modern mode implementation using nanobind.
 """
 
-from typing import Union, Optional, List
-from pathlib import Path
+
 import numpy as np
 
 
@@ -14,13 +13,13 @@ def plot(
     x=None,
     y=None,
     data=None,
-    region: Optional[Union[str, List[float]]] = None,
-    projection: Optional[str] = None,
-    style: Optional[str] = None,
-    color: Optional[str] = None,
-    pen: Optional[str] = None,
-    frame: Union[bool, str, List[str], None] = None,
-    **kwargs
+    region: str | list[float] | None = None,
+    projection: str | None = None,
+    style: str | None = None,
+    color: str | None = None,
+    pen: str | None = None,
+    frame: bool | str | list[str] | None = None,
+    **kwargs,
 ):
     """
     Plot lines, polygons, and symbols.
@@ -99,4 +98,3 @@ def plot(
     else:
         # No data case - still need to call the module
         self._session.call_module("plot", " ".join(args))
-

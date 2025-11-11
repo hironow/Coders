@@ -9,11 +9,12 @@ All tests should now pass for 100% validation success.
 import sys
 import tempfile
 from pathlib import Path
+
 import numpy as np
 
 # Add pygmt_nb to path (dynamically resolve project root)
 project_root = Path(__file__).parent.parent
-sys.path.insert(0, str(project_root / 'python'))
+sys.path.insert(0, str(project_root / "python"))
 
 import pygmt_nb
 
@@ -23,24 +24,20 @@ def analyze_ps_file(filepath):
     if not filepath.exists():
         return None
 
-    info = {
-        'exists': True,
-        'size': filepath.stat().st_size,
-        'valid_ps': False
-    }
+    info = {"exists": True, "size": filepath.stat().st_size, "valid_ps": False}
 
     try:
-        with open(filepath, 'r', encoding='latin-1') as f:
+        with open(filepath, encoding="latin-1") as f:
             lines = f.readlines()[:50]
             for line in lines:
-                if line.startswith('%!PS-Adobe'):
-                    info['valid_ps'] = True
-                elif line.startswith('%%Creator:'):
-                    info['creator'] = line.split(':', 1)[1].strip()
-                elif line.startswith('%%Pages:'):
-                    info['pages'] = line.split(':', 1)[1].strip()
+                if line.startswith("%!PS-Adobe"):
+                    info["valid_ps"] = True
+                elif line.startswith("%%Creator:"):
+                    info["creator"] = line.split(":", 1)[1].strip()
+                elif line.startswith("%%Pages:"):
+                    info["pages"] = line.split(":", 1)[1].strip()
     except Exception as e:
-        info['error'] = str(e)
+        info["error"] = str(e)
 
     return info
 
@@ -55,10 +52,10 @@ class ValidationTest:
 
     def run_test(self):
         """Run validation test."""
-        print(f"\n{'='*70}")
+        print(f"\n{'=' * 70}")
         print(f"Test: {self.name}")
         print(f"Description: {self.description}")
-        print(f"{'='*70}")
+        print(f"{'=' * 70}")
 
         output = self.temp_dir / "pygmt_nb.ps"
 
@@ -66,20 +63,20 @@ class ValidationTest:
             self.run_pygmt_nb(output)
             info = analyze_ps_file(output)
 
-            if info and info['valid_ps']:
-                print(f"  ✅ SUCCESS")
+            if info and info["valid_ps"]:
+                print("  ✅ SUCCESS")
                 print(f"    File: {output.name}")
                 print(f"    Size: {info['size']:,} bytes")
                 print(f"    Creator: {info.get('creator', 'GMT6')}")
                 print(f"    Pages: {info.get('pages', '1')}")
-                return {'success': True, 'size': info['size'], 'error': None}
+                return {"success": True, "size": info["size"], "error": None}
             else:
-                print(f"  ❌ FAILED - Invalid PS file")
-                return {'success': False, 'size': 0, 'error': 'Invalid PS'}
+                print("  ❌ FAILED - Invalid PS file")
+                return {"success": False, "size": 0, "error": "Invalid PS"}
 
         except Exception as e:
             print(f"  ❌ ERROR: {e}")
-            return {'success': False, 'size': 0, 'error': str(e)}
+            return {"success": False, "size": 0, "error": str(e)}
 
     def run_pygmt_nb(self, output_path):
         """Run with pygmt_nb - to be overridden."""
@@ -90,13 +87,14 @@ class ValidationTest:
 # FIXED Test 5: Complete Scientific Workflow
 # =============================================================================
 
+
 class Test05_CompleteWorkflow_FIXED(ValidationTest):
     """Fixed Test 5: Complete scientific workflow (corrected frame syntax)."""
 
     def __init__(self):
         super().__init__(
             "Complete Scientific Workflow (FIXED)",
-            "Full workflow with all major components - corrected frame syntax"
+            "Full workflow with all major components - corrected frame syntax",
         )
         self.x = np.array([132, 135, 138, 141, 144, 147])
         self.y = np.array([32, 35, 38, 41, 38, 35])
@@ -108,25 +106,16 @@ class Test05_CompleteWorkflow_FIXED(ValidationTest):
         fig.basemap(
             region=[130, 150, 30, 45],
             projection="M15c",
-            frame=["afg", "WSen"]  # Simplified frame without title
+            frame=["afg", "WSen"],  # Simplified frame without title
         )
 
         # Coast
         fig.coast(
-            land="lightgray",
-            water="lightblue",
-            shorelines="1/0.5p,black",
-            borders="1/1p,red"
+            land="lightgray", water="lightblue", shorelines="1/0.5p,black", borders="1/1p,red"
         )
 
         # Data points
-        fig.plot(
-            x=self.x,
-            y=self.y,
-            style="c0.5c",
-            fill="red",
-            pen="1p,black"
-        )
+        fig.plot(x=self.x, y=self.y, style="c0.5c", fill="red", pen="1p,black")
 
         # Text labels (title added as text instead of frame parameter)
         fig.text(x=140, y=44, text="Japan Region", font="16p,Helvetica-Bold,black")
@@ -142,13 +131,13 @@ class Test05_CompleteWorkflow_FIXED(ValidationTest):
 # FIXED Test 7: Histogram
 # =============================================================================
 
+
 class Test07_Histogram_FIXED(ValidationTest):
     """Fixed Test 7: Histogram (corrected frame syntax)."""
 
     def __init__(self):
         super().__init__(
-            "Data Histogram (FIXED)",
-            "Test histogram with custom styling - corrected frame syntax"
+            "Data Histogram (FIXED)", "Test histogram with custom styling - corrected frame syntax"
         )
         self.data = np.random.randn(1000)
 
@@ -163,7 +152,7 @@ class Test07_Histogram_FIXED(ValidationTest):
             frame=["afg", "WSen"],
             series="-4/4/0.5",
             pen="1p,black",
-            fill="orange"
+            fill="orange",
         )
 
         fig.savefig(str(output_path))
@@ -173,13 +162,13 @@ class Test07_Histogram_FIXED(ValidationTest):
 # Additional Comprehensive Tests
 # =============================================================================
 
+
 class Test09_AllFigureMethods(ValidationTest):
     """Test 9: Multiple figure methods in sequence."""
 
     def __init__(self):
         super().__init__(
-            "All Major Figure Methods",
-            "Sequential test of basemap, coast, plot, text, logo"
+            "All Major Figure Methods", "Sequential test of basemap, coast, plot, text, logo"
         )
 
     def run_pygmt_nb(self, output_path):
@@ -206,10 +195,7 @@ class Test10_ModuleFunctions(ValidationTest):
     """Test 10: Module-level functions."""
 
     def __init__(self):
-        super().__init__(
-            "Module Functions Test",
-            "Test info, makecpt, and select functions"
-        )
+        super().__init__("Module Functions Test", "Test info, makecpt, and select functions")
         self.temp_data = self.temp_dir / "data.txt"
         x = np.random.uniform(0, 10, 100)
         y = np.random.uniform(0, 10, 100)
@@ -234,10 +220,10 @@ class Test10_ModuleFunctions(ValidationTest):
 
 def main():
     """Run final validation with fixed tests."""
-    print("="*70)
+    print("=" * 70)
     print("PHASE 4: FINAL VALIDATION - RETRY WITH FIXES")
     print("Testing previously failed tests with corrections")
-    print("="*70)
+    print("=" * 70)
 
     # Define all tests including fixed versions
     tests = [
@@ -254,21 +240,21 @@ def main():
         results.append((test.name, result))
 
     # Summary
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("FINAL VALIDATION SUMMARY")
-    print("="*70)
+    print("=" * 70)
 
     success_count = 0
     total_size = 0
 
     print(f"\n{'Test':<45} {'Status':<12} {'Size'}")
-    print("-"*70)
+    print("-" * 70)
 
     for name, result in results:
-        if result['success']:
+        if result["success"]:
             status = "✅ SUCCESS"
             size_str = f"{result['size']:,} bytes"
-            total_size += result['size']
+            total_size += result["size"]
             success_count += 1
         else:
             status = "❌ FAILED"
@@ -276,41 +262,41 @@ def main():
 
         print(f"{name:<45} {status:<12} {size_str}")
 
-    print("-"*70)
+    print("-" * 70)
     print(f"\nRetry Tests: {len(results)}")
     print(f"  ✅ Successful: {success_count}")
     print(f"  ❌ Failed: {len(results) - success_count}")
 
     if total_size > 0:
-        print(f"\nTotal Output: {total_size:,} bytes ({total_size/1024:.1f} KB)")
+        print(f"\nTotal Output: {total_size:,} bytes ({total_size / 1024:.1f} KB)")
 
     # Combined with previous results
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("COMBINED VALIDATION RESULTS (ALL PHASES)")
-    print("="*70)
+    print("=" * 70)
 
     previous_success = 14  # From Phase 4 initial validation
     total_tests = 16 + len(results)  # Original 16 + retry tests
     total_success = previous_success + success_count
 
-    print(f"\n📊 Overall Statistics:")
+    print("\n📊 Overall Statistics:")
     print(f"   Total Tests Run: {total_tests}")
     print(f"   Successful: {total_success}")
-    print(f"   Success Rate: {total_success/total_tests*100:.1f}%")
+    print(f"   Success Rate: {total_success / total_tests * 100:.1f}%")
 
     if success_count == len(results):
-        print(f"\n🎉 ALL RETRY TESTS PASSED!")
-        print(f"   Previously failed tests: FIXED ✅")
-        print(f"   New comprehensive tests: PASSED ✅")
+        print("\n🎉 ALL RETRY TESTS PASSED!")
+        print("   Previously failed tests: FIXED ✅")
+        print("   New comprehensive tests: PASSED ✅")
 
         # Calculate new overall success rate
         if total_success >= total_tests - 2:  # Allow up to 2 failures from original tests
             print(f"\n🏆 VALIDATION COMPLETE: {total_success}/{total_tests} tests passed")
-            print(f"   pygmt_nb is FULLY VALIDATED ✅")
+            print("   pygmt_nb is FULLY VALIDATED ✅")
 
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("FINAL VALIDATION COMPLETE")
-    print("="*70)
+    print("=" * 70)
 
 
 if __name__ == "__main__":

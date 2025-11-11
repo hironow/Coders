@@ -17,17 +17,19 @@ Benchmarks cover common workflows:
 """
 
 import sys
-import time
 import tempfile
+import time
 from pathlib import Path
+
 import numpy as np
 
 # Add pygmt_nb to path
-sys.path.insert(0, '/home/user/Coders/pygmt_nanobind_benchmark/python')
+sys.path.insert(0, "/home/user/Coders/pygmt_nanobind_benchmark/python")
 
 # Check PyGMT availability
 try:
     import pygmt
+
     PYGMT_AVAILABLE = True
     print("✓ PyGMT found")
 except ImportError:
@@ -35,6 +37,7 @@ except ImportError:
     print("✗ PyGMT not available - will only benchmark pygmt_nb")
 
 import pygmt_nb
+
 
 # Benchmark utilities
 def timeit(func, iterations=10):
@@ -55,11 +58,11 @@ def timeit(func, iterations=10):
 def format_time(ms):
     """Format time in ms to readable string."""
     if ms < 1:
-        return f"{ms*1000:.2f} μs"
+        return f"{ms * 1000:.2f} μs"
     elif ms < 1000:
         return f"{ms:.2f} ms"
     else:
-        return f"{ms/1000:.2f} s"
+        return f"{ms / 1000:.2f} s"
 
 
 class Benchmark:
@@ -80,10 +83,10 @@ class Benchmark:
 
     def run(self):
         """Run benchmark and return results."""
-        print(f"\n{'='*70}")
+        print(f"\n{'=' * 70}")
         print(f"Benchmark: {self.name}")
         print(f"Description: {self.description}")
-        print(f"{'='*70}")
+        print(f"{'=' * 70}")
 
         results = {}
 
@@ -91,30 +94,30 @@ class Benchmark:
         print("\n[pygmt_nb modern mode + nanobind]")
         try:
             avg, min_t, max_t = timeit(self.run_pygmt_nb, iterations=10)
-            results['pygmt_nb'] = {'avg': avg, 'min': min_t, 'max': max_t}
+            results["pygmt_nb"] = {"avg": avg, "min": min_t, "max": max_t}
             print(f"  Average: {format_time(avg)}")
             print(f"  Range: {format_time(min_t)} - {format_time(max_t)}")
         except Exception as e:
             print(f"  ❌ Error: {e}")
-            results['pygmt_nb'] = None
+            results["pygmt_nb"] = None
 
         # Benchmark PyGMT if available
         if PYGMT_AVAILABLE:
             print("\n[PyGMT official]")
             try:
                 avg, min_t, max_t = timeit(self.run_pygmt, iterations=10)
-                results['pygmt'] = {'avg': avg, 'min': min_t, 'max': max_t}
+                results["pygmt"] = {"avg": avg, "min": min_t, "max": max_t}
                 print(f"  Average: {format_time(avg)}")
                 print(f"  Range: {format_time(min_t)} - {format_time(max_t)}")
             except Exception as e:
                 print(f"  ❌ Error: {e}")
-                results['pygmt'] = None
+                results["pygmt"] = None
         else:
-            results['pygmt'] = None
+            results["pygmt"] = None
 
         # Calculate speedup
-        if results['pygmt_nb'] and results['pygmt']:
-            speedup = results['pygmt']['avg'] / results['pygmt_nb']['avg']
+        if results["pygmt_nb"] and results["pygmt"]:
+            speedup = results["pygmt"]["avg"] / results["pygmt_nb"]["avg"]
             print(f"\n🚀 Speedup: {speedup:.2f}x faster with pygmt_nb")
 
         return results
@@ -124,10 +127,7 @@ class SimpleBasemapBenchmark(Benchmark):
     """Benchmark 1: Simple basemap creation."""
 
     def __init__(self):
-        super().__init__(
-            "Simple Basemap",
-            "Create a basic Cartesian basemap with frame"
-        )
+        super().__init__("Simple Basemap", "Create a basic Cartesian basemap with frame")
 
     def run_pygmt(self):
         fig = pygmt.Figure()
@@ -144,10 +144,7 @@ class CoastMapBenchmark(Benchmark):
     """Benchmark 2: Coastal map with features."""
 
     def __init__(self):
-        super().__init__(
-            "Coastal Map",
-            "Basemap + coast with land/water fill and shorelines"
-        )
+        super().__init__("Coastal Map", "Basemap + coast with land/water fill and shorelines")
 
     def run_pygmt(self):
         fig = pygmt.Figure()
@@ -166,10 +163,7 @@ class ScatterPlotBenchmark(Benchmark):
     """Benchmark 3: Scatter plot with data."""
 
     def __init__(self):
-        super().__init__(
-            "Scatter Plot",
-            "Plot 100 data points with symbols"
-        )
+        super().__init__("Scatter Plot", "Plot 100 data points with symbols")
         self.x = np.linspace(0, 10, 100)
         self.y = np.sin(self.x) * 5 + 5
 
@@ -190,10 +184,7 @@ class TextAnnotationBenchmark(Benchmark):
     """Benchmark 4: Text annotations."""
 
     def __init__(self):
-        super().__init__(
-            "Text Annotation",
-            "Add multiple text labels to map"
-        )
+        super().__init__("Text Annotation", "Add multiple text labels to map")
 
     def run_pygmt(self):
         fig = pygmt.Figure()
@@ -214,23 +205,30 @@ class GridVisualizationBenchmark(Benchmark):
     """Benchmark 5: Grid visualization with colorbar."""
 
     def __init__(self):
-        super().__init__(
-            "Grid Visualization",
-            "Display grid with grdimage + colorbar"
-        )
+        super().__init__("Grid Visualization", "Display grid with grdimage + colorbar")
         self.grid_file = "/home/user/Coders/pygmt_nanobind_benchmark/tests/data/test.nc"
 
     def run_pygmt(self):
         fig = pygmt.Figure()
-        fig.grdimage(self.grid_file, region=[-20, 20, -20, 20],
-                     projection="M15c", frame="afg", cmap="viridis")
+        fig.grdimage(
+            self.grid_file,
+            region=[-20, 20, -20, 20],
+            projection="M15c",
+            frame="afg",
+            cmap="viridis",
+        )
         fig.colorbar(frame="af")
         fig.savefig(str(self.temp_dir / "pygmt_grid.ps"))
 
     def run_pygmt_nb(self):
         fig = pygmt_nb.Figure()
-        fig.grdimage(self.grid_file, region=[-20, 20, -20, 20],
-                     projection="M15c", frame="afg", cmap="viridis")
+        fig.grdimage(
+            self.grid_file,
+            region=[-20, 20, -20, 20],
+            projection="M15c",
+            frame="afg",
+            cmap="viridis",
+        )
         fig.colorbar(frame="af")
         fig.savefig(str(self.temp_dir / "pygmt_nb_grid.ps"))
 
@@ -240,8 +238,7 @@ class CompleteWorkflowBenchmark(Benchmark):
 
     def __init__(self):
         super().__init__(
-            "Complete Workflow",
-            "Basemap + coast + plot + text + logo (typical use case)"
+            "Complete Workflow", "Basemap + coast + plot + text + logo (typical use case)"
         )
         self.x = np.array([135, 140, 145])
         self.y = np.array([35, 37, 39])
@@ -267,13 +264,13 @@ class CompleteWorkflowBenchmark(Benchmark):
 
 def main():
     """Run all benchmarks."""
-    print("="*70)
+    print("=" * 70)
     print("PyGMT vs pygmt_nb Modern Mode Comparison Benchmark")
-    print("="*70)
-    print(f"\nConfiguration:")
-    print(f"  - pygmt_nb: Modern mode + nanobind (direct GMT C API)")
+    print("=" * 70)
+    print("\nConfiguration:")
+    print("  - pygmt_nb: Modern mode + nanobind (direct GMT C API)")
     print(f"  - PyGMT: {'Available' if PYGMT_AVAILABLE else 'Not available'}")
-    print(f"  - Iterations per benchmark: 10")
+    print("  - Iterations per benchmark: 10")
 
     benchmarks = [
         SimpleBasemapBenchmark(),
@@ -290,16 +287,16 @@ def main():
         all_results.append((benchmark.name, results))
 
     # Summary
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("SUMMARY")
-    print("="*70)
+    print("=" * 70)
     print(f"\n{'Benchmark':<30} {'pygmt_nb':<15} {'PyGMT':<15} {'Speedup'}")
-    print("-"*70)
+    print("-" * 70)
 
     total_speedup = []
     for name, results in all_results:
-        pygmt_nb_time = results.get('pygmt_nb', {}).get('avg', 0)
-        pygmt_time = results.get('pygmt', {}).get('avg', 0)
+        pygmt_nb_time = results.get("pygmt_nb", {}).get("avg", 0)
+        pygmt_time = results.get("pygmt", {}).get("avg", 0)
 
         pygmt_nb_str = format_time(pygmt_nb_time) if pygmt_nb_time else "N/A"
         pygmt_str = format_time(pygmt_time) if pygmt_time else "N/A"
@@ -318,15 +315,15 @@ def main():
         min_speedup = min(total_speedup)
         max_speedup = max(total_speedup)
 
-        print("-"*70)
+        print("-" * 70)
         print(f"\n🚀 Average Speedup: {avg_speedup:.2f}x faster with pygmt_nb")
         print(f"   Range: {min_speedup:.2f}x - {max_speedup:.2f}x")
 
-        print(f"\n💡 Key Insights:")
+        print("\n💡 Key Insights:")
         print(f"   - nanobind provides {avg_speedup:.1f}x average performance improvement")
-        print(f"   - Modern mode eliminates subprocess overhead")
-        print(f"   - Direct GMT C API calls (Session.call_module) vs subprocess")
-        print(f"   - Ghostscript-free PostScript output via .ps- extraction")
+        print("   - Modern mode eliminates subprocess overhead")
+        print("   - Direct GMT C API calls (Session.call_module) vs subprocess")
+        print("   - Ghostscript-free PostScript output via .ps- extraction")
 
     if not PYGMT_AVAILABLE:
         print("\n⚠️  Note: PyGMT not installed - only pygmt_nb was benchmarked")

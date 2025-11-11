@@ -4,29 +4,28 @@ grdview - Create 3-D perspective plots.
 Figure method (imported into Figure class).
 """
 
-from typing import Union, Optional, List
 from pathlib import Path
 
 
 def grdview(
     self,
-    grid: Union[str, Path],
-    region: Optional[Union[str, List[float]]] = None,
-    projection: Optional[str] = None,
-    perspective: Optional[Union[str, List[float]]] = None,
-    frame: Optional[Union[bool, str, list]] = None,
-    cmap: Optional[str] = None,
-    drapegrid: Optional[Union[str, Path]] = None,
-    surftype: Optional[str] = None,
-    plane: Optional[Union[str, float]] = None,
-    shading: Optional[Union[str, float]] = None,
-    zscale: Optional[Union[str, float]] = None,
-    zsize: Optional[Union[str, float]] = None,
-    contourpen: Optional[str] = None,
-    meshpen: Optional[str] = None,
-    facadepen: Optional[str] = None,
-    transparency: Optional[float] = None,
-    **kwargs
+    grid: str | Path,
+    region: str | list[float] | None = None,
+    projection: str | None = None,
+    perspective: str | list[float] | None = None,
+    frame: bool | str | list | None = None,
+    cmap: str | None = None,
+    drapegrid: str | Path | None = None,
+    surftype: str | None = None,
+    plane: str | float | None = None,
+    shading: str | float | None = None,
+    zscale: str | float | None = None,
+    zsize: str | float | None = None,
+    contourpen: str | None = None,
+    meshpen: str | None = None,
+    facadepen: str | None = None,
+    transparency: float | None = None,
+    **kwargs,
 ):
     """
     Create 3-D perspective image or surface mesh from a grid.

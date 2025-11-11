@@ -4,22 +4,22 @@ select - Select data table subsets based on spatial criteria.
 Module-level function (not a Figure method).
 """
 
-from typing import Union, Optional, List, Literal
-from pathlib import Path
-import numpy as np
-import tempfile
 import os
+import tempfile
+from pathlib import Path
+
+import numpy as np
 
 from pygmt_nb.clib import Session
 
 
 def select(
-    data: Union[np.ndarray, List, str, Path],
-    region: Optional[Union[str, List[float]]] = None,
+    data: np.ndarray | list | str | Path,
+    region: str | list[float] | None = None,
     reverse: bool = False,
-    output: Optional[Union[str, Path]] = None,
-    **kwargs
-) -> Union[np.ndarray, None]:
+    output: str | Path | None = None,
+    **kwargs,
+) -> np.ndarray | None:
     """
     Select data table subsets based on multiple spatial criteria.
 
@@ -81,7 +81,7 @@ def select(
         outfile = str(output)
     else:
         # Temp file for array output
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
             outfile = f.name
 
     try:

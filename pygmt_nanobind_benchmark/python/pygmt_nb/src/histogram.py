@@ -4,21 +4,21 @@ histogram - PyGMT-compatible plotting method.
 Modern mode implementation using nanobind.
 """
 
-from typing import Union, Optional, List, Sequence
 from pathlib import Path
+
 import numpy as np
 
 
 def histogram(
     self,
-    data: Union[np.ndarray, List, str, Path],
-    region: Optional[Union[str, List[float]]] = None,
-    projection: Optional[str] = None,
-    frame: Union[bool, str, List[str], None] = None,
-    series: Optional[Union[str, List[float]]] = None,
-    fill: Optional[str] = None,
-    pen: Optional[str] = None,
-    **kwargs
+    data: np.ndarray | list | str | Path,
+    region: str | list[float] | None = None,
+    projection: str | None = None,
+    frame: bool | str | list[str] | None = None,
+    series: str | list[float] | None = None,
+    fill: str | None = None,
+    pen: str | None = None,
+    **kwargs,
 ):
     """
     Calculate and plot histograms.
@@ -71,7 +71,7 @@ def histogram(
             args.append(f"-R{'/'.join(str(x) for x in region)}")
         else:
             args.append(f"-R{region}")
-    elif hasattr(self, '_region') and self._region:
+    elif hasattr(self, "_region") and self._region:
         r = self._region
         if isinstance(r, list):
             args.append(f"-R{'/'.join(str(x) for x in r)}")
@@ -81,7 +81,7 @@ def histogram(
     # Projection (-J option)
     if projection is not None:
         args.append(f"-J{projection}")
-    elif hasattr(self, '_projection') and self._projection:
+    elif hasattr(self, "_projection") and self._projection:
         args.append(f"-J{self._projection}")
 
     # Frame (-B option)

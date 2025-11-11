@@ -4,25 +4,23 @@ sphdistance - Create Voronoi distance, node, or natural nearest-neighbor grid on
 Module-level function (not a Figure method).
 """
 
-from typing import Union, Optional, List
 from pathlib import Path
+
 import numpy as np
-import tempfile
-import os
 
 from pygmt_nb.clib import Session
 
 
 def sphdistance(
-    data: Optional[Union[np.ndarray, str, Path]] = None,
-    x: Optional[np.ndarray] = None,
-    y: Optional[np.ndarray] = None,
-    outgrid: Union[str, Path] = "sphdistance_output.nc",
-    region: Optional[Union[str, List[float]]] = None,
-    spacing: Optional[Union[str, List[float]]] = None,
-    unit: Optional[str] = None,
-    quantity: Optional[str] = None,
-    **kwargs
+    data: np.ndarray | str | Path | None = None,
+    x: np.ndarray | None = None,
+    y: np.ndarray | None = None,
+    outgrid: str | Path = "sphdistance_output.nc",
+    region: str | list[float] | None = None,
+    spacing: str | list[float] | None = None,
+    unit: str | None = None,
+    quantity: str | None = None,
+    **kwargs,
 ):
     """
     Create Voronoi distance, node, or natural nearest-neighbor grid on a sphere.

@@ -4,22 +4,21 @@ grdlandmask - Create a \"wet-dry\" mask grid from shoreline data.
 Module-level function (not a Figure method).
 """
 
-from typing import Union, Optional, List
 from pathlib import Path
 
 from pygmt_nb.clib import Session
 
 
 def grdlandmask(
-    outgrid: Union[str, Path],
-    region: Union[str, List[float]],
-    spacing: Union[str, List[float]],
-    resolution: Optional[str] = None,
-    shorelines: Optional[Union[str, int]] = None,
-    area_thresh: Optional[Union[str, int]] = None,
-    registration: Optional[str] = None,
-    maskvalues: Optional[Union[str, List[float]]] = None,
-    **kwargs
+    outgrid: str | Path,
+    region: str | list[float],
+    spacing: str | list[float],
+    resolution: str | None = None,
+    shorelines: str | int | None = None,
+    area_thresh: str | int | None = None,
+    registration: str | None = None,
+    maskvalues: str | list[float] | None = None,
+    **kwargs,
 ):
     """
     Create a \"wet-dry\" mask grid from shoreline data.

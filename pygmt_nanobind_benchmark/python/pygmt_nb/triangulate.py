@@ -4,26 +4,26 @@ triangulate - Delaunay triangulation or Voronoi partitioning of data.
 Module-level function (not a Figure method).
 """
 
-from typing import Union, Optional, List
-from pathlib import Path
-import numpy as np
-import tempfile
 import os
+import tempfile
+from pathlib import Path
+
+import numpy as np
 
 from pygmt_nb.clib import Session
 
 
 def triangulate(
-    data: Optional[Union[np.ndarray, List, str, Path]] = None,
-    x: Optional[np.ndarray] = None,
-    y: Optional[np.ndarray] = None,
-    z: Optional[np.ndarray] = None,
-    region: Optional[Union[str, List[float]]] = None,
-    output: Optional[Union[str, Path]] = None,
-    grid: Optional[Union[str, Path]] = None,
-    spacing: Optional[Union[str, List[float]]] = None,
-    **kwargs
-) -> Union[np.ndarray, None]:
+    data: np.ndarray | list | str | Path | None = None,
+    x: np.ndarray | None = None,
+    y: np.ndarray | None = None,
+    z: np.ndarray | None = None,
+    region: str | list[float] | None = None,
+    output: str | Path | None = None,
+    grid: str | Path | None = None,
+    spacing: str | list[float] | None = None,
+    **kwargs,
+) -> np.ndarray | None:
     """
     Delaunay triangulation or Voronoi partitioning of Cartesian data.
 
@@ -125,7 +125,7 @@ def triangulate(
             return_array = False
         else:
             # Temp file for array output
-            with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+            with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
                 outfile = f.name
             return_array = True
 

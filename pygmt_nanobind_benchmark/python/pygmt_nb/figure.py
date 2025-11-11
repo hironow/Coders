@@ -12,13 +12,11 @@ Key features:
 - PyGMT-compatible API
 """
 
-from typing import Union, Optional, List
-from pathlib import Path
-import time
-import shlex
 import tempfile
+import time
+from pathlib import Path
 
-from pygmt_nb.clib import Session, Grid
+from pygmt_nb.clib import Session
 
 
 def _unique_figure_name() -> str:
@@ -31,18 +29,19 @@ def _escape_frame_spaces(value: str) -> str:
     Escape spaces in GMT frame specifications by wrapping label text in double quotes.
     For example: x1p+lCrustal age → x1p+l"Crustal age"
     """
-    if ' ' not in value:
+    if " " not in value:
         return value
 
     # Find +l or +L (label modifier) and wrap its content in double quotes
     import re
+
     # Pattern: +l or +L followed by any characters until the next + or end of string
-    pattern = r'(\+[lLS])([^+]+)'
+    pattern = r"(\+[lLS])([^+]+)"
 
     def quote_label(match):
         prefix = match.group(1)  # +l, +L, or +S
         content = match.group(2)  # label text
-        if ' ' in content:
+        if " " in content:
             # Wrap in double quotes if it contains spaces
             return f'{prefix}"{content}"'
         return match.group(0)
@@ -106,8 +105,7 @@ class Figure:
 
         if not ps_minus_files:
             raise RuntimeError(
-                f"No PostScript file found for figure '{self._figure_name}'. "
-                "Did you plot anything?"
+                f"No PostScript file found for figure '{self._figure_name}'. Did you plot anything?"
             )
 
         # Return the most recently modified file
@@ -116,12 +114,12 @@ class Figure:
 
     def savefig(
         self,
-        fname: Union[str, Path],
+        fname: str | Path,
         transparent: bool = False,
         dpi: int = 300,
         crop: bool = True,
         anti_alias: bool = True,
-        **kwargs
+        **kwargs,
     ):
         """
         Save the figure to a file.
@@ -146,50 +144,49 @@ class Figure:
 
         # Format mapping (file extension -> GMT psconvert format code)
         fmt_map = {
-            '.bmp': 'b',
-            '.eps': 'e',
-            '.jpg': 'j',
-            '.jpeg': 'j',
-            '.pdf': 'f',
-            '.png': 'G' if transparent else 'g',
-            '.ppm': 'm',
-            '.tif': 't',
-            '.ps': None,  # PS doesn't need conversion
+            ".bmp": "b",
+            ".eps": "e",
+            ".jpg": "j",
+            ".jpeg": "j",
+            ".pdf": "f",
+            ".png": "G" if transparent else "g",
+            ".ppm": "m",
+            ".tif": "t",
+            ".ps": None,  # PS doesn't need conversion
         }
 
         if suffix not in fmt_map:
             raise ValueError(
-                f"Unsupported file format: {suffix}. "
-                f"Supported formats: {', '.join(fmt_map.keys())}"
+                f"Unsupported file format: {suffix}. Supported formats: {', '.join(fmt_map.keys())}"
             )
 
         # Find the .ps- file
         ps_minus_file = self._find_ps_minus_file()
 
         # Read content
-        content = ps_minus_file.read_text(errors='ignore')
+        content = ps_minus_file.read_text(errors="ignore")
 
         # GMT modern mode PS files redefine showpage to do nothing (/showpage {} def)
         # We need to restore the original showpage and call it for proper rendering
         # Use systemdict to access the original PostScript showpage operator
-        if '%%EOF' in content:
+        if "%%EOF" in content:
             # Insert showpage restoration and call before %%EOF
-            content = content.replace('%%EOF', 'systemdict /showpage get exec\n%%EOF')
+            content = content.replace("%%EOF", "systemdict /showpage get exec\n%%EOF")
         else:
-            content += '\nsystemdict /showpage get exec\n'
+            content += "\nsystemdict /showpage get exec\n"
 
         # Add %%EOF marker if missing
         if not content.rstrip().endswith("%%EOF"):
             content += "%%EOF\n"
 
         # For PS format, save directly without conversion
-        if suffix == '.ps':
+        if suffix == ".ps":
             fname.write_text(content)
             return
 
         # For EPS and raster formats, use GMT psconvert via nanobind
         # Save PS content to temporary file first
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.ps', delete=False) as tmp_ps:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".ps", delete=False) as tmp_ps:
             tmp_ps_path = Path(tmp_ps.name)
             tmp_ps.write(content)
 
@@ -209,7 +206,7 @@ class Figure:
                 dpi=dpi,
                 crop=crop,
                 anti_alias="t2,g2" if anti_alias else None,
-                **kwargs
+                **kwargs,
             )
         finally:
             # Clean up temporary file
@@ -226,39 +223,38 @@ class Figure:
             NotImplementedError: Always
         """
         raise NotImplementedError(
-            "Figure.show() is not yet implemented. "
-            "Use savefig() to save to a file instead."
+            "Figure.show() is not yet implemented. Use savefig() to save to a file instead."
         )
 
     # Import plotting methods from src/ (PyGMT pattern)
     from pygmt_nb.src import (  # noqa: E402, F401
         basemap,
         coast,
-        plot,
-        text,
-        grdimage,
         colorbar,
-        grdcontour,
-        logo,
-        legend,
-        histogram,
-        image,
         contour,
-        plot3d,
+        grdcontour,
+        grdimage,
         grdview,
-        inset,
-        subplot,
-        shift_origin,
-        psconvert,
+        histogram,
         hlines,
-        vlines,
+        image,
+        inset,
+        legend,
+        logo,
         meca,
+        plot,
+        plot3d,
+        psconvert,
         rose,
+        shift_origin,
         solar,
+        subplot,
         ternary,
+        text,
         tilemap,
         timestamp,
         velo,
+        vlines,
         wiggle,
     )
 

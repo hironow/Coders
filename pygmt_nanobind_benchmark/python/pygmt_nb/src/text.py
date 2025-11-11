@@ -4,9 +4,7 @@ text - PyGMT-compatible plotting method.
 Modern mode implementation using nanobind.
 """
 
-from typing import Union, Optional, List
-from pathlib import Path
-import numpy as np
+
 
 
 def text(
@@ -14,13 +12,13 @@ def text(
     x=None,
     y=None,
     text=None,
-    region: Optional[Union[str, List[float]]] = None,
-    projection: Optional[str] = None,
-    font: Optional[str] = None,
-    justify: Optional[str] = None,
-    angle: Optional[Union[int, float]] = None,
-    frame: Union[bool, str, List[str], None] = None,
-    **kwargs
+    region: str | list[float] | None = None,
+    projection: str | None = None,
+    font: str | None = None,
+    justify: str | None = None,
+    angle: int | float | None = None,
+    frame: bool | str | list[str] | None = None,
+    **kwargs,
 ):
     """
     Plot text strings.
@@ -98,14 +96,12 @@ def text(
 
     # Pass coordinates via virtual file, text via temporary file
     # (GMT text requires text as a separate column/file)
-    x_array = np.asarray(x, dtype=np.float64)
-    y_array = np.asarray(y, dtype=np.float64)
-
     # For now, write text to a temporary file and use that
     # TODO: Implement GMT_Put_Strings for full virtual file support
     import tempfile
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
-        for xi, yi, t in zip(x, y, text):
+
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
+        for xi, yi, t in zip(x, y, text, strict=True):
             f.write(f"{xi} {yi} {t}\n")
         tmpfile = f.name
 
@@ -113,5 +109,5 @@ def text(
         self._session.call_module("text", f"{tmpfile} " + " ".join(args))
     finally:
         import os
-        os.unlink(tmpfile)
 
+        os.unlink(tmpfile)

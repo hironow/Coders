@@ -4,15 +4,14 @@ vlines - Plot vertical lines.
 Figure method (not a standalone module function).
 """
 
-from typing import Union, Optional, List
 
 
 def vlines(
     self,
-    x: Union[float, List[float]],
-    pen: Optional[str] = None,
-    label: Optional[str] = None,
-    **kwargs
+    x: float | list[float],
+    pen: str | None = None,
+    label: str | None = None,
+    **kwargs,
 ):
     """
     Plot vertical lines.

@@ -59,11 +59,7 @@ class TestLogo(unittest.TestCase):
     def test_logo_on_map(self) -> None:
         """Test logo plotted on a map."""
         fig = Figure()
-        fig.basemap(
-            region=[130, 150, 30, 45],
-            projection="M10c",
-            frame=True
-        )
+        fig.basemap(region=[130, 150, 30, 45], projection="M10c", frame=True)
         fig.logo(position="jTR+o0.5c+w5c", box=True)
         output = self.test_output / "logo_on_map.ps"
         fig.savefig(str(output))
@@ -100,11 +96,7 @@ class TestLogo(unittest.TestCase):
     def test_logo_with_transparency(self) -> None:
         """Test logo with transparency."""
         fig = Figure()
-        fig.basemap(
-            region=[0, 10, 0, 10],
-            projection="X10c",
-            frame=True
-        )
+        fig.basemap(region=[0, 10, 0, 10], projection="X10c", frame=True)
         fig.logo(position="jBL+o0.5c+w4c", transparency=50)
         output = self.test_output / "logo_transparency.ps"
         fig.savefig(str(output))
@@ -114,11 +106,7 @@ class TestLogo(unittest.TestCase):
     def test_logo_multiple_on_figure(self) -> None:
         """Test multiple logos on the same figure."""
         fig = Figure()
-        fig.basemap(
-            region=[0, 20, 0, 20],
-            projection="X15c",
-            frame=True
-        )
+        fig.basemap(region=[0, 20, 0, 20], projection="X15c", frame=True)
         # First logo in top-right
         fig.logo(position="jTR+o0.5c+w3c")
         # Second logo in bottom-left

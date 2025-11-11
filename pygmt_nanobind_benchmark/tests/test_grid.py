@@ -16,7 +16,7 @@ class TestGridCreation(unittest.TestCase):
 
     def test_grid_can_be_created_from_file(self) -> None:
         """Test that a Grid can be created from a GMT grid file."""
-        from pygmt_nb.clib import Session, Grid
+        from pygmt_nb.clib import Grid, Session
 
         # This test will fail until we implement Grid class
         with Session() as session:
@@ -34,7 +34,7 @@ class TestGridProperties(unittest.TestCase):
 
     def test_grid_has_shape_property(self) -> None:
         """Test that Grid exposes shape (n_rows, n_columns)."""
-        from pygmt_nb.clib import Session, Grid
+        from pygmt_nb.clib import Grid, Session
 
         with Session() as session:
             grid_file = Path(__file__).parent / "data" / "test_grid.nc"
@@ -48,7 +48,7 @@ class TestGridProperties(unittest.TestCase):
 
     def test_grid_has_region_property(self) -> None:
         """Test that Grid exposes region (west, east, south, north)."""
-        from pygmt_nb.clib import Session, Grid
+        from pygmt_nb.clib import Grid, Session
 
         with Session() as session:
             grid_file = Path(__file__).parent / "data" / "test_grid.nc"
@@ -61,7 +61,7 @@ class TestGridProperties(unittest.TestCase):
 
     def test_grid_has_registration_property(self) -> None:
         """Test that Grid exposes registration type."""
-        from pygmt_nb.clib import Session, Grid
+        from pygmt_nb.clib import Grid, Session
 
         with Session() as session:
             grid_file = Path(__file__).parent / "data" / "test_grid.nc"
@@ -78,7 +78,7 @@ class TestGridDataAccess(unittest.TestCase):
     def test_grid_data_returns_numpy_array(self) -> None:
         """Test that Grid.data() returns a NumPy array."""
         import numpy as np
-        from pygmt_nb.clib import Session, Grid
+        from pygmt_nb.clib import Grid, Session
 
         with Session() as session:
             grid_file = Path(__file__).parent / "data" / "test_grid.nc"
@@ -93,7 +93,7 @@ class TestGridDataAccess(unittest.TestCase):
     def test_grid_data_has_correct_dtype(self) -> None:
         """Test that Grid data has correct dtype (float32 by default)."""
         import numpy as np
-        from pygmt_nb.clib import Session, Grid
+        from pygmt_nb.clib import Grid, Session
 
         with Session() as session:
             grid_file = Path(__file__).parent / "data" / "test_grid.nc"
@@ -109,7 +109,7 @@ class TestGridResourceManagement(unittest.TestCase):
 
     def test_grid_cleans_up_automatically(self) -> None:
         """Test that Grid is cleaned up when out of scope."""
-        from pygmt_nb.clib import Session, Grid
+        from pygmt_nb.clib import Grid, Session
 
         with Session() as session:
             grid_file = Path(__file__).parent / "data" / "test_grid.nc"

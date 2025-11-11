@@ -4,14 +4,9 @@ which - Find full path to specified files.
 Module-level function (not a Figure method).
 """
 
-from typing import Union, Optional, List
-from pathlib import Path
 
 
-def which(
-    fname: Union[str, List[str]],
-    **kwargs
-):
+def which(fname: str | list[str], **kwargs):
     """
     Find full path to specified files.
 
@@ -95,11 +90,9 @@ def which(
     grdinfo : Get grid information
     info : Get table information
     """
-    from pygmt_nb.clib import Session
     import tempfile
 
-    # Build GMT command
-    args = []
+    from pygmt_nb.clib import Session
 
     # Handle single file or list
     if isinstance(fname, str):
@@ -115,18 +108,19 @@ def which(
         for f in files:
             # Use gmtwhich module
             try:
-                with tempfile.NamedTemporaryFile(mode='w+', suffix='.txt', delete=False) as tmp:
+                with tempfile.NamedTemporaryFile(mode="w+", suffix=".txt", delete=False) as tmp:
                     outfile = tmp.name
 
                 session.call_module("gmtwhich", f"{f} ->{outfile}")
 
                 # Read result
-                with open(outfile, 'r') as tmp:
+                with open(outfile) as tmp:
                     path = tmp.read().strip()
 
                 results.append(path if path else None)
 
                 import os
+
                 if os.path.exists(outfile):
                     os.unlink(outfile)
 

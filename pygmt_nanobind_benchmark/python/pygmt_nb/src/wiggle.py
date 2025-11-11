@@ -4,22 +4,22 @@ wiggle - Plot z = f(x,y) anomalies along tracks.
 Figure method (not a standalone module function).
 """
 
-from typing import Union, Optional, List
 from pathlib import Path
+
 import numpy as np
 
 
 def wiggle(
     self,
-    data: Optional[Union[np.ndarray, str, Path]] = None,
-    x: Optional[np.ndarray] = None,
-    y: Optional[np.ndarray] = None,
-    z: Optional[np.ndarray] = None,
-    scale: Optional[str] = None,
-    pen: Optional[str] = None,
-    fillpositive: Optional[str] = None,
-    fillnegative: Optional[str] = None,
-    **kwargs
+    data: np.ndarray | str | Path | None = None,
+    x: np.ndarray | None = None,
+    y: np.ndarray | None = None,
+    z: np.ndarray | None = None,
+    scale: str | None = None,
+    pen: str | None = None,
+    fillpositive: str | None = None,
+    fillnegative: str | None = None,
+    **kwargs,
 ):
     """
     Plot z = f(x,y) anomalies along tracks.

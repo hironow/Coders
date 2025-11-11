@@ -4,14 +4,13 @@ shift_origin - Shift plot origin in x and/or y direction.
 Figure method (imported into Figure class).
 """
 
-from typing import Union, Optional, List
 
 
 def shift_origin(
     self,
-    xshift: Optional[Union[str, float]] = None,
-    yshift: Optional[Union[str, float]] = None,
-    **kwargs
+    xshift: str | float | None = None,
+    yshift: str | float | None = None,
+    **kwargs,
 ):
     """
     Shift the plot origin in x and/or y directions.

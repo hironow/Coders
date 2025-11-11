@@ -4,22 +4,22 @@ grd2xyz - Convert grid to table data.
 Module-level function (not a Figure method).
 """
 
-from typing import Union, Optional, List
-from pathlib import Path
-import numpy as np
-import tempfile
 import os
+import tempfile
+from pathlib import Path
+
+import numpy as np
 
 from pygmt_nb.clib import Session
 
 
 def grd2xyz(
-    grid: Union[str, Path],
-    output: Optional[Union[str, Path]] = None,
-    region: Optional[Union[str, List[float]]] = None,
-    cstyle: Optional[str] = None,
-    **kwargs
-) -> Union[np.ndarray, None]:
+    grid: str | Path,
+    output: str | Path | None = None,
+    region: str | list[float] | None = None,
+    cstyle: str | None = None,
+    **kwargs,
+) -> np.ndarray | None:
     """
     Convert grid to table data.
 
@@ -91,7 +91,7 @@ def grd2xyz(
         return_array = False
     else:
         # Temp file for array output
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
             outfile = f.name
         return_array = True
 

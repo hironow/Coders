@@ -4,7 +4,6 @@ subplot - Manage Figure subplot configuration and panel selection.
 Figure method (imported into Figure class).
 """
 
-from typing import Union, Optional, List, Tuple
 
 
 class SubplotContext:
@@ -20,12 +19,12 @@ class SubplotContext:
         session,
         nrows: int,
         ncols: int,
-        figsize: Optional[Union[str, List, Tuple]] = None,
-        autolabel: Optional[Union[bool, str]] = None,
-        margins: Optional[Union[str, List]] = None,
-        title: Optional[str] = None,
-        frame: Optional[Union[str, List]] = None,
-        **kwargs
+        figsize: str | list | tuple | None = None,
+        autolabel: bool | str | None = None,
+        margins: str | list | None = None,
+        title: str | None = None,
+        frame: str | list | None = None,
+        **kwargs,
     ):
         """
         Initialize subplot context.
@@ -90,7 +89,7 @@ class SubplotContext:
 
         # Title (-T option)
         if self._title is not None:
-            args.append(f"-T\"{self._title}\"")
+            args.append(f'-T"{self._title}"')
 
         # Frame (-B option for all panels)
         if self._frame is not None:
@@ -113,9 +112,9 @@ class SubplotContext:
 
     def set_panel(
         self,
-        panel: Union[int, Tuple[int, int], List[int]],
-        fixedlabel: Optional[str] = None,
-        **kwargs
+        panel: int | tuple[int, int] | list[int],
+        fixedlabel: str | None = None,
+        **kwargs,
     ):
         """
         Set the current subplot panel for plotting.
@@ -144,7 +143,7 @@ class SubplotContext:
 
         # Fixed label (-A option)
         if fixedlabel is not None:
-            args.append(f"-A\"{fixedlabel}\"")
+            args.append(f'-A"{fixedlabel}"')
 
         # Call GMT subplot set
         self._session.call_module("subplot", "set " + " ".join(args))
@@ -154,12 +153,12 @@ def subplot(
     self,
     nrows: int = 1,
     ncols: int = 1,
-    figsize: Optional[Union[str, List, Tuple]] = None,
-    autolabel: Optional[Union[bool, str]] = None,
-    margins: Optional[Union[str, List]] = None,
-    title: Optional[str] = None,
-    frame: Optional[Union[str, List]] = None,
-    **kwargs
+    figsize: str | list | tuple | None = None,
+    autolabel: bool | str | None = None,
+    margins: str | list | None = None,
+    title: str | None = None,
+    frame: str | list | None = None,
+    **kwargs,
 ):
     """
     Create a subplot context for multi-panel figures.
@@ -239,5 +238,5 @@ def subplot(
         margins=margins,
         title=title,
         frame=frame,
-        **kwargs
+        **kwargs,
     )

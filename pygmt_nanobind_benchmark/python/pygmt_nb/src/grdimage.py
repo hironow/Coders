@@ -4,21 +4,19 @@ grdimage - PyGMT-compatible plotting method.
 Modern mode implementation using nanobind.
 """
 
-from typing import Union, Optional, List
 from pathlib import Path
-import numpy as np
 
 from pygmt_nb.clib import Grid
 
 
 def grdimage(
     self,
-    grid: Union[str, Path, Grid],
-    projection: Optional[str] = None,
-    region: Optional[Union[str, List[float]]] = None,
-    cmap: Optional[str] = None,
-    frame: Union[bool, str, List[str], None] = None,
-    **kwargs
+    grid: str | Path | Grid,
+    projection: str | None = None,
+    region: str | list[float] | None = None,
+    cmap: str | None = None,
+    frame: bool | str | list[str] | None = None,
+    **kwargs,
 ):
     """
     Plot a grid as an image.
@@ -65,4 +63,3 @@ def grdimage(
             args.append(f"-B{frame}")
 
     self._session.call_module("grdimage", " ".join(args))
-

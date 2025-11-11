@@ -4,15 +4,14 @@ basemap - Plot base maps and frames for pygmt_nb.
 Modern mode implementation using nanobind for direct GMT C API access.
 """
 
-from typing import Union, Optional, List
 
 
 def basemap(
     self,
-    region: Optional[Union[str, List[float]]] = None,
-    projection: Optional[str] = None,
-    frame: Union[bool, str, List[str], None] = None,
-    **kwargs
+    region: str | list[float] | None = None,
+    projection: str | None = None,
+    frame: bool | str | list[str] | None = None,
+    **kwargs,
 ):
     """
     Draw a basemap (map frame, axes, and optional grid).
@@ -67,16 +66,19 @@ def basemap(
     # Frame - handle spaces in labels
     def _escape_frame_spaces(value: str) -> str:
         """Escape spaces in GMT frame specifications."""
-        if ' ' not in value:
+        if " " not in value:
             return value
         import re
-        pattern = r'(\+[lLS])([^+]+)'
+
+        pattern = r"(\+[lLS])([^+]+)"
+
         def quote_label(match):
             prefix = match.group(1)
             content = match.group(2)
-            if ' ' in content:
+            if " " in content:
                 return f'{prefix}"{content}"'
             return match.group(0)
+
         return re.sub(pattern, quote_label, value)
 
     if frame is True:

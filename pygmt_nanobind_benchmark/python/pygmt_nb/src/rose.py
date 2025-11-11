@@ -4,21 +4,21 @@ rose - Plot windrose diagrams or polar histograms.
 Figure method (not a standalone module function).
 """
 
-from typing import Union, Optional, List
 from pathlib import Path
+
 import numpy as np
 
 
 def rose(
     self,
-    data: Optional[Union[np.ndarray, str, Path]] = None,
-    region: Optional[Union[str, List[float]]] = None,
-    diameter: Optional[str] = None,
-    sector_width: Optional[Union[int, float]] = None,
+    data: np.ndarray | str | Path | None = None,
+    region: str | list[float] | None = None,
+    diameter: str | None = None,
+    sector_width: int | float | None = None,
     vectors: bool = False,
-    pen: Optional[str] = None,
-    fill: Optional[str] = None,
-    **kwargs
+    pen: str | None = None,
+    fill: str | None = None,
+    **kwargs,
 ):
     """
     Plot windrose diagrams or polar histograms.

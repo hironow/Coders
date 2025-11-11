@@ -4,24 +4,24 @@ contour - PyGMT-compatible plotting method.
 Modern mode implementation using nanobind.
 """
 
-from typing import Union, Optional, List
 from pathlib import Path
+
 import numpy as np
 
 
 def contour(
     self,
-    data: Optional[Union[np.ndarray, str, Path]] = None,
+    data: np.ndarray | str | Path | None = None,
     x=None,
     y=None,
     z=None,
-    region: Optional[Union[str, List[float]]] = None,
-    projection: Optional[str] = None,
-    frame: Union[bool, str, List[str], None] = None,
-    levels: Optional[Union[str, int, List]] = None,
-    annotation: Optional[Union[str, int]] = None,
-    pen: Optional[str] = None,
-    **kwargs
+    region: str | list[float] | None = None,
+    projection: str | None = None,
+    frame: bool | str | list[str] | None = None,
+    levels: str | int | list | None = None,
+    annotation: str | int | None = None,
+    pen: str | None = None,
+    **kwargs,
 ):
     """
     Contour table data by direct triangulation.
@@ -80,7 +80,7 @@ def contour(
             args.append(f"-R{'/'.join(str(x) for x in region)}")
         else:
             args.append(f"-R{region}")
-    elif hasattr(self, '_region') and self._region:
+    elif hasattr(self, "_region") and self._region:
         r = self._region
         if isinstance(r, list):
             args.append(f"-R{'/'.join(str(x) for x in r)}")
@@ -90,7 +90,7 @@ def contour(
     # Projection (-J option)
     if projection is not None:
         args.append(f"-J{projection}")
-    elif hasattr(self, '_projection') and self._projection:
+    elif hasattr(self, "_projection") and self._projection:
         args.append(f"-J{self._projection}")
 
     # Frame (-B option)

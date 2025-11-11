@@ -4,20 +4,19 @@ grdvolume - Calculate grid volume and area.
 Module-level function (not a Figure method).
 """
 
-from typing import Union, Optional, List
-from pathlib import Path
 import tempfile
+from pathlib import Path
 
 from pygmt_nb.clib import Session
 
 
 def grdvolume(
-    grid: Union[str, Path],
-    output: Optional[Union[str, Path]] = None,
-    contour: Optional[Union[float, List[float]]] = None,
-    unit: Optional[str] = None,
-    region: Optional[Union[str, List[float]]] = None,
-    **kwargs
+    grid: str | Path,
+    output: str | Path | None = None,
+    contour: float | list[float] | None = None,
+    unit: str | None = None,
+    region: str | list[float] | None = None,
+    **kwargs,
 ):
     """
     Calculate grid volume and area.
@@ -162,18 +161,19 @@ def grdvolume(
             # Return output as string - grdvolume outputs to stdout by default
             # For now, simplify by requiring output parameter
             # or just call with no output capture
-            with tempfile.NamedTemporaryFile(mode='w+', suffix='.txt', delete=False) as f:
+            with tempfile.NamedTemporaryFile(mode="w+", suffix=".txt", delete=False) as f:
                 outfile = f.name
 
             try:
                 session.call_module("grdvolume", " ".join(args) + f" ->{outfile}")
 
                 # Read result
-                with open(outfile, 'r') as f:
+                with open(outfile) as f:
                     result = f.read()
 
                 return result
             finally:
                 import os
+
                 if os.path.exists(outfile):
                     os.unlink(outfile)

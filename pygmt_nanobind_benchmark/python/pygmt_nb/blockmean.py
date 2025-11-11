@@ -4,26 +4,26 @@ blockmean - Block average (x,y,z) data tables by mean estimation.
 Module-level function (not a Figure method).
 """
 
-from typing import Union, Optional, List
-from pathlib import Path
-import numpy as np
-import tempfile
 import os
+import tempfile
+from pathlib import Path
+
+import numpy as np
 
 from pygmt_nb.clib import Session
 
 
 def blockmean(
-    data: Optional[Union[np.ndarray, List, str, Path]] = None,
-    x: Optional[np.ndarray] = None,
-    y: Optional[np.ndarray] = None,
-    z: Optional[np.ndarray] = None,
-    output: Optional[Union[str, Path]] = None,
-    region: Optional[Union[str, List[float]]] = None,
-    spacing: Optional[Union[str, List[float]]] = None,
-    registration: Optional[str] = None,
-    **kwargs
-) -> Union[np.ndarray, None]:
+    data: np.ndarray | list | str | Path | None = None,
+    x: np.ndarray | None = None,
+    y: np.ndarray | None = None,
+    z: np.ndarray | None = None,
+    output: str | Path | None = None,
+    region: str | list[float] | None = None,
+    spacing: str | list[float] | None = None,
+    registration: str | None = None,
+    **kwargs,
+) -> np.ndarray | None:
     """
     Block average (x,y,z) data tables by mean estimation.
 
@@ -148,7 +148,7 @@ def blockmean(
         return_array = False
     else:
         # Temp file for array output
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
             outfile = f.name
         return_array = True
 
@@ -173,7 +173,9 @@ def blockmean(
                     vectors = [data_array[:, i] for i in range(min(3, data_array.shape[1]))]
 
                     with session.virtualfile_from_vectors(*vectors) as vfile:
-                        session.call_module("blockmean", f"{vfile} " + " ".join(args) + f" ->{outfile}")
+                        session.call_module(
+                            "blockmean", f"{vfile} " + " ".join(args) + f" ->{outfile}"
+                        )
 
             elif x is not None and y is not None and z is not None:
                 # Separate x, y, z arrays

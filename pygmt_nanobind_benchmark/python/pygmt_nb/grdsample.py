@@ -4,20 +4,19 @@ grdsample - Resample a grid onto a new lattice.
 Module-level function (not a Figure method).
 """
 
-from typing import Union, Optional, List
 from pathlib import Path
 
 from pygmt_nb.clib import Session
 
 
 def grdsample(
-    grid: Union[str, Path],
-    outgrid: Union[str, Path],
-    spacing: Optional[Union[str, List[float]]] = None,
-    region: Optional[Union[str, List[float]]] = None,
-    registration: Optional[str] = None,
+    grid: str | Path,
+    outgrid: str | Path,
+    spacing: str | list[float] | None = None,
+    region: str | list[float] | None = None,
+    registration: str | None = None,
     translate: bool = False,
-    **kwargs
+    **kwargs,
 ):
     """
     Resample a grid onto a new lattice.

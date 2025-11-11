@@ -4,17 +4,16 @@ tilemap - Plot raster tiles from XYZ tile servers.
 Figure method (not a standalone module function).
 """
 
-from typing import Union, Optional, List
 
 
 def tilemap(
     self,
-    region: Union[str, List[float]],
+    region: str | list[float],
     projection: str,
-    zoom: Optional[int] = None,
-    source: Optional[str] = None,
+    zoom: int | None = None,
+    source: str | None = None,
     lonlat: bool = True,
-    **kwargs
+    **kwargs,
 ):
     """
     Plot raster tiles from XYZ tile servers.

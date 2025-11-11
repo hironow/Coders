@@ -4,10 +4,10 @@ Test Figure.coast.
 Based on PyGMT's test_coast.py, adapted for pygmt_nb.
 """
 
+import os
+import tempfile
 import unittest
 from pathlib import Path
-import tempfile
-import os
 
 
 class TestCoast(unittest.TestCase):
@@ -20,6 +20,7 @@ class TestCoast(unittest.TestCase):
     def tearDown(self):
         """Clean up temporary files."""
         import shutil
+
         if os.path.exists(self.temp_dir):
             shutil.rmtree(self.temp_dir)
 
@@ -39,9 +40,9 @@ class TestCoast(unittest.TestCase):
         assert output_file.stat().st_size > 0
 
         # Verify it's a valid PostScript
-        with open(output_file, 'rb') as f:
+        with open(output_file, "rb") as f:
             header = f.read(4)
-            assert header == b'%!PS'
+            assert header == b"%!PS"
 
     def test_coast_world_mercator(self) -> None:
         """Test generating a global Mercator map with coastlines."""

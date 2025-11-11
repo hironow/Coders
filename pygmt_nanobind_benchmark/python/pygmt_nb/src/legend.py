@@ -4,17 +4,15 @@ legend - PyGMT-compatible plotting method.
 Modern mode implementation using nanobind.
 """
 
-from typing import Union, Optional, List
 from pathlib import Path
-import numpy as np
 
 
 def legend(
     self,
-    spec: Optional[Union[str, Path]] = None,
+    spec: str | Path | None = None,
     position: str = "JTR+jTR+o0.2c",
-    box: Union[bool, str] = True,
-    **kwargs
+    box: bool | str = True,
+    **kwargs,
 ):
     """
     Plot a legend on the map.

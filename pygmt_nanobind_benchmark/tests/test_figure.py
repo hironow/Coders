@@ -7,13 +7,13 @@ Following TDD (Test-Driven Development) principles:
 3. Refactor while keeping tests green
 """
 
+import os
+import shutil
+import subprocess
+import tempfile
 import unittest
 from pathlib import Path
-import tempfile
-import os
-import subprocess
-import sys
-import shutil
+
 
 # Check if Ghostscript is available
 def ghostscript_available():
@@ -23,14 +23,12 @@ def ghostscript_available():
         if gs_path is None:
             return False
         subprocess.run(
-            [gs_path, "--version"],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            check=True
+            [gs_path, "--version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True
         )
         return True
     except (subprocess.CalledProcessError, FileNotFoundError, PermissionError):
         return False
+
 
 GHOSTSCRIPT_AVAILABLE = ghostscript_available()
 
@@ -51,7 +49,7 @@ class TestFigureCreation(unittest.TestCase):
 
         fig = Figure()
         # Figure should have an internal session
-        assert hasattr(fig, '_session')
+        assert hasattr(fig, "_session")
         assert fig._session is not None
 
 
@@ -68,7 +66,7 @@ class TestFigureGrdimage(unittest.TestCase):
         from pygmt_nb import Figure
 
         fig = Figure()
-        assert hasattr(fig, 'grdimage')
+        assert hasattr(fig, "grdimage")
         assert callable(fig.grdimage)
 
     def test_grdimage_accepts_grid_file_path(self) -> None:
@@ -82,7 +80,7 @@ class TestFigureGrdimage(unittest.TestCase):
     @unittest.skip("Grid object support not yet implemented")
     def test_grdimage_accepts_grid_object(self) -> None:
         """Test that grdimage accepts a Grid object."""
-        from pygmt_nb import Figure, Session, Grid
+        from pygmt_nb import Figure, Grid, Session
 
         with Session() as session:
             grid = Grid(session, str(self.test_grid))
@@ -118,6 +116,7 @@ class TestFigureSavefig(unittest.TestCase):
     def tearDown(self):
         """Clean up temporary files."""
         import shutil
+
         if os.path.exists(self.temp_dir):
             shutil.rmtree(self.temp_dir)
 
@@ -126,7 +125,7 @@ class TestFigureSavefig(unittest.TestCase):
         from pygmt_nb import Figure
 
         fig = Figure()
-        assert hasattr(fig, 'savefig')
+        assert hasattr(fig, "savefig")
         assert callable(fig.savefig)
 
     @unittest.skipIf(not GHOSTSCRIPT_AVAILABLE, "Ghostscript not installed")
@@ -177,9 +176,9 @@ class TestFigureSavefig(unittest.TestCase):
         assert output_file.stat().st_size > 0, "Output file is empty"
 
         # Verify it's a valid PostScript (check magic bytes)
-        with open(output_file, 'rb') as f:
+        with open(output_file, "rb") as f:
             header = f.read(4)
-            assert header == b'%!PS', "Not a valid PostScript file"
+            assert header == b"%!PS", "Not a valid PostScript file"
 
     @unittest.skipIf(not GHOSTSCRIPT_AVAILABLE, "Ghostscript not installed")
     def test_savefig_creates_jpg_file(self) -> None:
@@ -209,6 +208,7 @@ class TestFigureIntegration(unittest.TestCase):
     def tearDown(self):
         """Clean up temporary files."""
         import shutil
+
         if os.path.exists(self.temp_dir):
             shutil.rmtree(self.temp_dir)
 
@@ -232,10 +232,10 @@ class TestFigureIntegration(unittest.TestCase):
         assert output_file.stat().st_size > 0
 
         # Verify it's a valid PNG (check magic bytes)
-        with open(output_file, 'rb') as f:
+        with open(output_file, "rb") as f:
             header = f.read(8)
             # PNG magic bytes: 89 50 4E 47 0D 0A 1A 0A
-            assert header[:4] == b'\x89PNG', "Not a valid PNG file"
+            assert header[:4] == b"\x89PNG", "Not a valid PNG file"
 
     @unittest.skipIf(not GHOSTSCRIPT_AVAILABLE, "Ghostscript not installed")
     def test_multiple_operations_on_same_figure(self) -> None:
@@ -265,6 +265,7 @@ class TestFigureBasemap(unittest.TestCase):
     def tearDown(self):
         """Clean up temporary files."""
         import shutil
+
         if os.path.exists(self.temp_dir):
             shutil.rmtree(self.temp_dir)
 
@@ -273,7 +274,7 @@ class TestFigureBasemap(unittest.TestCase):
         from pygmt_nb import Figure
 
         fig = Figure()
-        assert hasattr(fig, 'basemap')
+        assert hasattr(fig, "basemap")
         assert callable(fig.basemap)
 
     def test_basemap_accepts_region_and_projection(self) -> None:
@@ -316,9 +317,9 @@ class TestFigureBasemap(unittest.TestCase):
         assert output_file.stat().st_size > 0
 
         # Verify it's a valid PostScript
-        with open(output_file, 'rb') as f:
+        with open(output_file, "rb") as f:
             header = f.read(4)
-            assert header == b'%!PS'
+            assert header == b"%!PS"
 
 
 class TestFigureCoast(unittest.TestCase):
@@ -331,6 +332,7 @@ class TestFigureCoast(unittest.TestCase):
     def tearDown(self):
         """Clean up temporary files."""
         import shutil
+
         if os.path.exists(self.temp_dir):
             shutil.rmtree(self.temp_dir)
 
@@ -339,7 +341,7 @@ class TestFigureCoast(unittest.TestCase):
         from pygmt_nb import Figure
 
         fig = Figure()
-        assert hasattr(fig, 'coast')
+        assert hasattr(fig, "coast")
         assert callable(fig.coast)
 
     def test_coast_accepts_region_and_projection(self) -> None:
@@ -390,9 +392,9 @@ class TestFigureCoast(unittest.TestCase):
         assert output_file.stat().st_size > 0
 
         # Verify it's a valid PostScript
-        with open(output_file, 'rb') as f:
+        with open(output_file, "rb") as f:
             header = f.read(4)
-            assert header == b'%!PS'
+            assert header == b"%!PS"
 
     def test_coast_with_borders(self) -> None:
         """Test that coast accepts borders parameter."""

@@ -4,19 +4,19 @@ velo - Plot velocity vectors, crosses, anisotropy bars, and wedges.
 Figure method (not a standalone module function).
 """
 
-from typing import Union, Optional, List
 from pathlib import Path
+
 import numpy as np
 
 
 def velo(
     self,
-    data: Optional[Union[np.ndarray, str, Path]] = None,
-    scale: Optional[str] = None,
-    pen: Optional[str] = None,
-    fill: Optional[str] = None,
-    uncertaintyfill: Optional[str] = None,
-    **kwargs
+    data: np.ndarray | str | Path | None = None,
+    scale: str | None = None,
+    pen: str | None = None,
+    fill: str | None = None,
+    uncertaintyfill: str | None = None,
+    **kwargs,
 ):
     """
     Plot velocity vectors, crosses, anisotropy bars, and wedges.

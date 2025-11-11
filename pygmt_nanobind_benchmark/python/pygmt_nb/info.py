@@ -4,21 +4,21 @@ info - Get information about data tables.
 Module-level function (not a Figure method).
 """
 
-from typing import Union, List, Optional
-from pathlib import Path
-import numpy as np
-import tempfile
 import os
+import tempfile
+from pathlib import Path
+
+import numpy as np
 
 from pygmt_nb.clib import Session
 
 
 def info(
-    data: Union[np.ndarray, List, str, Path],
-    spacing: Optional[Union[str, List[float]]] = None,
+    data: np.ndarray | list | str | Path,
+    spacing: str | list[float] | None = None,
     per_column: bool = False,
-    **kwargs
-) -> Union[np.ndarray, str]:
+    **kwargs,
+) -> np.ndarray | str:
     """
     Get information about data tables.
 
@@ -85,14 +85,14 @@ def info(
             cmd_args = f"{data} " + " ".join(args)
 
             # For output capture, write to temp file
-            with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+            with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
                 outfile = f.name
 
             try:
                 session.call_module("info", f"{cmd_args} ->{outfile}")
 
                 # Read output
-                with open(outfile, 'r') as f:
+                with open(outfile) as f:
                     output = f.read().strip()
             finally:
                 os.unlink(outfile)
@@ -109,7 +109,7 @@ def info(
             vectors = [data_array[:, i] for i in range(data_array.shape[1])]
 
             # Output file for capturing result
-            with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+            with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
                 outfile = f.name
 
             try:
@@ -117,7 +117,7 @@ def info(
                     session.call_module("info", f"{vfile} " + " ".join(args) + f" ->{outfile}")
 
                 # Read output
-                with open(outfile, 'r') as f:
+                with open(outfile) as f:
                     output = f.read().strip()
             finally:
                 os.unlink(outfile)
@@ -128,8 +128,9 @@ def info(
         try:
             values = output.split()
             if len(values) >= 4:
-                return np.array([float(values[0]), float(values[1]),
-                               float(values[2]), float(values[3])])
+                return np.array(
+                    [float(values[0]), float(values[1]), float(values[2]), float(values[3])]
+                )
         except (ValueError, IndexError):
             pass
 

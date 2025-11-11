@@ -4,10 +4,11 @@ Test Figure.plot.
 Based on PyGMT's test_plot.py, adapted for pygmt_nb.
 """
 
+import os
+import tempfile
 import unittest
 from pathlib import Path
-import tempfile
-import os
+
 import numpy as np
 
 
@@ -25,6 +26,7 @@ class TestPlot(unittest.TestCase):
     def tearDown(self):
         """Clean up temporary files."""
         import shutil
+
         if os.path.exists(self.temp_dir):
             shutil.rmtree(self.temp_dir)
 
@@ -33,7 +35,7 @@ class TestPlot(unittest.TestCase):
         from pygmt_nb import Figure
 
         fig = Figure()
-        assert hasattr(fig, 'plot')
+        assert hasattr(fig, "plot")
         assert callable(fig.plot)
 
     def test_plot_red_circles(self) -> None:
@@ -60,9 +62,9 @@ class TestPlot(unittest.TestCase):
         assert output_file.stat().st_size > 0
 
         # Verify it's a valid PostScript
-        with open(output_file, 'rb') as f:
+        with open(output_file, "rb") as f:
             header = f.read(4)
-            assert header == b'%!PS'
+            assert header == b"%!PS"
 
     def test_plot_green_squares(self) -> None:
         """Plot data in green squares."""
@@ -135,13 +137,7 @@ class TestPlot(unittest.TestCase):
         fig = Figure()
         # No x or y
         with self.assertRaises(ValueError):
-            fig.plot(
-                region=self.region,
-                projection="X10c",
-                style="c0.2c",
-                fill="red",
-                frame="afg"
-            )
+            fig.plot(region=self.region, projection="X10c", style="c0.2c", fill="red", frame="afg")
 
         # Only x, no y
         with self.assertRaises(ValueError):
@@ -151,7 +147,7 @@ class TestPlot(unittest.TestCase):
                 projection="X10c",
                 style="c0.2c",
                 fill="red",
-                frame="afg"
+                frame="afg",
             )
 
         # Only y, no x
@@ -162,7 +158,7 @@ class TestPlot(unittest.TestCase):
                 projection="X10c",
                 style="c0.2c",
                 fill="red",
-                frame="afg"
+                frame="afg",
             )
 
     def test_plot_region_required(self) -> None:
@@ -194,7 +190,7 @@ class TestPlot(unittest.TestCase):
             y=self.y,
             # region and projection inherited from basemap() call above
             style="c0.2c",
-            fill="red"
+            fill="red",
         )
 
         output_file = Path(self.temp_dir) / "plot_with_basemap.ps"

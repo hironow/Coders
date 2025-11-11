@@ -4,23 +4,23 @@ sphinterpolate - Spherical gridding in tension of data on a sphere.
 Module-level function (not a Figure method).
 """
 
-from typing import Union, Optional, List
 from pathlib import Path
+
 import numpy as np
 
 from pygmt_nb.clib import Session
 
 
 def sphinterpolate(
-    data: Optional[Union[np.ndarray, str, Path]] = None,
-    x: Optional[np.ndarray] = None,
-    y: Optional[np.ndarray] = None,
-    z: Optional[np.ndarray] = None,
-    outgrid: Union[str, Path] = "sphinterpolate_output.nc",
-    region: Union[str, List[float]] = None,
-    spacing: Union[str, List[float]] = None,
-    tension: Optional[float] = None,
-    **kwargs
+    data: np.ndarray | str | Path | None = None,
+    x: np.ndarray | None = None,
+    y: np.ndarray | None = None,
+    z: np.ndarray | None = None,
+    outgrid: str | Path = "sphinterpolate_output.nc",
+    region: str | list[float] = None,
+    spacing: str | list[float] = None,
+    tension: float | None = None,
+    **kwargs,
 ):
     """
     Spherical gridding in tension of data on a sphere.

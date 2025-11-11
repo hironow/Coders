@@ -4,22 +4,20 @@ grdcontour - PyGMT-compatible plotting method.
 Modern mode implementation using nanobind.
 """
 
-from typing import Union, Optional, List
 from pathlib import Path
-import numpy as np
 
 
 def grdcontour(
     self,
-    grid: Union[str, Path],
-    region: Optional[Union[str, List[float]]] = None,
-    projection: Optional[str] = None,
-    interval: Optional[Union[int, float, str]] = None,
-    annotation: Optional[Union[int, float, str]] = None,
-    pen: Optional[str] = None,
-    limit: Optional[List[float]] = None,
-    frame: Union[bool, str, List[str], None] = None,
-    **kwargs
+    grid: str | Path,
+    region: str | list[float] | None = None,
+    projection: str | None = None,
+    interval: int | float | str | None = None,
+    annotation: int | float | str | None = None,
+    pen: str | None = None,
+    limit: list[float] | None = None,
+    frame: bool | str | list[str] | None = None,
+    **kwargs,
 ):
     """
     Draw contour lines from a grid file.
@@ -73,4 +71,3 @@ def grdcontour(
             args.append(f"-B{frame}")
 
     self._session.call_module("grdcontour", " ".join(args))
-

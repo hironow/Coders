@@ -4,19 +4,18 @@ grdinfo - Extract information from grids.
 Module-level function (not a Figure method).
 """
 
-from typing import Union, Optional, List
-from pathlib import Path
-import tempfile
 import os
+import tempfile
+from pathlib import Path
 
 from pygmt_nb.clib import Session
 
 
 def grdinfo(
-    grid: Union[str, Path],
-    region: Optional[Union[str, List[float]]] = None,
+    grid: str | Path,
+    region: str | list[float] | None = None,
     per_column: bool = False,
-    **kwargs
+    **kwargs,
 ) -> str:
     """
     Extract information from 2-D grids or 3-D cubes.
@@ -72,7 +71,7 @@ def grdinfo(
         args.append("-C")
 
     # Execute via nanobind session and capture output
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
         outfile = f.name
 
     try:
@@ -80,7 +79,7 @@ def grdinfo(
             session.call_module("grdinfo", " ".join(args) + f" ->{outfile}")
 
         # Read output
-        with open(outfile, 'r') as f:
+        with open(outfile) as f:
             output = f.read().strip()
     finally:
         os.unlink(outfile)

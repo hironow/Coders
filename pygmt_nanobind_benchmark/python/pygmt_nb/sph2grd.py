@@ -4,19 +4,18 @@ sph2grd - Compute grid from spherical harmonic coefficients.
 Module-level function (not a Figure method).
 """
 
-from typing import Union, Optional, List
 from pathlib import Path
 
 from pygmt_nb.clib import Session
 
 
 def sph2grd(
-    data: Union[str, Path],
-    outgrid: Union[str, Path],
-    region: Union[str, List[float]] = None,
-    spacing: Union[str, List[float]] = None,
-    normalize: Optional[str] = None,
-    **kwargs
+    data: str | Path,
+    outgrid: str | Path,
+    region: str | list[float] = None,
+    spacing: str | list[float] = None,
+    normalize: str | None = None,
+    **kwargs,
 ):
     """
     Compute grid from spherical harmonic coefficients.

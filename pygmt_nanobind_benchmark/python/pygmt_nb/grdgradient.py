@@ -4,22 +4,21 @@ grdgradient - Calculate directional gradients from a grid.
 Module-level function (not a Figure method).
 """
 
-from typing import Union, Optional, List
 from pathlib import Path
 
 from pygmt_nb.clib import Session
 
 
 def grdgradient(
-    grid: Union[str, Path],
-    outgrid: Union[str, Path],
-    azimuth: Optional[Union[float, str]] = None,
-    direction: Optional[str] = None,
-    normalize: Optional[Union[bool, str]] = None,
-    slope_file: Optional[Union[str, Path]] = None,
-    radiance: Optional[Union[str, float]] = None,
-    region: Optional[Union[str, List[float]]] = None,
-    **kwargs
+    grid: str | Path,
+    outgrid: str | Path,
+    azimuth: float | str | None = None,
+    direction: str | None = None,
+    normalize: bool | str | None = None,
+    slope_file: str | Path | None = None,
+    radiance: str | float | None = None,
+    region: str | list[float] | None = None,
+    **kwargs,
 ):
     """
     Compute the directional derivative of a grid.

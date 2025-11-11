@@ -4,21 +4,20 @@ grd2cpt - Make GMT color palette table from a grid file.
 Module-level function (not a Figure method).
 """
 
-from typing import Union, Optional, List
 from pathlib import Path
 
 from pygmt_nb.clib import Session
 
 
 def grd2cpt(
-    grid: Union[str, Path],
-    output: Optional[Union[str, Path]] = None,
-    cmap: Optional[str] = None,
+    grid: str | Path,
+    output: str | Path | None = None,
+    cmap: str | None = None,
     continuous: bool = False,
     reverse: bool = False,
-    truncate: Optional[Union[str, List[float]]] = None,
-    region: Optional[Union[str, List[float]]] = None,
-    **kwargs
+    truncate: str | list[float] | None = None,
+    region: str | list[float] | None = None,
+    **kwargs,
 ):
     """
     Make GMT color palette table from a grid file.

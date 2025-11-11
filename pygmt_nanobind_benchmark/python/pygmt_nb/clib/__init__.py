@@ -5,11 +5,12 @@ This module provides the Session class, Grid class, and low-level GMT API bindin
 """
 
 import contextlib
-import numpy as np
-from typing import Sequence, Generator
+from collections.abc import Generator, Sequence
 
-from pygmt_nb.clib._pygmt_nb_core import Session as _CoreSession
+import numpy as np
+
 from pygmt_nb.clib._pygmt_nb_core import Grid
+from pygmt_nb.clib._pygmt_nb_core import Session as _CoreSession
 
 
 class Session(_CoreSession):
@@ -85,8 +86,7 @@ class Session(_CoreSession):
         # Check all arrays have same length
         if not all(len(arr) == n_rows for arr in arrays):
             raise ValueError(
-                f"All arrays must have same length. Got lengths: "
-                f"{[len(arr) for arr in arrays]}"
+                f"All arrays must have same length. Got lengths: {[len(arr) for arr in arrays]}"
             )
 
         # Get GMT constants
@@ -97,12 +97,7 @@ class Session(_CoreSession):
 
         # Create GMT dataset container
         # dim = [n_columns, n_rows, data_type, unused]
-        dataset = self.create_data(
-            family,
-            geometry,
-            mode,
-            [n_columns, n_rows, dtype, 0]
-        )
+        dataset = self.create_data(family, geometry, mode, [n_columns, n_rows, dtype, 0])
 
         try:
             # Attach each vector as a column

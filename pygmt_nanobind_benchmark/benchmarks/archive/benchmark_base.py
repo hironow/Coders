@@ -5,10 +5,10 @@ Provides common infrastructure for all benchmarks.
 """
 
 import time
-from dataclasses import dataclass
-from typing import Any, Callable, Optional
-import sys
 import tracemalloc
+from collections.abc import Callable
+from dataclasses import dataclass
+from typing import Any
 
 
 @dataclass
@@ -20,8 +20,8 @@ class BenchmarkResult:
     median_time: float  # seconds
     std_dev: float  # seconds
     iterations: int
-    memory_current: Optional[int] = None  # bytes
-    memory_peak: Optional[int] = None  # bytes
+    memory_current: int | None = None  # bytes
+    memory_peak: int | None = None  # bytes
 
     @property
     def ops_per_second(self) -> float:
@@ -74,7 +74,7 @@ class ComparisonResult:
         return 0.0
 
     @property
-    def memory_ratio(self) -> Optional[float]:
+    def memory_ratio(self) -> float | None:
         """Calculate memory usage ratio (baseline / candidate)."""
         if (
             self.baseline.memory_current is not None
@@ -183,9 +183,7 @@ class BenchmarkRunner:
             ComparisonResult with speedup information
         """
         baseline = self.run(baseline_func, f"{name} (baseline)", measure_memory=True)
-        candidate = self.run(
-            candidate_func, f"{name} (candidate)", measure_memory=True
-        )
+        candidate = self.run(candidate_func, f"{name} (candidate)", measure_memory=True)
 
         return ComparisonResult(name=name, baseline=baseline, candidate=candidate)
 

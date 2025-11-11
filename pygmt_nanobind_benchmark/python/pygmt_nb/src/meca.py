@@ -4,21 +4,21 @@ meca - Plot focal mechanisms (beachballs).
 Figure method (not a standalone module function).
 """
 
-from typing import Union, Optional, List
 from pathlib import Path
+
 import numpy as np
 
 
 def meca(
     self,
-    data: Optional[Union[np.ndarray, str, Path]] = None,
-    scale: Optional[str] = None,
-    convention: Optional[str] = None,
-    component: Optional[str] = None,
-    pen: Optional[str] = None,
-    compressionfill: Optional[str] = None,
-    extensionfill: Optional[str] = None,
-    **kwargs
+    data: np.ndarray | str | Path | None = None,
+    scale: str | None = None,
+    convention: str | None = None,
+    component: str | None = None,
+    pen: str | None = None,
+    compressionfill: str | None = None,
+    extensionfill: str | None = None,
+    **kwargs,
 ):
     """
     Plot focal mechanisms (beachballs).

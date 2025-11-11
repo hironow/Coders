@@ -12,15 +12,16 @@ Extended validation that:
 import sys
 import tempfile
 from pathlib import Path
+
 import numpy as np
-import subprocess
 
 # Add pygmt_nb to path (dynamically resolve project root)
 project_root = Path(__file__).parent.parent
-sys.path.insert(0, str(project_root / 'python'))
+sys.path.insert(0, str(project_root / "python"))
 
 try:
     import pygmt
+
     PYGMT_AVAILABLE = True
     print("✓ PyGMT available")
 except ImportError:
@@ -37,32 +38,32 @@ def analyze_ps_file(filepath):
         return None
 
     info = {
-        'exists': True,
-        'size': filepath.stat().st_size,
-        'header': None,
-        'creator': None,
-        'pages': None,
-        'bbox': None,
-        'valid_ps': False
+        "exists": True,
+        "size": filepath.stat().st_size,
+        "header": None,
+        "creator": None,
+        "pages": None,
+        "bbox": None,
+        "valid_ps": False,
     }
 
     try:
-        with open(filepath, 'r', encoding='latin-1') as f:
+        with open(filepath, encoding="latin-1") as f:
             lines = f.readlines()[:50]  # Read first 50 lines
 
             for line in lines:
-                if line.startswith('%!PS-Adobe'):
-                    info['valid_ps'] = True
-                    info['header'] = line.strip()
-                elif line.startswith('%%Creator:'):
-                    info['creator'] = line.split(':', 1)[1].strip()
-                elif line.startswith('%%Pages:'):
-                    info['pages'] = line.split(':', 1)[1].strip()
-                elif line.startswith('%%BoundingBox:'):
-                    info['bbox'] = line.split(':', 1)[1].strip()
+                if line.startswith("%!PS-Adobe"):
+                    info["valid_ps"] = True
+                    info["header"] = line.strip()
+                elif line.startswith("%%Creator:"):
+                    info["creator"] = line.split(":", 1)[1].strip()
+                elif line.startswith("%%Pages:"):
+                    info["pages"] = line.split(":", 1)[1].strip()
+                elif line.startswith("%%BoundingBox:"):
+                    info["bbox"] = line.split(":", 1)[1].strip()
 
     except Exception as e:
-        info['error'] = str(e)
+        info["error"] = str(e)
 
     return info
 
@@ -77,16 +78,12 @@ class DetailedValidationTest:
 
     def run_test(self):
         """Run validation test."""
-        print(f"\n{'='*70}")
+        print(f"\n{'=' * 70}")
         print(f"Test: {self.name}")
         print(f"Description: {self.description}")
-        print(f"{'='*70}")
+        print(f"{'=' * 70}")
 
-        results = {
-            'name': self.name,
-            'description': self.description,
-            'outputs': {}
-        }
+        results = {"name": self.name, "description": self.description, "outputs": {}}
 
         # Test pygmt_nb
         print("\n[pygmt_nb] Running...")
@@ -94,20 +91,20 @@ class DetailedValidationTest:
         try:
             self.run_pygmt_nb(nb_output)
             nb_info = analyze_ps_file(nb_output)
-            results['outputs']['pygmt_nb'] = nb_info
+            results["outputs"]["pygmt_nb"] = nb_info
 
-            if nb_info and nb_info['valid_ps']:
-                print(f"  ✓ Success")
+            if nb_info and nb_info["valid_ps"]:
+                print("  ✓ Success")
                 print(f"    File: {nb_output.name}")
                 print(f"    Size: {nb_info['size']:,} bytes")
                 print(f"    Creator: {nb_info['creator']}")
                 print(f"    Pages: {nb_info['pages']}")
             else:
-                print(f"  ✗ Failed - Invalid PS file")
+                print("  ✗ Failed - Invalid PS file")
 
         except Exception as e:
             print(f"  ✗ Error: {e}")
-            results['outputs']['pygmt_nb'] = {'error': str(e)}
+            results["outputs"]["pygmt_nb"] = {"error": str(e)}
 
         return results
 
@@ -120,13 +117,14 @@ class DetailedValidationTest:
 # Detailed Tests
 # =============================================================================
 
+
 class DetailedTest01_Basemap(DetailedValidationTest):
     """Detailed test 1: Basic basemap."""
 
     def __init__(self):
         super().__init__(
             "Basemap with Multiple Frames",
-            "Test basemap with different frame styles and annotations"
+            "Test basemap with different frame styles and annotations",
         )
 
     def run_pygmt_nb(self, output_path):
@@ -141,17 +139,14 @@ class DetailedTest02_CoastalMap(DetailedValidationTest):
     def __init__(self):
         super().__init__(
             "Coastal Map with Multiple Features",
-            "Test coast with shorelines, land, water, and borders"
+            "Test coast with shorelines, land, water, and borders",
         )
 
     def run_pygmt_nb(self, output_path):
         fig = pygmt_nb.Figure()
         fig.basemap(region=[130, 150, 30, 45], projection="M15c", frame="afg")
         fig.coast(
-            land="lightgreen",
-            water="lightblue",
-            shorelines="1/0.5p,black",
-            borders="1/1p,red"
+            land="lightgreen", water="lightblue", shorelines="1/0.5p,black", borders="1/1p,red"
         )
         fig.savefig(str(output_path))
 
@@ -161,8 +156,7 @@ class DetailedTest03_DataVisualization(DetailedValidationTest):
 
     def __init__(self):
         super().__init__(
-            "Multi-Element Data Visualization",
-            "Plot with symbols, lines, and filled areas"
+            "Multi-Element Data Visualization", "Plot with symbols, lines, and filled areas"
         )
         self.x = np.linspace(0, 10, 50)
         self.y1 = np.sin(self.x) * 3 + 5
@@ -186,8 +180,7 @@ class DetailedTest04_TextAndAnnotations(DetailedValidationTest):
 
     def __init__(self):
         super().__init__(
-            "Text with Various Fonts and Colors",
-            "Test text annotations with different styles"
+            "Text with Various Fonts and Colors", "Test text annotations with different styles"
         )
 
     def run_pygmt_nb(self, output_path):
@@ -207,10 +200,7 @@ class DetailedTest05_ComplexWorkflow(DetailedValidationTest):
     """Detailed test 5: Complete complex workflow."""
 
     def __init__(self):
-        super().__init__(
-            "Complete Scientific Workflow",
-            "Full workflow with all major components"
-        )
+        super().__init__("Complete Scientific Workflow", "Full workflow with all major components")
         self.x = np.array([132, 135, 138, 141, 144, 147])
         self.y = np.array([32, 35, 38, 41, 38, 35])
         self.z = np.array([100, 150, 200, 250, 200, 150])
@@ -220,27 +210,16 @@ class DetailedTest05_ComplexWorkflow(DetailedValidationTest):
 
         # Basemap
         fig.basemap(
-            region=[130, 150, 30, 45],
-            projection="M15c",
-            frame=["afg", "WSen+tJapan Region"]
+            region=[130, 150, 30, 45], projection="M15c", frame=["afg", "WSen+tJapan Region"]
         )
 
         # Coast
         fig.coast(
-            land="lightgray",
-            water="lightblue",
-            shorelines="1/0.5p,black",
-            borders="1/1p,red"
+            land="lightgray", water="lightblue", shorelines="1/0.5p,black", borders="1/1p,red"
         )
 
         # Data points with size variation
-        fig.plot(
-            x=self.x,
-            y=self.y,
-            style="c0.5c",
-            fill="red",
-            pen="1p,black"
-        )
+        fig.plot(x=self.x, y=self.y, style="c0.5c", fill="red", pen="1p,black")
 
         # Text labels
         fig.text(x=140, y=43, text="Pacific Ocean", font="14p,Helvetica-Bold,darkblue")
@@ -255,14 +234,12 @@ class DetailedTest05_ComplexWorkflow(DetailedValidationTest):
 # Function Coverage Tests
 # =============================================================================
 
+
 class DetailedTest06_GridOperations(DetailedValidationTest):
     """Detailed test 6: Grid operations."""
 
     def __init__(self):
-        super().__init__(
-            "Grid Visualization",
-            "Test grdimage and colorbar"
-        )
+        super().__init__("Grid Visualization", "Test grdimage and colorbar")
         self.grid_file = "/home/user/Coders/pygmt_nanobind_benchmark/tests/data/test_grid.nc"
 
     def run_pygmt_nb(self, output_path):
@@ -272,7 +249,7 @@ class DetailedTest06_GridOperations(DetailedValidationTest):
             region=[-20, 20, -20, 20],
             projection="M15c",
             frame="afg",
-            cmap="viridis"
+            cmap="viridis",
         )
         fig.colorbar(frame="af+lElevation")
         fig.savefig(str(output_path))
@@ -282,10 +259,7 @@ class DetailedTest07_Histogram(DetailedValidationTest):
     """Detailed test 7: Histogram."""
 
     def __init__(self):
-        super().__init__(
-            "Data Histogram",
-            "Test histogram with custom styling"
-        )
+        super().__init__("Data Histogram", "Test histogram with custom styling")
         self.data = np.random.randn(1000)
 
     def run_pygmt_nb(self, output_path):
@@ -296,7 +270,7 @@ class DetailedTest07_Histogram(DetailedValidationTest):
             frame=["afg", "WSen+tData Distribution"],
             series="-4/4/0.5",
             pen="1p,black",
-            fill="orange"
+            fill="orange",
         )
         fig.savefig(str(output_path))
 
@@ -305,10 +279,7 @@ class DetailedTest08_MultiPanel(DetailedValidationTest):
     """Detailed test 8: Multi-panel figure."""
 
     def __init__(self):
-        super().__init__(
-            "Multi-Panel Layout",
-            "Test shift_origin for multiple plots"
-        )
+        super().__init__("Multi-Panel Layout", "Test shift_origin for multiple plots")
 
     def run_pygmt_nb(self, output_path):
         fig = pygmt_nb.Figure()
@@ -327,10 +298,10 @@ class DetailedTest08_MultiPanel(DetailedValidationTest):
 
 def main():
     """Run detailed Phase 4 validation."""
-    print("="*70)
+    print("=" * 70)
     print("PHASE 4: DETAILED VALIDATION")
     print("In-Depth Testing of pygmt_nb Implementation")
-    print("="*70)
+    print("=" * 70)
 
     # Define all tests
     tests = [
@@ -351,23 +322,23 @@ def main():
         all_results.append(result)
 
     # Summary
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("DETAILED VALIDATION SUMMARY")
-    print("="*70)
+    print("=" * 70)
 
     success_count = 0
     total_size = 0
 
     print(f"\n{'Test':<35} {'Status':<12} {'Size':<15} {'Valid PS'}")
-    print("-"*70)
+    print("-" * 70)
 
     for result in all_results:
-        name = result['name']
-        nb_output = result['outputs'].get('pygmt_nb', {})
+        name = result["name"]
+        nb_output = result["outputs"].get("pygmt_nb", {})
 
-        if nb_output.get('valid_ps'):
+        if nb_output.get("valid_ps"):
             status = "✅ SUCCESS"
-            size = nb_output['size']
+            size = nb_output["size"]
             total_size += size
             size_str = f"{size:,} bytes"
             valid_ps = "✓"
@@ -379,34 +350,34 @@ def main():
 
         print(f"{name:<35} {status:<12} {size_str:<15} {valid_ps}")
 
-    print("-"*70)
+    print("-" * 70)
     print(f"\nTotal Tests: {len(all_results)}")
     print(f"  ✅ Successful: {success_count}")
     print(f"  ❌ Failed: {len(all_results) - success_count}")
-    print(f"\nTotal Output Size: {total_size:,} bytes ({total_size/1024:.1f} KB)")
+    print(f"\nTotal Output Size: {total_size:,} bytes ({total_size / 1024:.1f} KB)")
 
     if success_count == len(all_results):
-        print(f"\n🎉 ALL DETAILED TESTS PASSED!")
-        print(f"\n✅ Validation Results:")
+        print("\n🎉 ALL DETAILED TESTS PASSED!")
+        print("\n✅ Validation Results:")
         print(f"   - All {len(all_results)} tests generated valid PostScript")
-        print(f"   - PS files are well-formed with correct headers")
-        print(f"   - All GMT commands executed successfully")
-        print(f"   - pygmt_nb is fully functional")
+        print("   - PS files are well-formed with correct headers")
+        print("   - All GMT commands executed successfully")
+        print("   - pygmt_nb is fully functional")
 
     # Summary of capabilities tested
-    print(f"\n📊 Capabilities Validated:")
-    print(f"   ✓ Basemap creation with multiple frame styles")
-    print(f"   ✓ Coastal features (land, water, shorelines, borders)")
-    print(f"   ✓ Data plotting (symbols, lines)")
-    print(f"   ✓ Text annotations (multiple fonts and colors)")
-    print(f"   ✓ Grid visualization (grdimage + colorbar)")
-    print(f"   ✓ Histograms")
-    print(f"   ✓ Multi-panel layouts (shift_origin)")
-    print(f"   ✓ Complete workflows with all elements")
+    print("\n📊 Capabilities Validated:")
+    print("   ✓ Basemap creation with multiple frame styles")
+    print("   ✓ Coastal features (land, water, shorelines, borders)")
+    print("   ✓ Data plotting (symbols, lines)")
+    print("   ✓ Text annotations (multiple fonts and colors)")
+    print("   ✓ Grid visualization (grdimage + colorbar)")
+    print("   ✓ Histograms")
+    print("   ✓ Multi-panel layouts (shift_origin)")
+    print("   ✓ Complete workflows with all elements")
 
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("PHASE 4 DETAILED VALIDATION COMPLETE")
-    print("="*70)
+    print("=" * 70)
 
 
 if __name__ == "__main__":

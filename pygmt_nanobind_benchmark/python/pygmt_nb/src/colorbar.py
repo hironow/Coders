@@ -4,17 +4,15 @@ colorbar - PyGMT-compatible plotting method.
 Modern mode implementation using nanobind.
 """
 
-from typing import Union, Optional, List
-from pathlib import Path
-import numpy as np
+
 
 
 def colorbar(
     self,
-    position: Optional[str] = None,
-    frame: Union[bool, str, List[str], None] = None,
-    cmap: Optional[str] = None,
-    **kwargs
+    position: str | None = None,
+    frame: bool | str | list[str] | None = None,
+    cmap: str | None = None,
+    **kwargs,
 ):
     """
     Add a color scale bar to the figure.
@@ -52,4 +50,3 @@ def colorbar(
                     args.append(f"-B{f}")
 
     self._session.call_module("colorbar", " ".join(args))
-

@@ -4,23 +4,21 @@ coast - PyGMT-compatible plotting method.
 Modern mode implementation using nanobind.
 """
 
-from typing import Union, Optional, List
-from pathlib import Path
-import numpy as np
+
 
 
 def coast(
     self,
-    region: Optional[Union[str, List[float]]] = None,
-    projection: Optional[str] = None,
-    land: Optional[str] = None,
-    water: Optional[str] = None,
-    shorelines: Union[bool, str, int, None] = None,
-    resolution: Optional[str] = None,
-    borders: Union[str, List[str], None] = None,
-    frame: Union[bool, str, List[str], None] = None,
-    dcw: Union[str, List[str], None] = None,
-    **kwargs
+    region: str | list[float] | None = None,
+    projection: str | None = None,
+    land: str | None = None,
+    water: str | None = None,
+    shorelines: bool | str | int | None = None,
+    resolution: str | None = None,
+    borders: str | list[str] | None = None,
+    frame: bool | str | list[str] | None = None,
+    dcw: str | list[str] | None = None,
+    **kwargs,
 ):
     """
     Draw coastlines, borders, and water bodies.
@@ -114,4 +112,3 @@ def coast(
         args.append("-W")
 
     self._session.call_module("coast", " ".join(args))
-

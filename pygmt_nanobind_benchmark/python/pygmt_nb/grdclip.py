@@ -4,20 +4,19 @@ grdclip - Clip grid values.
 Module-level function (not a Figure method).
 """
 
-from typing import Union, Optional, List
 from pathlib import Path
 
 from pygmt_nb.clib import Session
 
 
 def grdclip(
-    grid: Union[str, Path],
-    outgrid: Union[str, Path],
-    above: Optional[Union[str, List]] = None,
-    below: Optional[Union[str, List]] = None,
-    between: Optional[Union[str, List]] = None,
-    region: Optional[Union[str, List[float]]] = None,
-    **kwargs
+    grid: str | Path,
+    outgrid: str | Path,
+    above: str | list | None = None,
+    below: str | list | None = None,
+    between: str | list | None = None,
+    region: str | list[float] | None = None,
+    **kwargs,
 ):
     """
     Clip grid values.

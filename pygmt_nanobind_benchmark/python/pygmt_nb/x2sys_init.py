@@ -4,16 +4,15 @@ x2sys_init - Initialize a new X2SYS track database.
 Module-level function (not a Figure method).
 """
 
-from typing import Union, Optional
 
 
 def x2sys_init(
     tag: str,
     suffix: str,
-    units: Optional[str] = None,
-    gap: Optional[float] = None,
+    units: str | None = None,
+    gap: float | None = None,
     force: bool = False,
-    **kwargs
+    **kwargs,
 ):
     """
     Initialize a new X2SYS track database.

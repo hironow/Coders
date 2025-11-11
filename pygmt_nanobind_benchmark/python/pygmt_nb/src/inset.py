@@ -4,7 +4,6 @@ inset - Manage Figure inset setup and completion.
 Figure method (imported into Figure class).
 """
 
-from typing import Union, Optional, List
 
 
 class InsetContext:
@@ -19,10 +18,10 @@ class InsetContext:
         self,
         session,
         position: str,
-        box: Optional[Union[bool, str]] = None,
-        offset: Optional[str] = None,
-        margin: Optional[Union[str, float, List]] = None,
-        **kwargs
+        box: bool | str | None = None,
+        offset: str | None = None,
+        margin: str | float | list | None = None,
+        **kwargs,
     ):
         """
         Initialize inset context.
@@ -89,10 +88,10 @@ class InsetContext:
 def inset(
     self,
     position: str,
-    box: Optional[Union[bool, str]] = None,
-    offset: Optional[str] = None,
-    margin: Optional[Union[str, float, List]] = None,
-    **kwargs
+    box: bool | str | None = None,
+    offset: str | None = None,
+    margin: str | float | list | None = None,
+    **kwargs,
 ):
     """
     Create a figure inset context for plotting a map within a map.
@@ -156,10 +155,5 @@ def inset(
     The original coordinate system is restored after exiting the context.
     """
     return InsetContext(
-        session=self._session,
-        position=position,
-        box=box,
-        offset=offset,
-        margin=margin,
-        **kwargs
+        session=self._session, position=position, box=box, offset=offset, margin=margin, **kwargs
     )

@@ -4,18 +4,16 @@ image - PyGMT-compatible plotting method.
 Modern mode implementation using nanobind.
 """
 
-from typing import Union, Optional, List
 from pathlib import Path
-import numpy as np
 
 
 def image(
     self,
-    imagefile: Union[str, Path],
-    position: Optional[str] = None,
-    box: Union[bool, str] = False,
+    imagefile: str | Path,
+    position: str | None = None,
+    box: bool | str = False,
     monochrome: bool = False,
-    **kwargs
+    **kwargs,
 ):
     """
     Plot raster or EPS images.

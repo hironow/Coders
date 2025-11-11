@@ -4,8 +4,8 @@ plot3d - Plot lines, polygons, and symbols in 3D.
 Figure method (imported into Figure class).
 """
 
-from typing import Union, Optional, List
 from pathlib import Path
+
 import numpy as np
 
 
@@ -15,19 +15,19 @@ def plot3d(
     x=None,
     y=None,
     z=None,
-    region: Optional[Union[str, List[float]]] = None,
-    projection: Optional[str] = None,
-    perspective: Optional[Union[str, List[float]]] = None,
-    frame: Optional[Union[bool, str, list]] = None,
-    style: Optional[str] = None,
-    color: Optional[str] = None,
-    fill: Optional[str] = None,
-    pen: Optional[str] = None,
-    size: Optional[Union[str, float]] = None,
-    intensity: Optional[float] = None,
-    transparency: Optional[float] = None,
-    label: Optional[str] = None,
-    **kwargs
+    region: str | list[float] | None = None,
+    projection: str | None = None,
+    perspective: str | list[float] | None = None,
+    frame: bool | str | list | None = None,
+    style: str | None = None,
+    color: str | None = None,
+    fill: str | None = None,
+    pen: str | None = None,
+    size: str | float | None = None,
+    intensity: float | None = None,
+    transparency: float | None = None,
+    label: str | None = None,
+    **kwargs,
 ):
     """
     Plot lines, polygons, and symbols in 3-D.

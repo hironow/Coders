@@ -4,25 +4,25 @@ binstats - Bin spatial data and compute statistics.
 Module-level function (not a Figure method).
 """
 
-from typing import Union, Optional, List
-from pathlib import Path
-import numpy as np
 import tempfile
+from pathlib import Path
+
+import numpy as np
 
 from pygmt_nb.clib import Session
 
 
 def binstats(
-    data: Optional[Union[np.ndarray, str, Path]] = None,
-    x: Optional[np.ndarray] = None,
-    y: Optional[np.ndarray] = None,
-    z: Optional[np.ndarray] = None,
-    output: Optional[Union[str, Path]] = None,
-    outgrid: Optional[Union[str, Path]] = None,
-    region: Union[str, List[float]] = None,
-    spacing: Union[str, List[float]] = None,
-    statistic: Optional[str] = None,
-    **kwargs
+    data: np.ndarray | str | Path | None = None,
+    x: np.ndarray | None = None,
+    y: np.ndarray | None = None,
+    z: np.ndarray | None = None,
+    output: str | Path | None = None,
+    outgrid: str | Path | None = None,
+    region: str | list[float] = None,
+    spacing: str | list[float] = None,
+    statistic: str | None = None,
+    **kwargs,
 ):
     """
     Bin spatial data and compute statistics.
@@ -215,14 +215,17 @@ def binstats(
                     return None
                 else:
                     # Return as array
-                    with tempfile.NamedTemporaryFile(mode='w+', suffix='.txt', delete=False) as f:
+                    with tempfile.NamedTemporaryFile(mode="w+", suffix=".txt", delete=False) as f:
                         outfile = f.name
                     try:
-                        session.call_module("gmtbinstats", f"{data} " + " ".join(args) + f" ->{outfile}")
+                        session.call_module(
+                            "gmtbinstats", f"{data} " + " ".join(args) + f" ->{outfile}"
+                        )
                         result = np.loadtxt(outfile)
                         return result
                     finally:
                         import os
+
                         if os.path.exists(outfile):
                             os.unlink(outfile)
             else:
@@ -240,21 +243,28 @@ def binstats(
 
                 with session.virtualfile_from_vectors(*vectors) as vfile:
                     if output is not None:
-                        session.call_module("gmtbinstats", f"{vfile} " + " ".join(args) + f" ->{output}")
+                        session.call_module(
+                            "gmtbinstats", f"{vfile} " + " ".join(args) + f" ->{output}"
+                        )
                         return None
                     elif outgrid is not None:
                         session.call_module("gmtbinstats", f"{vfile} " + " ".join(args))
                         return None
                     else:
                         # Return as array
-                        with tempfile.NamedTemporaryFile(mode='w+', suffix='.txt', delete=False) as f:
+                        with tempfile.NamedTemporaryFile(
+                            mode="w+", suffix=".txt", delete=False
+                        ) as f:
                             outfile = f.name
                         try:
-                            session.call_module("gmtbinstats", f"{vfile} " + " ".join(args) + f" ->{outfile}")
+                            session.call_module(
+                                "gmtbinstats", f"{vfile} " + " ".join(args) + f" ->{outfile}"
+                            )
                             result = np.loadtxt(outfile)
                             return result
                         finally:
                             import os
+
                             if os.path.exists(outfile):
                                 os.unlink(outfile)
 
@@ -266,21 +276,26 @@ def binstats(
 
             with session.virtualfile_from_vectors(x_array, y_array, z_array) as vfile:
                 if output is not None:
-                    session.call_module("gmtbinstats", f"{vfile} " + " ".join(args) + f" ->{output}")
+                    session.call_module(
+                        "gmtbinstats", f"{vfile} " + " ".join(args) + f" ->{output}"
+                    )
                     return None
                 elif outgrid is not None:
                     session.call_module("gmtbinstats", f"{vfile} " + " ".join(args))
                     return None
                 else:
                     # Return as array
-                    with tempfile.NamedTemporaryFile(mode='w+', suffix='.txt', delete=False) as f:
+                    with tempfile.NamedTemporaryFile(mode="w+", suffix=".txt", delete=False) as f:
                         outfile = f.name
                     try:
-                        session.call_module("gmtbinstats", f"{vfile} " + " ".join(args) + f" ->{outfile}")
+                        session.call_module(
+                            "gmtbinstats", f"{vfile} " + " ".join(args) + f" ->{outfile}"
+                        )
                         result = np.loadtxt(outfile)
                         return result
                     finally:
                         import os
+
                         if os.path.exists(outfile):
                             os.unlink(outfile)
         else:

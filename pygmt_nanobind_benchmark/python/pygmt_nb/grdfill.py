@@ -4,18 +4,17 @@ grdfill - Interpolate across holes in a grid.
 Module-level function (not a Figure method).
 """
 
-from typing import Union, Optional, List
 from pathlib import Path
 
 from pygmt_nb.clib import Session
 
 
 def grdfill(
-    grid: Union[str, Path],
-    outgrid: Union[str, Path],
-    mode: Optional[str] = None,
-    region: Optional[Union[str, List[float]]] = None,
-    **kwargs
+    grid: str | Path,
+    outgrid: str | Path,
+    mode: str | None = None,
+    region: str | list[float] | None = None,
+    **kwargs,
 ):
     """
     Interpolate across holes (NaN values) in a grid.

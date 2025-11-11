@@ -4,21 +4,20 @@ grdproject - Forward and inverse map transformation of grids.
 Module-level function (not a Figure method).
 """
 
-from typing import Union, Optional, List
 from pathlib import Path
 
 from pygmt_nb.clib import Session
 
 
 def grdproject(
-    grid: Union[str, Path],
-    outgrid: Union[str, Path],
-    projection: Optional[str] = None,
+    grid: str | Path,
+    outgrid: str | Path,
+    projection: str | None = None,
     inverse: bool = False,
-    region: Optional[Union[str, List[float]]] = None,
-    spacing: Optional[Union[str, List[float]]] = None,
-    center: Optional[Union[str, List[float]]] = None,
-    **kwargs
+    region: str | list[float] | None = None,
+    spacing: str | list[float] | None = None,
+    center: str | list[float] | None = None,
+    **kwargs,
 ):
     """
     Forward and inverse map transformation of grids.

@@ -7,12 +7,12 @@ Following TDD (Test-Driven Development) principles:
 3. Refactor while keeping tests green
 """
 
+import os
+import sys
+import tempfile
 import unittest
 from pathlib import Path
-import tempfile
-import os
 
-import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from pygmt_nb import Figure
@@ -31,23 +31,21 @@ class TestGrdcontour(unittest.TestCase):
     def tearDown(self):
         """Clean up test fixtures."""
         import shutil
+
         if os.path.exists(self.temp_dir):
             shutil.rmtree(self.temp_dir)
 
     def test_figure_has_grdcontour_method(self) -> None:
         """Test that Figure has grdcontour method."""
         fig = Figure()
-        assert hasattr(fig, 'grdcontour')
+        assert hasattr(fig, "grdcontour")
         assert callable(fig.grdcontour)
 
     def test_grdcontour_simple(self) -> None:
         """Create simple contours from grid."""
         fig = Figure()
         fig.grdcontour(
-            grid=str(self.test_grid),
-            region=self.region,
-            projection=self.projection,
-            frame="afg"
+            grid=str(self.test_grid), region=self.region, projection=self.projection, frame="afg"
         )
 
         output = Path(self.temp_dir) / "grdcontour_simple.ps"
@@ -64,7 +62,7 @@ class TestGrdcontour(unittest.TestCase):
             region=self.region,
             projection=self.projection,
             interval=100,  # Contour every 100 units
-            frame="afg"
+            frame="afg",
         )
 
         output = Path(self.temp_dir) / "grdcontour_interval.ps"
@@ -82,7 +80,7 @@ class TestGrdcontour(unittest.TestCase):
             projection=self.projection,
             interval=100,
             annotation=500,  # Annotate every 500 units
-            frame="afg"
+            frame="afg",
         )
 
         output = Path(self.temp_dir) / "grdcontour_annotation.ps"
@@ -100,7 +98,7 @@ class TestGrdcontour(unittest.TestCase):
             projection=self.projection,
             interval=100,
             pen="0.5p,blue",  # Blue thin lines
-            frame="afg"
+            frame="afg",
         )
 
         output = Path(self.temp_dir) / "grdcontour_pen.ps"
@@ -118,7 +116,7 @@ class TestGrdcontour(unittest.TestCase):
             projection=self.projection,
             interval=100,
             limit=[-1000, 1000],  # Only contours between -1000 and 1000
-            frame="afg"
+            frame="afg",
         )
 
         output = Path(self.temp_dir) / "grdcontour_limit.ps"
@@ -132,10 +130,7 @@ class TestGrdcontour(unittest.TestCase):
         fig = Figure()
         fig.basemap(region=self.region, projection=self.projection, frame="afg")
         fig.grdcontour(
-            grid=str(self.test_grid),
-            region=self.region,
-            projection=self.projection,
-            interval=100
+            grid=str(self.test_grid), region=self.region, projection=self.projection, interval=100
         )
 
         output = Path(self.temp_dir) / "grdcontour_with_basemap.ps"
@@ -154,7 +149,7 @@ class TestGrdcontour(unittest.TestCase):
             region=self.region,
             projection=self.projection,
             interval=200,
-            pen="0.5p,white"  # White contours on colored background
+            pen="0.5p,white",  # White contours on colored background
         )
 
         output = Path(self.temp_dir) / "grdcontour_overlay.ps"
@@ -164,5 +159,5 @@ class TestGrdcontour(unittest.TestCase):
         assert output.stat().st_size > 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

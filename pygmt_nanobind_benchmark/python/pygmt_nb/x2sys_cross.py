@@ -4,16 +4,15 @@ x2sys_cross - Calculate crossover errors between track data files.
 Module-level function (not a Figure method).
 """
 
-from typing import Union, Optional, List
 from pathlib import Path
 
 
 def x2sys_cross(
-    tracks: Union[str, List[str], Path, List[Path]],
+    tracks: str | list[str] | Path | list[Path],
     tag: str,
-    output: Optional[Union[str, Path]] = None,
-    interpolation: Optional[str] = None,
-    **kwargs
+    output: str | Path | None = None,
+    interpolation: str | None = None,
+    **kwargs,
 ):
     """
     Calculate crossover errors between track data files.
@@ -125,9 +124,11 @@ def x2sys_cross(
     x2sys_init : Initialize X2SYS database
     x2sys_list : Get information about crossovers
     """
-    from pygmt_nb.clib import Session
-    import numpy as np
     import tempfile
+
+    import numpy as np
+
+    from pygmt_nb.clib import Session
 
     # Build GMT command
     args = []
@@ -151,15 +152,19 @@ def x2sys_cross(
     with Session() as session:
         if output is not None:
             # Write to file
-            session.call_module("x2sys_cross", " ".join(track_list) + " " + " ".join(args) + f" ->{output}")
+            session.call_module(
+                "x2sys_cross", " ".join(track_list) + " " + " ".join(args) + f" ->{output}"
+            )
             return None
         else:
             # Return as array
-            with tempfile.NamedTemporaryFile(mode='w+', suffix='.txt', delete=False) as tmp:
+            with tempfile.NamedTemporaryFile(mode="w+", suffix=".txt", delete=False) as tmp:
                 outfile = tmp.name
 
             try:
-                session.call_module("x2sys_cross", " ".join(track_list) + " " + " ".join(args) + f" ->{outfile}")
+                session.call_module(
+                    "x2sys_cross", " ".join(track_list) + " " + " ".join(args) + f" ->{outfile}"
+                )
 
                 # Read result
                 result = np.loadtxt(outfile)
@@ -169,5 +174,6 @@ def x2sys_cross(
                 return None
             finally:
                 import os
+
                 if os.path.exists(outfile):
                     os.unlink(outfile)

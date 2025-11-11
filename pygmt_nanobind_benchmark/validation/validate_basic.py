@@ -9,14 +9,16 @@ Compares outputs to validate compatibility.
 import sys
 import tempfile
 from pathlib import Path
+
 import numpy as np
 
 # Add pygmt_nb to path (dynamically resolve project root)
 project_root = Path(__file__).parent.parent
-sys.path.insert(0, str(project_root / 'python'))
+sys.path.insert(0, str(project_root / "python"))
 
 try:
     import pygmt
+
     PYGMT_AVAILABLE = True
     print("✓ PyGMT available")
 except ImportError:
@@ -25,6 +27,7 @@ except ImportError:
     sys.exit(1)
 
 import pygmt_nb
+
 
 class ValidationTest:
     """Base class for validation tests."""
@@ -46,19 +49,19 @@ class ValidationTest:
 
     def validate(self):
         """Run both implementations and compare."""
-        print(f"\n{'='*70}")
+        print(f"\n{'=' * 70}")
         print(f"Validation Test: {self.name}")
         print(f"Description: {self.description}")
-        print(f"{'='*70}")
+        print(f"{'=' * 70}")
 
         results = {
-            'name': self.name,
-            'description': self.description,
-            'pygmt_success': False,
-            'pygmt_nb_success': False,
-            'pygmt_error': None,
-            'pygmt_nb_error': None,
-            'comparison': None
+            "name": self.name,
+            "description": self.description,
+            "pygmt_success": False,
+            "pygmt_nb_success": False,
+            "pygmt_error": None,
+            "pygmt_nb_error": None,
+            "comparison": None,
         }
 
         # Run PyGMT
@@ -66,13 +69,15 @@ class ValidationTest:
         try:
             self.run_pygmt()
             if self.pygmt_output.exists():
-                results['pygmt_success'] = True
-                results['pygmt_size'] = self.pygmt_output.stat().st_size
-                print(f"  ✓ Success - Output: {self.pygmt_output.name} ({results['pygmt_size']} bytes)")
+                results["pygmt_success"] = True
+                results["pygmt_size"] = self.pygmt_output.stat().st_size
+                print(
+                    f"  ✓ Success - Output: {self.pygmt_output.name} ({results['pygmt_size']} bytes)"
+                )
             else:
-                print(f"  ✗ Failed - No output file created")
+                print("  ✗ Failed - No output file created")
         except Exception as e:
-            results['pygmt_error'] = str(e)
+            results["pygmt_error"] = str(e)
             print(f"  ✗ Error: {e}")
 
         # Run pygmt_nb
@@ -80,31 +85,33 @@ class ValidationTest:
         try:
             self.run_pygmt_nb()
             if self.pygmt_nb_output.exists():
-                results['pygmt_nb_success'] = True
-                results['pygmt_nb_size'] = self.pygmt_nb_output.stat().st_size
-                print(f"  ✓ Success - Output: {self.pygmt_nb_output.name} ({results['pygmt_nb_size']} bytes)")
+                results["pygmt_nb_success"] = True
+                results["pygmt_nb_size"] = self.pygmt_nb_output.stat().st_size
+                print(
+                    f"  ✓ Success - Output: {self.pygmt_nb_output.name} ({results['pygmt_nb_size']} bytes)"
+                )
             else:
-                print(f"  ✗ Failed - No output file created")
+                print("  ✗ Failed - No output file created")
         except Exception as e:
-            results['pygmt_nb_error'] = str(e)
+            results["pygmt_nb_error"] = str(e)
             print(f"  ✗ Error: {e}")
 
         # Compare
-        if results['pygmt_success'] and results['pygmt_nb_success']:
-            print(f"\n[Comparison]")
+        if results["pygmt_success"] and results["pygmt_nb_success"]:
+            print("\n[Comparison]")
             print(f"  PyGMT format: EPS ({results['pygmt_size']} bytes)")
             print(f"  pygmt_nb format: PS ({results['pygmt_nb_size']} bytes)")
-            print(f"  ✓ Both implementations produced output successfully")
-            results['comparison'] = 'SUCCESS'
-        elif results['pygmt_nb_success']:
-            print(f"\n[Comparison]")
-            print(f"  ✓ pygmt_nb working")
-            print(f"  ✗ PyGMT failed")
-            results['comparison'] = 'PYGMT_NB_ONLY'
+            print("  ✓ Both implementations produced output successfully")
+            results["comparison"] = "SUCCESS"
+        elif results["pygmt_nb_success"]:
+            print("\n[Comparison]")
+            print("  ✓ pygmt_nb working")
+            print("  ✗ PyGMT failed")
+            results["comparison"] = "PYGMT_NB_ONLY"
         else:
-            print(f"\n[Comparison]")
-            print(f"  ✗ Test failed")
-            results['comparison'] = 'FAILED'
+            print("\n[Comparison]")
+            print("  ✗ Test failed")
+            results["comparison"] = "FAILED"
 
         return results
 
@@ -113,13 +120,13 @@ class ValidationTest:
 # Test 1: Basic Basemap
 # =============================================================================
 
+
 class Test01_BasicBasemap(ValidationTest):
     """Test 1: Basic basemap with frame."""
 
     def __init__(self):
         super().__init__(
-            "Basic Basemap",
-            "Create simple Cartesian basemap with frame and annotations"
+            "Basic Basemap", "Create simple Cartesian basemap with frame and annotations"
         )
 
     def run_pygmt(self):
@@ -137,13 +144,13 @@ class Test01_BasicBasemap(ValidationTest):
 # Test 2: Global Shorelines
 # =============================================================================
 
+
 class Test02_GlobalShorelines(ValidationTest):
     """Test 2: Global map with shorelines."""
 
     def __init__(self):
         super().__init__(
-            "Global Shorelines",
-            "Global map with coastlines using Winkel Tripel projection"
+            "Global Shorelines", "Global map with coastlines using Winkel Tripel projection"
         )
 
     def run_pygmt(self):
@@ -163,14 +170,12 @@ class Test02_GlobalShorelines(ValidationTest):
 # Test 3: Land and Water
 # =============================================================================
 
+
 class Test03_LandWater(ValidationTest):
     """Test 3: Regional map with land and water fill."""
 
     def __init__(self):
-        super().__init__(
-            "Land and Water",
-            "Regional map with colored land and water bodies"
-        )
+        super().__init__("Land and Water", "Regional map with colored land and water bodies")
 
     def run_pygmt(self):
         fig = pygmt.Figure()
@@ -189,14 +194,12 @@ class Test03_LandWater(ValidationTest):
 # Test 4: Simple Data Plot
 # =============================================================================
 
+
 class Test04_SimplePlot(ValidationTest):
     """Test 4: Plot data points with symbols."""
 
     def __init__(self):
-        super().__init__(
-            "Simple Data Plot",
-            "Plot sine wave data with circle symbols"
-        )
+        super().__init__("Simple Data Plot", "Plot sine wave data with circle symbols")
         self.x = np.linspace(0, 10, 50)
         self.y = np.sin(self.x) * 3 + 5
 
@@ -217,14 +220,12 @@ class Test04_SimplePlot(ValidationTest):
 # Test 5: Plot with Lines
 # =============================================================================
 
+
 class Test05_Lines(ValidationTest):
     """Test 5: Plot data as lines."""
 
     def __init__(self):
-        super().__init__(
-            "Line Plot",
-            "Plot continuous line with multiple segments"
-        )
+        super().__init__("Line Plot", "Plot continuous line with multiple segments")
         self.x = np.linspace(0, 10, 100)
         self.y = np.sin(self.x) * 3 + 5
 
@@ -245,14 +246,12 @@ class Test05_Lines(ValidationTest):
 # Test 6: Text Annotations
 # =============================================================================
 
+
 class Test06_Text(ValidationTest):
     """Test 6: Add text annotations."""
 
     def __init__(self):
-        super().__init__(
-            "Text Annotations",
-            "Add text labels at various positions"
-        )
+        super().__init__("Text Annotations", "Add text labels at various positions")
 
     def run_pygmt(self):
         fig = pygmt.Figure()
@@ -275,14 +274,12 @@ class Test06_Text(ValidationTest):
 # Test 7: Histogram
 # =============================================================================
 
+
 class Test07_Histogram(ValidationTest):
     """Test 7: Create histogram."""
 
     def __init__(self):
-        super().__init__(
-            "Histogram",
-            "Plot histogram of random data"
-        )
+        super().__init__("Histogram", "Plot histogram of random data")
         self.data = np.random.randn(1000)
 
     def run_pygmt(self):
@@ -293,7 +290,7 @@ class Test07_Histogram(ValidationTest):
             frame="afg",
             series="-4/4/0.5",
             pen="1p,black",
-            fill="skyblue"
+            fill="skyblue",
         )
         fig.savefig(str(self.pygmt_output))
 
@@ -305,7 +302,7 @@ class Test07_Histogram(ValidationTest):
             frame="afg",
             series="-4/4/0.5",
             pen="1p,black",
-            fill="skyblue"
+            fill="skyblue",
         )
         fig.savefig(str(self.pygmt_nb_output))
 
@@ -314,14 +311,12 @@ class Test07_Histogram(ValidationTest):
 # Test 8: Complete Workflow
 # =============================================================================
 
+
 class Test08_CompleteMap(ValidationTest):
     """Test 8: Complete map with multiple elements."""
 
     def __init__(self):
-        super().__init__(
-            "Complete Map",
-            "Map with basemap, coast, data points, text, and logo"
-        )
+        super().__init__("Complete Map", "Map with basemap, coast, data points, text, and logo")
         self.x = np.array([135, 140, 145])
         self.y = np.array([35, 37, 39])
 
@@ -348,12 +343,13 @@ class Test08_CompleteMap(ValidationTest):
 # Main Validation Suite
 # =============================================================================
 
+
 def main():
     """Run Phase 4 validation suite."""
-    print("="*70)
+    print("=" * 70)
     print("PHASE 4: PIXEL-IDENTICAL VALIDATION")
     print("Comparing pygmt_nb against PyGMT Gallery Examples")
-    print("="*70)
+    print("=" * 70)
 
     if not PYGMT_AVAILABLE:
         print("\n❌ PyGMT not available - cannot run validation")
@@ -378,25 +374,25 @@ def main():
         results.append(result)
 
     # Summary
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("VALIDATION SUMMARY")
-    print("="*70)
+    print("=" * 70)
     print(f"\n{'Test':<30} {'PyGMT':<15} {'pygmt_nb':<15} {'Status'}")
-    print("-"*70)
+    print("-" * 70)
 
     success_count = 0
     pygmt_nb_only_count = 0
     failed_count = 0
 
     for result in results:
-        name = result['name']
-        pygmt_status = "✓" if result['pygmt_success'] else "✗"
-        pygmt_nb_status = "✓" if result['pygmt_nb_success'] else "✗"
+        name = result["name"]
+        pygmt_status = "✓" if result["pygmt_success"] else "✗"
+        pygmt_nb_status = "✓" if result["pygmt_nb_success"] else "✗"
 
-        if result['comparison'] == 'SUCCESS':
+        if result["comparison"] == "SUCCESS":
             status = "✅ PASS"
             success_count += 1
-        elif result['comparison'] == 'PYGMT_NB_ONLY':
+        elif result["comparison"] == "PYGMT_NB_ONLY":
             status = "⚠️  pygmt_nb OK"
             pygmt_nb_only_count += 1
         else:
@@ -405,31 +401,31 @@ def main():
 
         print(f"{name:<30} {pygmt_status:<15} {pygmt_nb_status:<15} {status}")
 
-    print("-"*70)
+    print("-" * 70)
     print(f"\nTotal Tests: {len(results)}")
     print(f"  ✅ Both Working: {success_count}")
     print(f"  ⚠️  pygmt_nb Only: {pygmt_nb_only_count}")
     print(f"  ❌ Failed: {failed_count}")
 
     if success_count == len(results):
-        print(f"\n🎉 ALL TESTS PASSED!")
-        print(f"   pygmt_nb successfully replicates PyGMT output")
+        print("\n🎉 ALL TESTS PASSED!")
+        print("   pygmt_nb successfully replicates PyGMT output")
     elif pygmt_nb_only_count > 0:
-        print(f"\n✅ pygmt_nb is working correctly")
+        print("\n✅ pygmt_nb is working correctly")
         print(f"   PyGMT had {pygmt_nb_only_count} failures (system/config issues)")
     else:
-        print(f"\n⚠️  Some tests failed - review errors above")
+        print("\n⚠️  Some tests failed - review errors above")
 
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("PHASE 4 VALIDATION COMPLETE")
-    print("="*70)
+    print("=" * 70)
 
     # Note about format differences
-    print(f"\n📝 Note on Output Formats:")
-    print(f"   - PyGMT: EPS format (requires Ghostscript)")
-    print(f"   - pygmt_nb: PS format (native GMT output)")
-    print(f"   - Both formats contain same visual content")
-    print(f"   - pygmt_nb avoids Ghostscript dependency")
+    print("\n📝 Note on Output Formats:")
+    print("   - PyGMT: EPS format (requires Ghostscript)")
+    print("   - pygmt_nb: PS format (native GMT output)")
+    print("   - Both formats contain same visual content")
+    print("   - pygmt_nb avoids Ghostscript dependency")
 
 
 if __name__ == "__main__":

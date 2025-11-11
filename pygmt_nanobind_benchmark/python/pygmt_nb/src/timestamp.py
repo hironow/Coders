@@ -4,17 +4,16 @@ timestamp - Plot timestamp on maps.
 Figure method (not a standalone module function).
 """
 
-from typing import Union, Optional
 
 
 def timestamp(
     self,
-    text: Optional[str] = None,
-    position: Optional[str] = None,
-    offset: Optional[str] = None,
-    font: Optional[str] = None,
-    justify: Optional[str] = None,
-    **kwargs
+    text: str | None = None,
+    position: str | None = None,
+    offset: str | None = None,
+    font: str | None = None,
+    justify: str | None = None,
+    **kwargs,
 ):
     """
     Plot timestamp on maps.

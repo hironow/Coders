@@ -7,12 +7,12 @@ Following TDD (Test-Driven Development) principles:
 3. Refactor while keeping tests green
 """
 
+import os
+import sys
+import tempfile
 import unittest
 from pathlib import Path
-import tempfile
-import os
 
-import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from pygmt_nb import Figure
@@ -29,13 +29,14 @@ class TestColorbar(unittest.TestCase):
     def tearDown(self):
         """Clean up test fixtures."""
         import shutil
+
         if os.path.exists(self.temp_dir):
             shutil.rmtree(self.temp_dir)
 
     def test_figure_has_colorbar_method(self) -> None:
         """Test that Figure has colorbar method."""
         fig = Figure()
-        assert hasattr(fig, 'colorbar')
+        assert hasattr(fig, "colorbar")
         assert callable(fig.colorbar)
 
     def test_colorbar_simple(self) -> None:
@@ -131,5 +132,5 @@ class TestColorbar(unittest.TestCase):
         assert output.stat().st_size > 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

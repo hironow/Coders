@@ -4,11 +4,10 @@ Test Figure.text.
 Based on PyGMT's test_text.py, adapted for pygmt_nb.
 """
 
+import os
+import tempfile
 import unittest
 from pathlib import Path
-import tempfile
-import os
-import numpy as np
 
 
 class TestText(unittest.TestCase):
@@ -23,6 +22,7 @@ class TestText(unittest.TestCase):
     def tearDown(self):
         """Clean up temporary files."""
         import shutil
+
         if os.path.exists(self.temp_dir):
             shutil.rmtree(self.temp_dir)
 
@@ -31,7 +31,7 @@ class TestText(unittest.TestCase):
         from pygmt_nb import Figure
 
         fig = Figure()
-        assert hasattr(fig, 'text')
+        assert hasattr(fig, "text")
         assert callable(fig.text)
 
     def test_text_single_line(self) -> None:
@@ -56,9 +56,9 @@ class TestText(unittest.TestCase):
         assert output_file.stat().st_size > 0
 
         # Verify it's a valid PostScript
-        with open(output_file, 'rb') as f:
+        with open(output_file, "rb") as f:
             header = f.read(4)
-            assert header == b'%!PS'
+            assert header == b"%!PS"
 
     def test_text_multiple_lines(self) -> None:
         """Place multiple lines of text at their respective x, y locations."""

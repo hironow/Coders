@@ -4,19 +4,18 @@ makecpt - Make GMT color palette tables.
 Module-level function (not a Figure method).
 """
 
-from typing import Optional, Union, List, Tuple
 from pathlib import Path
 
 from pygmt_nb.clib import Session
 
 
 def makecpt(
-    cmap: Optional[str] = None,
-    series: Optional[Union[str, List[float]]] = None,
+    cmap: str | None = None,
+    series: str | list[float] | None = None,
     reverse: bool = False,
     continuous: bool = False,
-    output: Optional[Union[str, Path]] = None,
-    **kwargs
+    output: str | Path | None = None,
+    **kwargs,
 ):
     """
     Make GMT color palette tables (CPTs).

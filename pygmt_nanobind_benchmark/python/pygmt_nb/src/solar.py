@@ -4,17 +4,16 @@ solar - Plot day-light terminators and other sun-related parameters.
 Figure method (not a standalone module function).
 """
 
-from typing import Union, Optional, List
 
 
 def solar(
     self,
-    terminator: Optional[str] = None,
-    datetime: Optional[str] = None,
-    pen: Optional[str] = None,
-    fill: Optional[str] = None,
+    terminator: str | None = None,
+    datetime: str | None = None,
+    pen: str | None = None,
+    fill: str | None = None,
     sun_position: bool = False,
-    **kwargs
+    **kwargs,
 ):
     """
     Plot day-light terminators and other sun-related parameters.

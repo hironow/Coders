@@ -4,20 +4,20 @@ ternary - Plot ternary diagrams.
 Figure method (not a standalone module function).
 """
 
-from typing import Union, Optional, List
 from pathlib import Path
+
 import numpy as np
 
 
 def ternary(
     self,
-    data: Optional[Union[np.ndarray, str, Path]] = None,
-    region: Optional[Union[str, List[float]]] = None,
-    projection: Optional[str] = None,
-    symbol: Optional[str] = None,
-    pen: Optional[str] = None,
-    fill: Optional[str] = None,
-    **kwargs
+    data: np.ndarray | str | Path | None = None,
+    region: str | list[float] | None = None,
+    projection: str | None = None,
+    symbol: str | None = None,
+    pen: str | None = None,
+    fill: str | None = None,
+    **kwargs,
 ):
     """
     Plot ternary diagrams.

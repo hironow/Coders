@@ -4,20 +4,19 @@ dimfilter - Directional median filtering of grids.
 Module-level function (not a Figure method).
 """
 
-from typing import Union, Optional, List
 from pathlib import Path
 
 from pygmt_nb.clib import Session
 
 
 def dimfilter(
-    grid: Union[str, Path],
-    outgrid: Union[str, Path],
-    distance: Union[str, float],
+    grid: str | Path,
+    outgrid: str | Path,
+    distance: str | float,
     sectors: int = 4,
-    filter_type: Optional[str] = None,
-    region: Optional[Union[str, List[float]]] = None,
-    **kwargs
+    filter_type: str | None = None,
+    region: str | list[float] | None = None,
+    **kwargs,
 ):
     """
     Perform directional median filtering of grids.

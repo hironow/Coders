@@ -4,15 +4,14 @@ hlines - Plot horizontal lines.
 Figure method (not a standalone module function).
 """
 
-from typing import Union, Optional, List
 
 
 def hlines(
     self,
-    y: Union[float, List[float]],
-    pen: Optional[str] = None,
-    label: Optional[str] = None,
-    **kwargs
+    y: float | list[float],
+    pen: str | None = None,
+    label: str | None = None,
+    **kwargs,
 ):
     """
     Plot horizontal lines.

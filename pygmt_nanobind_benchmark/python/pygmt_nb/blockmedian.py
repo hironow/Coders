@@ -4,26 +4,26 @@ blockmedian - Block average (x,y,z) data tables by median estimation.
 Module-level function (not a Figure method).
 """
 
-from typing import Union, Optional, List
-from pathlib import Path
-import numpy as np
-import tempfile
 import os
+import tempfile
+from pathlib import Path
+
+import numpy as np
 
 from pygmt_nb.clib import Session
 
 
 def blockmedian(
-    data: Optional[Union[np.ndarray, List, str, Path]] = None,
-    x: Optional[np.ndarray] = None,
-    y: Optional[np.ndarray] = None,
-    z: Optional[np.ndarray] = None,
-    output: Optional[Union[str, Path]] = None,
-    region: Optional[Union[str, List[float]]] = None,
-    spacing: Optional[Union[str, List[float]]] = None,
-    registration: Optional[str] = None,
-    **kwargs
-) -> Union[np.ndarray, None]:
+    data: np.ndarray | list | str | Path | None = None,
+    x: np.ndarray | None = None,
+    y: np.ndarray | None = None,
+    z: np.ndarray | None = None,
+    output: str | Path | None = None,
+    region: str | list[float] | None = None,
+    spacing: str | list[float] | None = None,
+    registration: str | None = None,
+    **kwargs,
+) -> np.ndarray | None:
     """
     Block average (x,y,z) data tables by median estimation.
 
@@ -147,7 +147,7 @@ def blockmedian(
         return_array = False
     else:
         # Temp file for array output
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
             outfile = f.name
         return_array = True
 
@@ -157,7 +157,9 @@ def blockmedian(
             if data is not None:
                 if isinstance(data, (str, Path)):
                     # File input
-                    session.call_module("blockmedian", f"{data} " + " ".join(args) + f" ->{outfile}")
+                    session.call_module(
+                        "blockmedian", f"{data} " + " ".join(args) + f" ->{outfile}"
+                    )
                 else:
                     # Array input - use virtual file
                     data_array = np.atleast_2d(np.asarray(data, dtype=np.float64))
@@ -172,7 +174,9 @@ def blockmedian(
                     vectors = [data_array[:, i] for i in range(min(3, data_array.shape[1]))]
 
                     with session.virtualfile_from_vectors(*vectors) as vfile:
-                        session.call_module("blockmedian", f"{vfile} " + " ".join(args) + f" ->{outfile}")
+                        session.call_module(
+                            "blockmedian", f"{vfile} " + " ".join(args) + f" ->{outfile}"
+                        )
 
             elif x is not None and y is not None and z is not None:
                 # Separate x, y, z arrays
@@ -181,7 +185,9 @@ def blockmedian(
                 z_array = np.asarray(z, dtype=np.float64).ravel()
 
                 with session.virtualfile_from_vectors(x_array, y_array, z_array) as vfile:
-                    session.call_module("blockmedian", f"{vfile} " + " ".join(args) + f" ->{outfile}")
+                    session.call_module(
+                        "blockmedian", f"{vfile} " + " ".join(args) + f" ->{outfile}"
+                    )
             else:
                 raise ValueError("Must provide either 'data' or 'x', 'y', 'z' parameters")
 

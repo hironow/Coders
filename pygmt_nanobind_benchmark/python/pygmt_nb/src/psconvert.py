@@ -4,21 +4,19 @@ psconvert - Convert PostScript to other formats.
 Figure method (imported into Figure class).
 """
 
-from typing import Union, Optional
-from pathlib import Path
 
 
 def psconvert(
     self,
-    prefix: Optional[str] = None,
+    prefix: str | None = None,
     fmt: str = "g",
     crop: bool = True,
     portrait: bool = False,
     adjust: bool = True,
     dpi: int = 300,
     gray: bool = False,
-    anti_aliasing: Optional[str] = None,
-    **kwargs
+    anti_aliasing: str | None = None,
+    **kwargs,
 ):
     """
     Convert PostScript figure to other formats (PNG, PDF, JPEG, etc.).

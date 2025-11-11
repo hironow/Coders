@@ -4,20 +4,18 @@ logo - PyGMT-compatible plotting method.
 Modern mode implementation using nanobind.
 """
 
-from typing import Union, Optional, List
-from pathlib import Path
-import numpy as np
+
 
 
 def logo(
     self,
-    position: Optional[str] = None,
+    position: str | None = None,
     box: bool = False,
-    style: Optional[str] = None,
-    projection: Optional[str] = None,
-    region: Optional[Union[str, List[float]]] = None,
-    transparency: Optional[Union[int, float]] = None,
-    **kwargs
+    style: str | None = None,
+    projection: str | None = None,
+    region: str | list[float] | None = None,
+    transparency: int | float | None = None,
+    **kwargs,
 ):
     """
     Add the GMT logo to the figure.
@@ -44,11 +42,7 @@ def logo(
 
     # Style
     if style:
-        style_map = {
-            "standard": "l",
-            "url": "u",
-            "no_label": "n"
-        }
+        style_map = {"standard": "l", "url": "u", "no_label": "n"}
         style_code = style_map.get(style, style)
         args.append(f"-S{style_code}")
 
@@ -68,4 +62,3 @@ def logo(
         args.append(f"-t{transparency}")
 
     self._session.call_module("gmtlogo", " ".join(args))
-

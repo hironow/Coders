@@ -4,26 +4,26 @@ surface - Grid table data using adjustable tension continuous curvature splines.
 Module-level function (not a Figure method).
 """
 
-from typing import Union, Optional, List
 from pathlib import Path
+
 import numpy as np
 
 from pygmt_nb.clib import Session
 
 
 def surface(
-    data: Optional[Union[np.ndarray, List, str, Path]] = None,
-    x: Optional[np.ndarray] = None,
-    y: Optional[np.ndarray] = None,
-    z: Optional[np.ndarray] = None,
-    outgrid: Union[str, Path] = "surface_output.nc",
-    region: Optional[Union[str, List[float]]] = None,
-    spacing: Optional[Union[str, List[float]]] = None,
-    tension: Optional[float] = None,
-    convergence: Optional[float] = None,
-    mask: Optional[Union[str, Path]] = None,
-    searchradius: Optional[Union[str, float]] = None,
-    **kwargs
+    data: np.ndarray | list | str | Path | None = None,
+    x: np.ndarray | None = None,
+    y: np.ndarray | None = None,
+    z: np.ndarray | None = None,
+    outgrid: str | Path = "surface_output.nc",
+    region: str | list[float] | None = None,
+    spacing: str | list[float] | None = None,
+    tension: float | None = None,
+    convergence: float | None = None,
+    mask: str | Path | None = None,
+    searchradius: str | float | None = None,
+    **kwargs,
 ):
     """
     Grid table data using adjustable tension continuous curvature splines.

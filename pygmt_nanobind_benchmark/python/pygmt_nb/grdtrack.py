@@ -4,24 +4,24 @@ grdtrack - Sample grids at specified (x,y) locations.
 Module-level function (not a Figure method).
 """
 
-from typing import Union, Optional, List
-from pathlib import Path
-import numpy as np
-import tempfile
 import os
+import tempfile
+from pathlib import Path
+
+import numpy as np
 
 from pygmt_nb.clib import Session
 
 
 def grdtrack(
-    points: Union[np.ndarray, List, str, Path],
-    grid: Union[str, Path, List[Union[str, Path]]],
-    output: Optional[Union[str, Path]] = None,
-    newcolname: Optional[str] = None,
-    interpolation: Optional[str] = None,
+    points: np.ndarray | list | str | Path,
+    grid: str | Path | list[str | Path],
+    output: str | Path | None = None,
+    newcolname: str | None = None,
+    interpolation: str | None = None,
     no_skip: bool = False,
-    **kwargs
-) -> Union[np.ndarray, None]:
+    **kwargs,
+) -> np.ndarray | None:
     """
     Sample grids at specified (x,y) locations.
 
@@ -136,7 +136,7 @@ def grdtrack(
         return_array = False
     else:
         # Temp file for array output
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
             outfile = f.name
         return_array = True
 

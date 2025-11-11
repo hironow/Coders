@@ -4,21 +4,20 @@ grdfilter - Filter a grid in the space domain.
 Module-level function (not a Figure method).
 """
 
-from typing import Union, Optional, List, Literal
 from pathlib import Path
 
 from pygmt_nb.clib import Session
 
 
 def grdfilter(
-    grid: Union[str, Path],
-    outgrid: Union[str, Path],
-    filter: Optional[str] = None,
-    distance: Optional[Union[str, float]] = None,
-    region: Optional[Union[str, List[float]]] = None,
-    spacing: Optional[Union[str, List[float]]] = None,
-    nans: Optional[str] = None,
-    **kwargs
+    grid: str | Path,
+    outgrid: str | Path,
+    filter: str | None = None,
+    distance: str | float | None = None,
+    region: str | list[float] | None = None,
+    spacing: str | list[float] | None = None,
+    nans: str | None = None,
+    **kwargs,
 ):
     """
     Filter a grid file in the space (x,y) domain.

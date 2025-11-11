@@ -8,7 +8,6 @@ Future implementation will test:
 - Virtual file operations
 """
 
-import numpy as np
 
 try:
     import pygmt
@@ -17,8 +16,6 @@ try:
 except ImportError:
     PYGMT_AVAILABLE = False
 
-import pygmt_nb
-from benchmark_base import BenchmarkRunner
 
 
 def run_manual_benchmarks():
