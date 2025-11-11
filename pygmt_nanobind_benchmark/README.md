@@ -33,7 +33,7 @@ A complete, high-performance reimplementation of PyGMT using **nanobind** for di
 | Range | 1.01x - 1.34x |
 | Mechanism | Direct C API via nanobind |
 
-See [PHASE3_RESULTS.md](PHASE3_RESULTS.md) for detailed benchmarks.
+See [PERFORMANCE.md](PERFORMANCE.md) for detailed benchmarks.
 
 ## Validation
 
@@ -121,17 +121,17 @@ pygmt_nb/
 pytest tests/
 
 # Run validation
-python validation/validate_phase4_final.py
+python validation/validate_detailed.py
 
 # Run benchmarks
-python benchmarks/benchmark_phase3.py
+python benchmarks/benchmark.py
 ```
 
 ## Documentation
 
 - **FACT.md** - Implementation status (64/64 functions complete)
 - **FINAL_VALIDATION_REPORT.md** - Validation results (90% success)
-- **PHASE3_RESULTS.md** - Performance benchmarks (1.11x speedup)
+- **PERFORMANCE.md** - Performance benchmarks (1.11x speedup)
 - **INSTRUCTIONS** - Original project requirements
 
 ## Project Structure
@@ -141,7 +141,7 @@ pygmt_nanobind_benchmark/
 ├── README.md                      # This file
 ├── FACT.md                        # Implementation status
 ├── FINAL_VALIDATION_REPORT.md     # Validation results
-├── PHASE3_RESULTS.md              # Benchmark results
+├── PERFORMANCE.md                 # Benchmark results
 ├── INSTRUCTIONS                   # Requirements
 ├── python/pygmt_nb/               # Implementation (64 functions)
 ├── tests/                         # Unit tests

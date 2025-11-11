@@ -306,7 +306,7 @@ Test Date: 2025-11-11
 - 1.11x average speedup confirmed
 
 **Evidence**:
-- Phase 3 results: PHASE3_RESULTS.md
+- Performance benchmarks: PERFORMANCE.md
 - Module functions: All improved
 - Range: 1.01x - 1.34x
 
