@@ -18,5 +18,7 @@ from pygmt_nb.grdcut import grdcut
 from pygmt_nb.grd2xyz import grd2xyz
 from pygmt_nb.xyz2grd import xyz2grd
 from pygmt_nb.grdfilter import grdfilter
+from pygmt_nb.project import project
+from pygmt_nb.triangulate import triangulate
 
-__all__ = ["Session", "Grid", "Figure", "makecpt", "info", "grdinfo", "select", "grdcut", "grd2xyz", "xyz2grd", "grdfilter", "__version__"]
+__all__ = ["Session", "Grid", "Figure", "makecpt", "info", "grdinfo", "select", "grdcut", "grd2xyz", "xyz2grd", "grdfilter", "project", "triangulate", "__version__"]

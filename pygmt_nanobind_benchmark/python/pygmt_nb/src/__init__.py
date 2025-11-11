@@ -17,6 +17,7 @@ from pygmt_nb.src.legend import legend
 from pygmt_nb.src.histogram import histogram
 from pygmt_nb.src.image import image
 from pygmt_nb.src.contour import contour
+from pygmt_nb.src.plot3d import plot3d
 
 __all__ = [
     "basemap",
@@ -31,4 +32,5 @@ __all__ = [
     "histogram",
     "image",
     "contour",
+    "plot3d",
 ]

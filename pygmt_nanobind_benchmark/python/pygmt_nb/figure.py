@@ -187,6 +187,7 @@ class Figure:
         histogram,
         image,
         contour,
+        plot3d,
     )
 
 
