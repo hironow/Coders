@@ -18,6 +18,9 @@ from pygmt_nb.src.histogram import histogram
 from pygmt_nb.src.image import image
 from pygmt_nb.src.contour import contour
 from pygmt_nb.src.plot3d import plot3d
+from pygmt_nb.src.grdview import grdview
+from pygmt_nb.src.inset import inset
+from pygmt_nb.src.subplot import subplot
 
 __all__ = [
     "basemap",
@@ -33,4 +36,7 @@ __all__ = [
     "image",
     "contour",
     "plot3d",
+    "grdview",
+    "inset",
+    "subplot",
 ]

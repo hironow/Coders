@@ -188,6 +188,9 @@ class Figure:
         image,
         contour,
         plot3d,
+        grdview,
+        inset,
+        subplot,
     )
 
 
