@@ -25,6 +25,9 @@ from pygmt_nb.src.shift_origin import shift_origin
 from pygmt_nb.src.psconvert import psconvert
 from pygmt_nb.src.hlines import hlines
 from pygmt_nb.src.vlines import vlines
+from pygmt_nb.src.meca import meca
+from pygmt_nb.src.rose import rose
+from pygmt_nb.src.solar import solar
 
 __all__ = [
     "basemap",
@@ -47,4 +50,7 @@ __all__ = [
     "psconvert",
     "hlines",
     "vlines",
+    "meca",
+    "rose",
+    "solar",
 ]

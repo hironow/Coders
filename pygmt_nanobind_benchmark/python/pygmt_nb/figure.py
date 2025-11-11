@@ -195,6 +195,9 @@ class Figure:
         psconvert,
         hlines,
         vlines,
+        meca,
+        rose,
+        solar,
     )
 
 
