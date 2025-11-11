@@ -12,7 +12,10 @@
       "Bash(git restore:*)",
       "WebSearch",
       "WebFetch(domain:github.com)",
-      "WebFetch(domain:raw.githubusercontent.com)"
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(uv pip install:*)",
+      "Bash(uv run python:*)",
+      "Bash(brew --prefix:*)"
     ],
     "deny": [],
     "ask": []

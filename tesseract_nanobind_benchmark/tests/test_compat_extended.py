@@ -98,29 +98,30 @@ def test_set_page_seg_mode_stub():
 
 
 def test_get_page_seg_mode_stub():
-    """Test GetPageSegMode stub behavior (always returns AUTO)."""
+    """Test GetPageSegMode returns current mode."""
     from tesseract_nanobind.compat import PyTessBaseAPI, PSM
 
     # given: initialized API
     with PyTessBaseAPI(lang='eng') as api:
-        # when: calling GetPageSegMode
+        # when: calling GetPageSegMode (default mode)
         psm = api.GetPageSegMode()
 
-        # then: should always return PSM.AUTO
-        assert psm == PSM.AUTO
+        # then: should return valid PSM value
+        # Default is usually SINGLE_BLOCK (6) or AUTO (3)
+        assert psm in [PSM.AUTO, PSM.SINGLE_BLOCK, PSM.SINGLE_COLUMN]
 
 
 def test_set_variable_stub():
-    """Test SetVariable stub behavior (always returns False)."""
+    """Test SetVariable now works."""
     from tesseract_nanobind.compat import PyTessBaseAPI
 
     # given: initialized API
     with PyTessBaseAPI(lang='eng') as api:
-        # when: calling SetVariable
+        # when: calling SetVariable with valid variable
         result = api.SetVariable('tessedit_char_whitelist', '0123456789')
 
-        # then: should return False (not implemented)
-        assert result is False
+        # then: should return True (implemented)
+        assert result is True
 
 
 def test_set_rectangle_stub():

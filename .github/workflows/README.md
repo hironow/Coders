@@ -4,7 +4,7 @@ This directory contains GitHub Actions workflows for the Tesseract Nanobind proj
 
 ## Workflows
 
-### 1. Tesseract Nanobind CI (`tesseract-nanobind-ci.yml`)
+### 1. Tesseract Nanobind CI (`tesseract-nanobind-ci.yaml`)
 
 **Purpose**: Continuous Integration for build, test, and code quality checks.
 
@@ -49,7 +49,7 @@ This directory contains GitHub Actions workflows for the Tesseract Nanobind proj
   1. Run ruff linter
   2. Check code formatting
 
-### 2. Build Wheels (`tesseract-nanobind-build-wheels.yml`)
+### 2. Build Wheels (`tesseract-nanobind-build-wheels.yaml`)
 
 **Purpose**: Build distributable wheels for multiple platforms.
 
@@ -123,8 +123,8 @@ This will automatically trigger the wheel building workflow and create a GitHub 
 Add these badges to your README.md:
 
 ```markdown
-[![Tesseract Nanobind CI](https://github.com/hironow/Coders/actions/workflows/tesseract-nanobind-ci.yml/badge.svg)](https://github.com/hironow/Coders/actions/workflows/tesseract-nanobind-ci.yml)
-[![Build Wheels](https://github.com/hironow/Coders/actions/workflows/tesseract-nanobind-build-wheels.yml/badge.svg)](https://github.com/hironow/Coders/actions/workflows/tesseract-nanobind-build-wheels.yml)
+[![Tesseract Nanobind CI](https://github.com/hironow/Coders/actions/workflows/tesseract-nanobind-ci.yaml/badge.svg)](https://github.com/hironow/Coders/actions/workflows/tesseract-nanobind-ci.yaml)
+[![Build Wheels](https://github.com/hironow/Coders/actions/workflows/tesseract-nanobind-build-wheels.yaml/badge.svg)](https://github.com/hironow/Coders/actions/workflows/tesseract-nanobind-build-wheels.yaml)
 ```
 
 ## Dependencies

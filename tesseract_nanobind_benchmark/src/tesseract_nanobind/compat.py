@@ -51,6 +51,50 @@ class RIL:
     SYMBOL = 4
 
 
+class PT:
+    """PolyBlockType enumeration for layout analysis."""
+    UNKNOWN = 0
+    FLOWING_TEXT = 1
+    HEADING_TEXT = 2
+    PULLOUT_TEXT = 3
+    EQUATION = 4
+    INLINE_EQUATION = 5
+    TABLE = 6
+    VERTICAL_TEXT = 7
+    CAPTION_TEXT = 8
+    FLOWING_IMAGE = 9
+    HEADING_IMAGE = 10
+    PULLOUT_IMAGE = 11
+    HORZ_LINE = 12
+    VERT_LINE = 13
+    NOISE = 14
+    COUNT = 15
+
+
+class Orientation:
+    """Page orientation enumeration."""
+    PAGE_UP = 0
+    PAGE_RIGHT = 1
+    PAGE_DOWN = 2
+    PAGE_LEFT = 3
+
+
+class WritingDirection:
+    """Writing direction enumeration."""
+    LEFT_TO_RIGHT = 0
+    RIGHT_TO_LEFT = 1
+    TOP_TO_BOTTOM = 2
+    BOTTOM_TO_TOP = 3
+
+
+class TextlineOrder:
+    """Textline order enumeration."""
+    LEFT_TO_RIGHT = 0
+    RIGHT_TO_LEFT = 1
+    TOP_TO_BOTTOM = 2
+    BOTTOM_TO_TOP = 3
+
+
 class PyTessBaseAPI:
     """Tesserocr-compatible wrapper around TesseractAPI.
     
@@ -259,54 +303,273 @@ class PyTessBaseAPI:
         return [(box['text'], int(box['confidence'])) for box in boxes]
     
     def SetPageSegMode(self, psm):
-        """Set page segmentation mode (not fully implemented).
-        
+        """Set page segmentation mode.
+
         Args:
-            psm: Page segmentation mode
+            psm: Page segmentation mode (PSM enum value)
         """
-        # Not implemented - would require C++ API extension
-        pass
-    
+        if not self._initialized:
+            return
+        self._api.set_page_seg_mode(psm)
+
     def GetPageSegMode(self):
         """Get page segmentation mode.
-        
+
         Returns:
-            int: Current PSM (always returns AUTO)
+            int: Current PSM value
         """
-        return PSM.AUTO
-    
+        if not self._initialized:
+            return PSM.AUTO
+        return self._api.get_page_seg_mode()
+
     def SetVariable(self, name, value):
-        """Set a Tesseract variable (not fully implemented).
-        
+        """Set a Tesseract variable.
+
         Args:
             name: Variable name
-            value: Variable value
-        
+            value: Variable value (will be converted to string)
+
         Returns:
-            bool: False (not implemented)
+            bool: True if successful, False otherwise
         """
-        # Not implemented
-        return False
+        if not self._initialized:
+            return False
+        return self._api.set_variable(name, str(value))
     
     def GetInitLanguagesAsString(self):
         """Get initialized languages.
-        
+
         Returns:
             str: Language string
         """
-        return self._lang if self._initialized else ''
-    
+        if not self._initialized:
+            return ''
+        return self._api.get_init_languages_as_string()
+
+    def DetectOrientationScript(self):
+        """Detect page orientation and script.
+
+        Returns:
+            tuple: (orientation_deg, orientation_conf, script_name, script_conf)
+                orientation_deg: Orientation in degrees (0, 90, 180, 270)
+                orientation_conf: Confidence for orientation (0-100)
+                script_name: Detected script name (e.g., 'Latin', 'Han')
+                script_conf: Confidence for script (0-100)
+        """
+        if not self._initialized:
+            return (0, 0.0, '', 0.0)
+        return self._api.detect_orientation_script()
+
+    def GetComponentImages(self, level, text_only=True):
+        """Get bounding boxes for components at specified level.
+
+        Args:
+            level: RIL level (BLOCK, PARA, TEXTLINE, WORD, SYMBOL)
+            text_only: If True, only return text components
+
+        Returns:
+            list: List of tuples (x, y, w, h) for each component
+        """
+        if not self._initialized:
+            return []
+        return self._api.get_component_images(level, text_only)
+
+    def GetWords(self):
+        """Get all words with text, confidence, and bounding boxes.
+
+        Returns:
+            list: List of tuples (word, confidence, x, y, w, h)
+                word: UTF-8 text
+                confidence: Confidence score (0-100)
+                x, y: Top-left corner coordinates
+                w, h: Width and height
+        """
+        if not self._initialized:
+            return []
+        return self._api.get_words()
+
+    def GetTextlines(self):
+        """Get all text lines with text, confidence, and bounding boxes.
+
+        Returns:
+            list: List of tuples (line, confidence, x, y, w, h)
+                line: UTF-8 text
+                confidence: Confidence score (0-100)
+                x, y: Top-left corner coordinates
+                w, h: Width and height
+        """
+        if not self._initialized:
+            return []
+        return self._api.get_textlines()
+
+    def GetThresholdedImage(self):
+        """Get the thresholded (binarized) image used for OCR.
+
+        Returns:
+            numpy.ndarray: Thresholded image as 2D array (height, width)
+                Values are typically 0 (black) or 255 (white)
+                Returns empty array if no image has been set
+
+        Note:
+            The returned array is always CPU-based (NumPy).
+            Tesseract is a CPU library and does not support GPU processing.
+        """
+        if not self._initialized:
+            return np.array([[]], dtype=np.uint8)
+
+        # C++ returns (height, width, bytes_data)
+        height, width, data_bytes = self._api.get_thresholded_image()
+
+        if height == 0 or width == 0:
+            return np.array([[]], dtype=np.uint8)
+
+        # Convert bytes to numpy array
+        # Use .copy() to make it writable (frombuffer creates read-only array)
+        data = np.frombuffer(data_bytes, dtype=np.uint8).copy()
+        return data.reshape((height, width))
+
     def SetRectangle(self, left, top, width, height):
-        """Set recognition rectangle (not implemented).
-        
+        """Set recognition rectangle to restrict OCR to a sub-image.
+
         Args:
             left: Left coordinate
             top: Top coordinate
             width: Width
             height: Height
         """
-        # Not implemented - would require C++ API extension
-        pass
+        if not self._initialized:
+            return
+        self._api.set_rectangle(left, top, width, height)
+
+    def GetHOCRText(self, page_number=0):
+        """Get OCR result in hOCR format.
+
+        Args:
+            page_number: Page number (default: 0)
+
+        Returns:
+            str: OCR result in hOCR format
+        """
+        if not self._initialized:
+            return ""
+        return self._api.get_hocr_text(page_number)
+
+    def GetTSVText(self, page_number=0):
+        """Get OCR result in TSV format.
+
+        Args:
+            page_number: Page number (default: 0)
+
+        Returns:
+            str: OCR result in TSV format
+        """
+        if not self._initialized:
+            return ""
+        return self._api.get_tsv_text(page_number)
+
+    def GetBoxText(self, page_number=0):
+        """Get OCR result in box file format.
+
+        Args:
+            page_number: Page number (default: 0)
+
+        Returns:
+            str: OCR result in box file format
+        """
+        if not self._initialized:
+            return ""
+        return self._api.get_box_text(page_number)
+
+    def GetUNLVText(self):
+        """Get OCR result in UNLV format.
+
+        Returns:
+            str: OCR result in UNLV format
+        """
+        if not self._initialized:
+            return ""
+        return self._api.get_unlv_text()
+
+    def Clear(self):
+        """Clear recognition results without freeing loaded language data."""
+        if self._initialized:
+            self._api.clear()
+
+    def ClearAdaptiveClassifier(self):
+        """Clear the adaptive classifier."""
+        if self._initialized:
+            self._api.clear_adaptive_classifier()
+
+    def GetDatapath(self):
+        """Get tessdata path.
+
+        Returns:
+            str: Path to tessdata directory
+        """
+        if not self._initialized:
+            return ""
+        return self._api.get_datapath()
+
+    def GetIntVariable(self, name):
+        """Get an integer Tesseract variable.
+
+        Args:
+            name: Variable name
+
+        Returns:
+            int or None: Variable value if found, None otherwise
+        """
+        if not self._initialized:
+            return None
+        value = [0]  # mutable container for output parameter
+        if self._api.get_int_variable(name, value):
+            return value[0]
+        return None
+
+    def GetBoolVariable(self, name):
+        """Get a boolean Tesseract variable.
+
+        Args:
+            name: Variable name
+
+        Returns:
+            bool or None: Variable value if found, None otherwise
+        """
+        if not self._initialized:
+            return None
+        value = [False]  # mutable container for output parameter
+        if self._api.get_bool_variable(name, value):
+            return value[0]
+        return None
+
+    def GetDoubleVariable(self, name):
+        """Get a double Tesseract variable.
+
+        Args:
+            name: Variable name
+
+        Returns:
+            float or None: Variable value if found, None otherwise
+        """
+        if not self._initialized:
+            return None
+        value = [0.0]  # mutable container for output parameter
+        if self._api.get_double_variable(name, value):
+            return value[0]
+        return None
+
+    def GetStringVariable(self, name):
+        """Get a string Tesseract variable.
+
+        Args:
+            name: Variable name
+
+        Returns:
+            str: Variable value (empty string if not found)
+        """
+        if not self._initialized:
+            return ""
+        return self._api.get_string_variable(name)
 
 
 # Helper functions matching tesserocr
@@ -367,7 +630,7 @@ def tesseract_version():
 
 __all__ = [
     'PyTessBaseAPI',
-    'OEM', 'PSM', 'RIL',
+    'OEM', 'PSM', 'RIL', 'PT', 'Orientation', 'WritingDirection', 'TextlineOrder',
     'image_to_text', 'file_to_text',
     'get_languages', 'tesseract_version',
 ]

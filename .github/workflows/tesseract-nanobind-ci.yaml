@@ -5,12 +5,12 @@ on:
     branches: [ main, develop ]
     paths:
       - 'tesseract_nanobind_benchmark/**'
-      - '.github/workflows/tesseract-nanobind-ci.yml'
+      - '.github/workflows/tesseract-nanobind-ci.yaml'
   pull_request:
     branches: [ main, develop ]
     paths:
       - 'tesseract_nanobind_benchmark/**'
-      - '.github/workflows/tesseract-nanobind-ci.yml'
+      - '.github/workflows/tesseract-nanobind-ci.yaml'
   workflow_dispatch:
 
 jobs:
