@@ -16,7 +16,10 @@
       "Bash(find:*)",
       "Bash(head:*)",
       "Bash(done)",
-      "Bash(git mv:*)"
+      "Bash(git mv:*)",
+      "Bash(mise exec:*)",
+      "Bash(just gmt-install:*)",
+      "Bash(just gmt-test:*)"
     ],
     "deny": [
       "Bash(sudo:*)",
