@@ -43,7 +43,15 @@ tesseract-test:
     fi
 
 tesseract-benchmark:
-    cd tesseract_nanobind_benchmark && {{PYTHON}} benchmarks/benchmark.py
+    #!/usr/bin/env bash
+    set -euo pipefail
+    cd tesseract_nanobind_benchmark
+    # Use system python if not in a virtual environment (for CI compatibility)
+    if [ -n "${VIRTUAL_ENV:-}" ] || [ -d ".venv" ]; then
+        uv run --all-extras python benchmarks/benchmark.py
+    else
+        python benchmarks/benchmark.py
+    fi
 
 tesseract-clean:
     cd tesseract_nanobind_benchmark && rm -rf build/ dist/ *.egg-info .pytest_cache/
