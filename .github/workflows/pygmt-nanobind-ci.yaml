@@ -1,105 +1,183 @@
-name: Tests
+name: PyGMT Nanobind CI
 
 on:
   push:
-    branches: [ main, copilot/** ]
-  pull_request:
-    branches: [ main ]
+    branches: [ main, develop ]
     paths:
       - 'pygmt_nanobind_benchmark/**'
-      - '.github/workflows/gmt-ci.yaml'
+      - '.github/workflows/pygmt-nanobind-ci.yaml'
+      - 'justfile'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'pygmt_nanobind_benchmark/**'
+      - '.github/workflows/pygmt-nanobind-ci.yaml'
       - 'justfile'
   workflow_dispatch:
 
 jobs:
-  test:
-    name: Test Python ${{ matrix.python-version }} on ${{ matrix.os }}
+  build-and-test:
+    name: Build and Test (${{ matrix.os }}, Python ${{ matrix.python-version }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        python-version: ['3.11', '3.12', '3.13', '3.14']
+        python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
       with:
-        submodules: 'recursive'
+        submodules: recursive
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Install system dependencies
+    - name: Install system dependencies (Ubuntu)
+      if: runner.os == 'Linux'
       run: |
         sudo apt-get update
         sudo apt-get install -y \
-          cmake \
-          build-essential \
           libgmt-dev \
           gmt \
           gmt-dcw \
           gmt-gshhg \
-          ghostscript
+          cmake \
+          ninja-build
 
-    - name: Install uv
-      uses: astral-sh/setup-uv@v3
-      with:
-        enable-cache: true
-
-    - name: Install Python dependencies
-      working-directory: pygmt_nanobind_benchmark
+    - name: Install build tools (uv and just)
       run: |
-        uv pip install --system -e ".[test,dev]" --no-build-isolation
+        python -m pip install --upgrade pip
+        pip install uv
+        pipx install rust-just
+
+    - name: Build package
+      run: |
+        just gmt-build
 
     - name: Run tests
-      working-directory: pygmt_nanobind_benchmark
       run: |
-        uv run pytest tests/ -v --tb=short
+        just gmt-test
 
-    - name: Upload test results
-      uses: actions/upload-artifact@v4
-      if: failure()
-      with:
-        name: test-results-${{ matrix.os }}-${{ matrix.python-version }}
-        path: pygmt_nanobind_benchmark/tests/
-        retention-days: 7
-
-  lint:
-    name: Lint and Type Check
+  compatibility-test:
+    name: Compatibility Test (PyGMT API)
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
       with:
-        submodules: 'recursive'
+        submodules: recursive
 
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.12'
+        python-version: '3.11'
 
-    - name: Install uv
-      uses: astral-sh/setup-uv@v3
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          libgmt-dev \
+          gmt \
+          gmt-dcw \
+          gmt-gshhg \
+          cmake \
+          ninja-build
+
+    - name: Install build tools (uv and just)
+      run: |
+        python -m pip install --upgrade pip
+        pip install uv
+        pipx install rust-just
+
+    - name: Install PyGMT for compatibility testing
+      run: |
+        pip install pygmt pytest
+
+    - name: Build package
+      run: |
+        just gmt-build
+
+    - name: Run compatibility tests
+      working-directory: pygmt_nanobind_benchmark
+      run: |
+        python -m pytest tests/ -v -k "not benchmark"
+
+  benchmark:
+    name: Performance Benchmark
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
       with:
-        enable-cache: true
+        submodules: recursive
 
-    - name: Install dependencies
-      run: |
-        uv pip install --system ruff mypy
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
 
-    - name: Run ruff format check
-      working-directory: pygmt_nanobind_benchmark
+    - name: Install system dependencies
       run: |
-        uv run ruff format --check .
+        sudo apt-get update
+        sudo apt-get install -y \
+          libgmt-dev \
+          gmt \
+          gmt-dcw \
+          gmt-gshhg \
+          cmake \
+          ninja-build
 
-    - name: Run ruff lint
-      working-directory: pygmt_nanobind_benchmark
+    - name: Install build tools (uv and just)
       run: |
-        uv run ruff check .
+        python -m pip install --upgrade pip
+        pip install uv
+        pipx install rust-just
 
-    - name: Run mypy
-      working-directory: pygmt_nanobind_benchmark
+    - name: Install benchmark dependencies
       run: |
-        uv run mypy python/ tests/ || true
+        pip install pygmt pytest numpy
+
+    - name: Build package
+      run: |
+        just gmt-build
+
+    - name: Run comprehensive benchmark
+      run: |
+        just gmt-benchmark > pygmt_nanobind_benchmark/benchmark_results.txt
+        cat pygmt_nanobind_benchmark/benchmark_results.txt
+
+    - name: Upload benchmark results
+      uses: actions/upload-artifact@v4
+      with:
+        name: benchmark-results
+        path: pygmt_nanobind_benchmark/benchmark_results.txt
+
+  code-quality:
+    name: Code Quality Checks
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install build tools (uv and just)
+      run: |
+        python -m pip install --upgrade pip
+        pip install uv
+        pipx install rust-just
+
+    - name: Run code quality checks
+      run: |
+        just gmt-check
