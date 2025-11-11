@@ -13,6 +13,7 @@ PYTEST := "uv run --all-extras pytest"
 
 # Tesseract nanobind benchmark
 
+[group('tesseract')]
 tesseract-build:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -24,6 +25,7 @@ tesseract-build:
         {{PIP}} install --system -e .[test]
     fi
 
+[group('tesseract')]
 tesseract-check:
     {{UV}} tool install ruff
     {{UV}} tool install semgrep
@@ -32,6 +34,7 @@ tesseract-check:
     {{UV}} tool run ruff check tesseract_nanobind_benchmark/
     {{UV}} tool run semgrep --config=auto tesseract_nanobind_benchmark/
 
+[group('tesseract')]
 tesseract-test:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -43,6 +46,7 @@ tesseract-test:
         python -m pytest tests/ -v
     fi
 
+[group('tesseract')]
 tesseract-benchmark:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -54,16 +58,19 @@ tesseract-benchmark:
         python benchmarks/benchmark.py
     fi
 
+[group('tesseract')]
 tesseract-clean:
     cd tesseract_nanobind_benchmark && rm -rf build/ dist/ *.egg-info .pytest_cache/
 
 # Version management
 
 # Show current version
+[group('tesseract')]
 tesseract-version:
     @grep '^version = ' tesseract_nanobind_benchmark/pyproject.toml | sed 's/version = "\(.*\)"/\1/'
 
 # Bump patch version (0.1.0 -> 0.1.1)
+[group('tesseract')]
 tesseract-version-bump-patch:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -82,6 +89,7 @@ tesseract-version-bump-patch:
     echo "✓ Committed version bump"
 
 # Bump minor version (0.1.0 -> 0.2.0)
+[group('tesseract')]
 tesseract-version-bump-minor:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -99,6 +107,7 @@ tesseract-version-bump-minor:
     echo "✓ Committed version bump"
 
 # Bump major version (0.1.0 -> 1.0.0)
+[group('tesseract')]
 tesseract-version-bump-major:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -115,6 +124,7 @@ tesseract-version-bump-major:
     echo "✓ Committed version bump"
 
 # Create and push release tag
+[group('tesseract')]
 tesseract-release:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -133,53 +143,66 @@ tesseract-release:
 
 
 # Build the nanobind extension
+[group('gmt')]
 gmt-build:
     cd pygmt_nanobind_benchmark && uv run python -m pip install -e . --no-build-isolation
 
 # Install in development mode
+[group('gmt')]
 gmt-install:
     cd pygmt_nanobind_benchmark && uv run python -m pip install -e .
 
 # Run all tests
+[group('gmt')]
 gmt-test:
     cd pygmt_nanobind_benchmark && uv run pytest tests/ -v
 
 # Run specific test
+[group('gmt')]
 gmt-test-file file:
     cd pygmt_nanobind_benchmark && uv run pytest {{file}} -v
 
 # Run all benchmarks
+[group('gmt')]
 gmt-benchmark:
     cd pygmt_nanobind_benchmark && python3 benchmarks/compare_with_pygmt.py
 
 # Run specific benchmark category
+[group('gmt')]
 gmt-benchmark-category category:
     cd pygmt_nanobind_benchmark && python3 benchmarks/benchmark_{{category}}.py
 
 # Show benchmark results
+[group('gmt')]
 gmt-benchmark-results:
     @cat pygmt_nanobind_benchmark/benchmarks/BENCHMARK_RESULTS.md
 
 # Run validation (pixel-perfect comparison)
+[group('gmt')]
 gmt-validate:
     cd pygmt_nanobind_benchmark && uv run python validation/validate_examples.py
 
 # Format Python code
+[group('gmt')]
 gmt-format:
     uv run ruff format pygmt_nanobind_benchmark/
 
 # Lint Python code
+[group('gmt')]
 gmt-lint:
     uv run ruff check pygmt_nanobind_benchmark/
 
 # Type check with mypy
+[group('gmt')]
 gmt-typecheck:
     cd pygmt_nanobind_benchmark && uv run mypy python/ tests/
 
 # Run all quality checks
-gmt-verify: format lint typecheck test
+[group('gmt')]
+gmt-verify: gmt-format gmt-lint gmt-typecheck gmt-test
 
 # Clean build artifacts
+[group('gmt')]
 gmt-clean:
     rm -rf pygmt_nanobind_benchmark/build/
     rm -rf pygmt_nanobind_benchmark/*.egg-info/
