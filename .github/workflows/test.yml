@@ -1,0 +1,100 @@
+name: Tests
+
+on:
+  push:
+    branches: [ main, copilot/** ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Test Python ${{ matrix.python-version }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ['3.11', '3.12']
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          cmake \
+          build-essential \
+          libgmt-dev \
+          gmt \
+          gmt-dcw \
+          gmt-gshhg \
+          ghostscript
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        enable-cache: true
+
+    - name: Install Python dependencies
+      working-directory: pygmt_nanobind_benchmark
+      run: |
+        uv pip install --system -e ".[test,dev]" --no-build-isolation
+
+    - name: Run tests
+      working-directory: pygmt_nanobind_benchmark
+      run: |
+        uv run pytest tests/ -v --tb=short
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: test-results-${{ matrix.os }}-${{ matrix.python-version }}
+        path: pygmt_nanobind_benchmark/tests/
+        retention-days: 7
+
+  lint:
+    name: Lint and Type Check
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        enable-cache: true
+
+    - name: Install dependencies
+      run: |
+        uv pip install --system ruff mypy
+
+    - name: Run ruff format check
+      working-directory: pygmt_nanobind_benchmark
+      run: |
+        uv run ruff format --check .
+
+    - name: Run ruff lint
+      working-directory: pygmt_nanobind_benchmark
+      run: |
+        uv run ruff check .
+
+    - name: Run mypy
+      working-directory: pygmt_nanobind_benchmark
+      run: |
+        uv run mypy python/ tests/ || true
