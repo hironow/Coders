@@ -86,7 +86,8 @@ jobs:
           gmt-dcw \
           gmt-gshhg \
           cmake \
-          ninja-build
+          ninja-build \
+          ghostscript
 
     - name: Install build tools (uv and just)
       run: |
@@ -131,7 +132,8 @@ jobs:
           gmt-dcw \
           gmt-gshhg \
           cmake \
-          ninja-build
+          ninja-build \
+          ghostscript
 
     - name: Install build tools (uv and just)
       run: |
@@ -183,7 +185,8 @@ jobs:
           gmt-dcw \
           gmt-gshhg \
           cmake \
-          ninja-build
+          ninja-build \
+          ghostscript
 
     - name: Install build tools (uv and just)
       run: |
