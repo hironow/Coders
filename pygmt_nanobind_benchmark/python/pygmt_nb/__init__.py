@@ -21,5 +21,8 @@ from pygmt_nb.grdfilter import grdfilter
 from pygmt_nb.project import project
 from pygmt_nb.triangulate import triangulate
 from pygmt_nb.surface import surface
+from pygmt_nb.grdgradient import grdgradient
+from pygmt_nb.grdsample import grdsample
+from pygmt_nb.nearneighbor import nearneighbor
 
-__all__ = ["Session", "Grid", "Figure", "makecpt", "info", "grdinfo", "select", "grdcut", "grd2xyz", "xyz2grd", "grdfilter", "project", "triangulate", "surface", "__version__"]
+__all__ = ["Session", "Grid", "Figure", "makecpt", "info", "grdinfo", "select", "grdcut", "grd2xyz", "xyz2grd", "grdfilter", "project", "triangulate", "surface", "grdgradient", "grdsample", "nearneighbor", "__version__"]
