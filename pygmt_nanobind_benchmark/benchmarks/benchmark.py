@@ -222,7 +222,7 @@ class GridImageBenchmark(Benchmark):
 
     def __init__(self):
         super().__init__("GrdImage", "Display grid with colorbar", "Priority-1 Figure")
-        self.grid_file = "/home/user/Coders/pygmt_nanobind_benchmark/tests/data/test.nc"
+        self.grid_file = str(project_root / "tests" / "data" / "test_grid.nc")
 
     def run_pygmt(self):
         fig = pygmt.Figure()
@@ -312,7 +312,7 @@ class GrdFilterBenchmark(Benchmark):
 
     def __init__(self):
         super().__init__("GrdFilter", "Apply median filter to grid", "Priority-2 Grid")
-        self.grid_file = "/home/user/Coders/pygmt_nanobind_benchmark/tests/data/test.nc"
+        self.grid_file = str(project_root / "tests" / "data" / "test_grid.nc")
         self.output_file = str(self.temp_dir / "filtered.nc")
 
     def run_pygmt(self):
@@ -331,7 +331,7 @@ class GrdGradientBenchmark(Benchmark):
 
     def __init__(self):
         super().__init__("GrdGradient", "Compute grid gradients", "Priority-2 Grid")
-        self.grid_file = "/home/user/Coders/pygmt_nanobind_benchmark/tests/data/test.nc"
+        self.grid_file = str(project_root / "tests" / "data" / "test_grid.nc")
         self.output_file = str(self.temp_dir / "gradient.nc")
 
     def run_pygmt(self):
@@ -426,7 +426,7 @@ class GridProcessingWorkflow(Benchmark):
         super().__init__(
             "Grid Processing Workflow", "Load + filter + gradient + clip + visualize", "Workflow"
         )
-        self.grid_file = "/home/user/Coders/pygmt_nanobind_benchmark/tests/data/test.nc"
+        self.grid_file = str(project_root / "tests" / "data" / "test_grid.nc")
         self.filtered_file = str(self.temp_dir / "filtered.nc")
         self.gradient_file = str(self.temp_dir / "gradient.nc")
 

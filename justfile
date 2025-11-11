@@ -186,9 +186,9 @@ gmt-benchmark:
     cd pygmt_nanobind_benchmark
     # Use system python if not in a virtual environment (for CI compatibility)
     if [ -n "${VIRTUAL_ENV:-}" ] || [ -d ".venv" ]; then
-        uv run --all-extras python benchmarks/compare_with_pygmt.py
+        uv run --all-extras python benchmarks/benchmark.py
     else
-        python benchmarks/compare_with_pygmt.py
+        python benchmarks/benchmark.py
     fi
 
 # Clean build artifacts
