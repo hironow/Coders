@@ -907,6 +907,234 @@ class Figure:
                 "Check GMT psconvert output for errors."
             )
 
+    def colorbar(
+        self,
+        position: Optional[str] = None,
+        frame: Union[bool, str, List[str], None] = None,
+        cmap: Optional[str] = None,
+        **kwargs
+    ):
+        """
+        Add a color scale bar to the figure.
+
+        Typically used after grdimage() to show the color scale.
+        Uses GMT's psscale command.
+
+        Parameters:
+            position: Position specification using absolute coordinates
+                     Format: x/y+wLength[+h][+jJustify]
+                     - x/y: Position in plot units (cm)
+                     - +w: Width (e.g., +w8c for 8cm)
+                     - +h: Horizontal orientation (vertical by default)
+                     - +j: Justification (e.g., +jBC for bottom center)
+                     If None, uses default position (13c/8c+w8c+jML - middle left at 13cm,8cm)
+            frame: Frame/axis settings
+                  - bool: True for automatic frame, False for no frame
+                  - str: Single frame specification (e.g., "af")
+                  - list: Multiple specifications (e.g., ["af", "x+lLabel"])
+            cmap: Color palette name (e.g., "viridis"). If None, uses current palette from grdimage.
+            **kwargs: Additional GMT options (not yet implemented)
+
+        Examples:
+            >>> fig = pygmt_nb.Figure()
+            >>> fig.grdimage(grid="data.nc", cmap="viridis")
+            >>> fig.colorbar()  # Default position
+            >>> fig.colorbar(position="5c/1c+w8c+h")  # Bottom, horizontal, 5cm from left, 1cm from bottom
+            >>> fig.colorbar(frame="af")  # With annotations
+            >>> fig.colorbar(frame=["af", "x+lElevation", "y+lm"])  # With label
+        """
+        # Build GMT psscale command
+        args = []
+
+        # Color palette (optional - psscale can inherit from previous grdimage)
+        if cmap:
+            args.append(f"-C{cmap}")
+
+        # Position - use absolute positioning (Dx) instead of justify-based (DJ)
+        # DJ requires -R and -J which complicates things
+        if position:
+            args.append(f"-D{position}")
+        else:
+            # Default: horizontal colorbar at bottom center
+            # Position at 5cm from left, 1cm from bottom, 8cm wide, horizontal
+            args.append("-D5c/1c+w8c+h+jBC")
+
+        # Frame
+        if frame is True:
+            args.append("-Ba")
+        elif frame is False:
+            args.append("-B0")
+        elif frame is None:
+            # Default frame with annotations
+            args.append("-Ba")
+        elif isinstance(frame, str):
+            args.append(f"-B{frame}")
+        elif isinstance(frame, list):
+            for f in frame:
+                if f is True:
+                    args.append("-Ba")
+                elif isinstance(f, str):
+                    args.append(f"-B{f}")
+
+        # Output to PostScript
+        psfile = self._get_psfile_path()
+        if self._activated:
+            # Append to existing PS
+            args.append("-O")
+            args.append("-K")
+        else:
+            # Start new PS
+            args.append("-K")
+            self._activated = True
+
+        # Execute GMT psscale via subprocess
+        cmd = ["gmt", "psscale"] + args
+
+        try:
+            # Open file in appropriate mode
+            mode = "ab" if self._activated and os.path.exists(psfile) and os.path.getsize(psfile) > 0 else "wb"
+            with open(psfile, mode) as f:
+                result = subprocess.run(
+                    cmd,
+                    stdout=f,
+                    stderr=subprocess.PIPE,
+                    check=True,
+                    text=True
+                )
+        except subprocess.CalledProcessError as e:
+            raise RuntimeError(
+                f"GMT psscale failed: {e.stderr}"
+            ) from e
+
+    def grdcontour(
+        self,
+        grid: Union[str, Path],
+        region: Optional[Union[str, List[float]]] = None,
+        projection: Optional[str] = None,
+        interval: Optional[Union[int, float, str]] = None,
+        annotation: Optional[Union[int, float, str]] = None,
+        pen: Optional[str] = None,
+        limit: Optional[List[float]] = None,
+        frame: Union[bool, str, List[str], None] = None,
+        **kwargs
+    ):
+        """
+        Draw contour lines from a grid file.
+
+        Uses GMT's grdcontour command to create contour lines from gridded data.
+
+        Parameters:
+            grid: Grid file path (str/Path)
+            region: Map region as [west, east, south, north] or region code
+                   If None, uses grid's full extent
+            projection: Map projection (e.g., "X10c", "M15c")
+                       If None, uses automatic projection
+            interval: Contour interval (e.g., 100 for contours every 100 units)
+                     Can be a number or string with unit (e.g., "100")
+                     If None, GMT chooses automatically
+            annotation: Annotation interval (e.g., 500 for labels every 500 units)
+                       If None, no annotations
+            pen: Pen specification for contour lines (e.g., "0.5p,blue")
+                If None, uses GMT defaults
+            limit: Contour limits as [low, high] (only draw contours in this range)
+                  If None, draws all contours
+            frame: Frame/axis settings (same as basemap)
+            **kwargs: Additional GMT module options (not yet implemented)
+
+        Examples:
+            >>> fig = pygmt_nb.Figure()
+            >>> fig.grdcontour(grid="data.nc", region=[0, 10, 0, 10], projection="X10c")
+            >>> fig.grdcontour(grid="data.nc", interval=100, annotation=500)
+            >>> fig.grdcontour(grid="data.nc", pen="0.5p,blue", limit=[-1000, 1000])
+        """
+        # Convert grid path to string
+        if isinstance(grid, Path):
+            grid = str(grid)
+
+        # Build GMT grdcontour command
+        args = []
+
+        # Grid file
+        args.append(grid)
+
+        # Region
+        if region:
+            if isinstance(region, str):
+                args.append(f"-R{region}")
+            else:
+                if len(region) != 4:
+                    raise ValueError("Region must be [west, east, south, north]")
+                west, east, south, north = region
+                args.append(f"-R{west}/{east}/{south}/{north}")
+
+        # Projection
+        if projection:
+            args.append(f"-J{projection}")
+
+        # Contour interval
+        if interval is not None:
+            args.append(f"-C{interval}")
+
+        # Annotation
+        if annotation is not None:
+            args.append(f"-A{annotation}")
+
+        # Pen
+        if pen:
+            args.append(f"-W{pen}")
+
+        # Contour limits
+        if limit:
+            if len(limit) != 2:
+                raise ValueError("Limit must be [low, high]")
+            low, high = limit
+            args.append(f"-L{low}/{high}")
+
+        # Frame
+        if frame is not None:
+            if frame is True:
+                args.append("-Ba")
+            elif frame is False:
+                args.append("-B0")
+            elif isinstance(frame, str):
+                args.append(f"-B{frame}")
+            elif isinstance(frame, list):
+                for f in frame:
+                    if f is True:
+                        args.append("-Ba")
+                    elif isinstance(f, str):
+                        args.append(f"-B{f}")
+
+        # Output to PostScript
+        psfile = self._get_psfile_path()
+        if self._activated:
+            # Append to existing PS
+            args.append("-O")
+            args.append("-K")
+        else:
+            # Start new PS
+            args.append("-K")
+            self._activated = True
+
+        # Execute GMT grdcontour via subprocess
+        cmd = ["gmt", "grdcontour"] + args
+
+        try:
+            # Open file in appropriate mode
+            mode = "ab" if self._activated and os.path.exists(psfile) and os.path.getsize(psfile) > 0 else "wb"
+            with open(psfile, mode) as f:
+                result = subprocess.run(
+                    cmd,
+                    stdout=f,
+                    stderr=subprocess.PIPE,
+                    check=True,
+                    text=True
+                )
+        except subprocess.CalledProcessError as e:
+            raise RuntimeError(
+                f"GMT grdcontour failed: {e.stderr}"
+            ) from e
+
     def show(self, **kwargs):
         """
         Display the figure in a window or inline (Jupyter).
