@@ -4,3 +4,15 @@
 [submodule "external/gmt"]
 	path = external/gmt
 	url = https://github.com/GenericMappingTools/gmt.git
+[submodule "external/pytesseract"]
+	path = external/pytesseract
+	url = https://github.com/madmaze/pytesseract.git
+[submodule "external/tesserocr"]
+	path = external/tesserocr
+	url = https://github.com/sirfz/tesserocr.git
+[submodule "external/tesseract"]
+	path = external/tesseract
+	url = https://github.com/tesseract-ocr/tesseract.git
+[submodule "external/mlt"]
+	path = external/mlt
+	url = https://github.com/mltframework/mlt.git

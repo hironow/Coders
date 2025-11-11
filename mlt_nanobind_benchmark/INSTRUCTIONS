@@ -1,0 +1,16 @@
+Objective: Create a high-performance Python binding for the MLT framework using `nanobind`.
+
+1. Implement: Wrap the MLT C++ API (`libmlt`) using **only** `nanobind`.
+
+2. Efficiency: Prioritize high-speed, **zero-copy** data exchange for video frames (e.g., NumPy arrays) between Python and MLT.
+
+3. Benchmark: Measure and compare performance (especially for frame processing and timeline operations) against the official `mlt-python` (SWIG) binding.
+
+4. Validate: Ensure outputs and behaviors are identical to the original SWIG binding.
+
+5. Build: The build system must support dynamic linking to user-installed `libmlt` (and its dependencies), allowing path specification.
+
+Hints: already cloned repositories:
+
+* mlt: ../external/mlt
+* mlt-python: ../external/mlt/src/swig/python
