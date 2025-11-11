@@ -8,7 +8,7 @@ help:
 UV := "uv"
 PYTHON := "uv run python"
 PIP := "uv pip"
-PYTEST := "uv run pytest"
+PYTEST := "uv run --all-extras pytest"
 
 # Tesseract nanobind benchmark
 
@@ -18,9 +18,9 @@ tesseract-build:
     cd tesseract_nanobind_benchmark
     # Use --system flag if not in a virtual environment (for CI compatibility)
     if [ -n "${VIRTUAL_ENV:-}" ] || [ -d ".venv" ]; then
-        {{PIP}} install -e .
+        {{PIP}} install -e .[test]
     else
-        {{PIP}} install --system -e .
+        {{PIP}} install --system -e .[test]
     fi
 
 tesseract-check:
@@ -32,7 +32,15 @@ tesseract-check:
     {{UV}} tool run semgrep --config=auto tesseract_nanobind_benchmark/
 
 tesseract-test:
-    cd tesseract_nanobind_benchmark && {{PYTEST}} tests/ -v
+    #!/usr/bin/env bash
+    set -euo pipefail
+    cd tesseract_nanobind_benchmark
+    # Use system python if not in a virtual environment (for CI compatibility)
+    if [ -n "${VIRTUAL_ENV:-}" ] || [ -d ".venv" ]; then
+        {{PYTEST}} tests/ -v
+    else
+        python -m pytest tests/ -v
+    fi
 
 tesseract-benchmark:
     cd tesseract_nanobind_benchmark && {{PYTHON}} benchmarks/benchmark.py
