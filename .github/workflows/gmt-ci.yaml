@@ -5,6 +5,11 @@ on:
     branches: [ main, copilot/** ]
   pull_request:
     branches: [ main ]
+    paths:
+      - 'pygmt_nanobind_benchmark/**'
+      - '.github/workflows/gmt-ci.yaml'
+      - 'justfile'
+  workflow_dispatch:
 
 jobs:
   test:

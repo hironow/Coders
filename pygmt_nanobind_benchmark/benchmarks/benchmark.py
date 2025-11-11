@@ -20,8 +20,9 @@ import tempfile
 from pathlib import Path
 import numpy as np
 
-# Add pygmt_nb to path
-sys.path.insert(0, '/home/user/Coders/pygmt_nanobind_benchmark/python')
+# Add pygmt_nb to path (dynamically resolve project root)
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root / 'python'))
 
 # Check PyGMT availability
 try:

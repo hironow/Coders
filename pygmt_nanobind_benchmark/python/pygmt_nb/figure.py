@@ -152,9 +152,18 @@ class Figure:
         # Read content
         content = ps_minus_file.read_text(errors='ignore')
 
+        # GMT modern mode PS files redefine showpage to do nothing (/showpage {} def)
+        # We need to restore the original showpage and call it for proper rendering
+        # Use systemdict to access the original PostScript showpage operator
+        if '%%EOF' in content:
+            # Insert showpage restoration and call before %%EOF
+            content = content.replace('%%EOF', 'systemdict /showpage get exec\n%%EOF')
+        else:
+            content += '\nsystemdict /showpage get exec\n'
+
         # Add %%EOF marker if missing
         if not content.rstrip().endswith("%%EOF"):
-            content += "\n%%EOF\n"
+            content += "%%EOF\n"
 
         # Save to destination
         fname.write_text(content)

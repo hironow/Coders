@@ -13,19 +13,23 @@ import tempfile
 import os
 import subprocess
 import sys
+import shutil
 
 # Check if Ghostscript is available
 def ghostscript_available():
     """Check if Ghostscript is installed."""
     try:
+        gs_path = shutil.which("gs")
+        if gs_path is None:
+            return False
         subprocess.run(
-            ["gs", "--version"],
+            [gs_path, "--version"],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             check=True
         )
         return True
-    except (subprocess.CalledProcessError, FileNotFoundError):
+    except (subprocess.CalledProcessError, FileNotFoundError, PermissionError):
         return False
 
 GHOSTSCRIPT_AVAILABLE = ghostscript_available()
