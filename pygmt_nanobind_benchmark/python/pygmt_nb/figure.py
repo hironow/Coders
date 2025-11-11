@@ -473,6 +473,331 @@ class Figure:
                 f"GMT pscoast failed: {e.stderr}"
             ) from e
 
+    def plot(
+        self,
+        x=None,
+        y=None,
+        data=None,
+        region: Optional[Union[str, List[float]]] = None,
+        projection: Optional[str] = None,
+        style: Optional[str] = None,
+        fill: Optional[str] = None,
+        pen: Optional[str] = None,
+        frame: Union[bool, str, List[str], None] = None,
+        **kwargs
+    ):
+        """
+        Plot lines, polygons, and symbols.
+
+        This method wraps GMT's psxy module to plot data points,
+        lines, and symbols.
+
+        Parameters:
+            x: x-coordinates (array-like)
+            y: y-coordinates (array-like)
+            data: 2D array with columns [x, y, ...] (not yet implemented)
+            region: Map region
+                   - str: Region code (e.g., "g" for global)
+                   - list: [west, east, south, north]
+            projection: Map projection (e.g., "X10c", "M15c")
+                       Required parameter
+            style: Symbol style (e.g., "c0.2c" = circle 0.2cm diameter,
+                  "s0.3c" = square 0.3cm)
+                  If not specified, draws lines connecting points
+            fill: Fill color (e.g., "red", "#aaaaaa")
+            pen: Pen specification (e.g., "1p,black", "2p,blue")
+                Default pen if not specified
+            frame: Frame and axis settings (same as basemap)
+            **kwargs: Additional GMT module options (not yet implemented)
+
+        Examples:
+            >>> fig = Figure()
+            >>> fig.plot(x=[1, 2, 3], y=[2, 4, 3], region=[0, 4, 0, 5],
+            ...          projection="X10c", style="c0.2c", fill="red")
+            >>> fig.plot(x=[1, 2, 3], y=[2, 4, 3], region=[0, 4, 0, 5],
+            ...          projection="X10c", pen="2p,blue")
+        """
+        # Validate input data
+        if x is None and y is None and data is None:
+            raise ValueError("Must provide x and y, or data parameter")
+
+        if data is not None:
+            raise NotImplementedError(
+                "data parameter not yet implemented. "
+                "Please provide x and y arrays."
+            )
+
+        if x is None or y is None:
+            raise ValueError("Both x and y must be provided")
+
+        # Validate required parameters
+        if region is None:
+            raise ValueError("region parameter is required for plot()")
+        if projection is None:
+            raise ValueError("projection parameter is required for plot()")
+
+        # Import numpy for array handling
+        import numpy as np
+
+        # Convert to numpy arrays
+        x = np.atleast_1d(np.asarray(x))
+        y = np.atleast_1d(np.asarray(y))
+
+        if x.shape != y.shape:
+            raise ValueError(f"x and y must have same shape: {x.shape} vs {y.shape}")
+
+        # Build GMT psxy command
+        args = []
+
+        # Region
+        if isinstance(region, str):
+            args.append(f"-R{region}")
+        elif isinstance(region, list):
+            if len(region) != 4:
+                raise ValueError("Region must be [west, east, south, north]")
+            west, east, south, north = region
+            args.append(f"-R{west}/{east}/{south}/{north}")
+        else:
+            raise ValueError("region must be str or list")
+
+        # Projection
+        args.append(f"-J{projection}")
+
+        # Style (symbol)
+        if style:
+            args.append(f"-S{style}")
+
+        # Fill color
+        if fill:
+            args.append(f"-G{fill}")
+
+        # Pen
+        if pen:
+            args.append(f"-W{pen}")
+        elif not fill and not style:
+            # Default pen for lines
+            args.append("-W0.5p,black")
+
+        # Frame
+        if frame is True:
+            args.append("-Ba")
+        elif frame is False:
+            pass  # No frame
+        elif frame is None:
+            pass  # No frame by default
+        elif isinstance(frame, str):
+            args.append(f"-B{frame}")
+        elif isinstance(frame, list):
+            for f in frame:
+                if f is True:
+                    args.append("-Ba")
+                elif f is False:
+                    args.append("-B0")
+                elif isinstance(f, str):
+                    args.append(f"-B{f}")
+
+        # Output to PostScript
+        psfile = self._get_psfile_path()
+        if self._activated:
+            # Append to existing PS
+            args.append("-O")
+            args.append("-K")
+        else:
+            # Start new PS
+            args.append("-K")
+            self._activated = True
+
+        # Execute GMT psxy via subprocess with data input
+        # psxy reads data from stdin
+        cmd = ["gmt", "psxy"] + args
+
+        # Prepare input data (x y format, one pair per line)
+        input_data = "\n".join(f"{xi} {yi}" for xi, yi in zip(x, y))
+
+        try:
+            # Open file in appropriate mode
+            mode = "ab" if self._activated and os.path.exists(psfile) and os.path.getsize(psfile) > 0 else "wb"
+            with open(psfile, mode) as f:
+                result = subprocess.run(
+                    cmd,
+                    input=input_data,
+                    stdout=f,
+                    stderr=subprocess.PIPE,
+                    check=True,
+                    text=True
+                )
+        except subprocess.CalledProcessError as e:
+            raise RuntimeError(
+                f"GMT psxy failed: {e.stderr}"
+            ) from e
+
+    def text(
+        self,
+        x=None,
+        y=None,
+        text=None,
+        region: Optional[Union[str, List[float]]] = None,
+        projection: Optional[str] = None,
+        font: Optional[str] = None,
+        angle: Optional[Union[int, float]] = None,
+        justify: Optional[str] = None,
+        fill: Optional[str] = None,
+        frame: Union[bool, str, List[str], None] = None,
+        **kwargs
+    ):
+        """
+        Plot text strings.
+
+        This method wraps GMT's pstext module to place text strings
+        at specified locations.
+
+        Parameters:
+            x: x-coordinate(s) (scalar or array-like)
+            y: y-coordinate(s) (scalar or array-like)
+            text: Text string(s) (scalar str or array-like)
+            region: Map region
+                   - str: Region code (e.g., "g" for global)
+                   - list: [west, east, south, north]
+            projection: Map projection (e.g., "X10c", "M15c")
+                       Required parameter
+            font: Font specification (e.g., "12p,Helvetica,black",
+                 "18p,Helvetica-Bold,red")
+                 Format: size,fontname,color
+            angle: Text rotation angle in degrees
+            justify: Text justification (e.g., "MC" = Middle Center,
+                    "TL" = Top Left, "BR" = Bottom Right)
+            fill: Background fill color
+            frame: Frame and axis settings (same as basemap)
+            **kwargs: Additional GMT module options (not yet implemented)
+
+        Examples:
+            >>> fig = Figure()
+            >>> fig.text(x=2, y=1, text="Hello", region=[0, 4, 0, 2],
+            ...          projection="X10c")
+            >>> fig.text(x=[1, 2, 3], y=[0.5, 1.0, 1.5],
+            ...          text=["A", "B", "C"], region=[0, 4, 0, 2],
+            ...          projection="X10c", font="14p,Helvetica-Bold,red")
+        """
+        # Validate input data
+        if x is None or y is None or text is None:
+            raise ValueError("Must provide x, y, and text parameters")
+
+        # Validate required parameters
+        if region is None:
+            raise ValueError("region parameter is required for text()")
+        if projection is None:
+            raise ValueError("projection parameter is required for text()")
+
+        # Import numpy for array handling
+        import numpy as np
+
+        # Convert to arrays
+        x = np.atleast_1d(np.asarray(x))
+        y = np.atleast_1d(np.asarray(y))
+
+        # Handle text input (may be string or array)
+        if isinstance(text, str):
+            text = [text]
+        text = np.atleast_1d(np.asarray(text, dtype=str))
+
+        if x.shape != y.shape or x.shape != text.shape:
+            raise ValueError(
+                f"x, y, and text must have same shape: {x.shape} vs {y.shape} vs {text.shape}"
+            )
+
+        # Build GMT pstext command
+        args = []
+
+        # Region
+        if isinstance(region, str):
+            args.append(f"-R{region}")
+        elif isinstance(region, list):
+            if len(region) != 4:
+                raise ValueError("Region must be [west, east, south, north]")
+            west, east, south, north = region
+            args.append(f"-R{west}/{east}/{south}/{north}")
+        else:
+            raise ValueError("region must be str or list")
+
+        # Projection
+        args.append(f"-J{projection}")
+
+        # Build -F option with font, angle, and justify modifiers
+        f_option = "-F"
+        if font:
+            f_option += f"+f{font}"
+        else:
+            # Default font
+            f_option += "+f12p,Helvetica,black"
+
+        # Angle (must be part of -F option)
+        if angle is not None:
+            f_option += f"+a{angle}"
+
+        # Justify (must be part of -F option)
+        if justify:
+            f_option += f"+j{justify}"
+
+        args.append(f_option)
+
+        # Fill (background)
+        if fill:
+            args.append(f"-G{fill}")
+
+        # Frame
+        if frame is True:
+            args.append("-Ba")
+        elif frame is False:
+            pass  # No frame
+        elif frame is None:
+            pass  # No frame by default
+        elif isinstance(frame, str):
+            args.append(f"-B{frame}")
+        elif isinstance(frame, list):
+            for f in frame:
+                if f is True:
+                    args.append("-Ba")
+                elif f is False:
+                    args.append("-B0")
+                elif isinstance(f, str):
+                    args.append(f"-B{f}")
+
+        # Output to PostScript
+        psfile = self._get_psfile_path()
+        if self._activated:
+            # Append to existing PS
+            args.append("-O")
+            args.append("-K")
+        else:
+            # Start new PS
+            args.append("-K")
+            self._activated = True
+
+        # Execute GMT pstext via subprocess with data input
+        # pstext reads data from stdin: x y [angle justify font] text
+        cmd = ["gmt", "pstext"] + args
+
+        # Prepare input data
+        # Simple format: x y text (one per line)
+        input_data = "\n".join(f"{xi} {yi} {ti}" for xi, yi, ti in zip(x, y, text))
+
+        try:
+            # Open file in appropriate mode
+            mode = "ab" if self._activated and os.path.exists(psfile) and os.path.getsize(psfile) > 0 else "wb"
+            with open(psfile, mode) as f:
+                result = subprocess.run(
+                    cmd,
+                    input=input_data,
+                    stdout=f,
+                    stderr=subprocess.PIPE,
+                    check=True,
+                    text=True
+                )
+        except subprocess.CalledProcessError as e:
+            raise RuntimeError(
+                f"GMT pstext failed: {e.stderr}"
+            ) from e
+
     def savefig(
         self,
         fname: Union[str, Path],
