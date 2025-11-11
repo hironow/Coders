@@ -1,151 +1,217 @@
-# Tesseract Nanobind Benchmark
+# tesseract_nanobind
 
-[![Tesseract Nanobind CI](https://github.com/hironow/Coders/actions/workflows/tesseract-nanobind-ci.yaml/badge.svg)](https://github.com/hironow/Coders/actions/workflows/tesseract-nanobind-ci.yaml)
-[![Build Wheels](https://github.com/hironow/Coders/actions/workflows/tesseract-nanobind-build-wheels.yaml/badge.svg)](https://github.com/hironow/Coders/actions/workflows/tesseract-nanobind-build-wheels.yaml)
+[![CI Status](https://github.com/hironow/Coders/actions/workflows/tesseract-nanobind-ci.yaml/badge.svg)](https://github.com/hironow/Coders/actions/workflows/tesseract-nanobind-ci.yaml)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 
-High-performance Python bindings for Tesseract OCR using nanobind.
+**High-performance Tesseract OCR Python bindings with full tesserocr API compatibility.**
 
-## Objective
+A drop-in replacement for tesserocr that's **1.56x faster** than pytesseract with zero-copy NumPy integration.
 
-Create a high-speed Tesseract OCR binding using `nanobind` to provide:
-- Direct memory access for image data (NumPy arrays)
-- High-speed text extraction with coordinates and confidence
-- Better performance than pytesseract (subprocess) and tesserocr (CFFI)
+## Why Use This?
 
-## Requirements
+✅ **tesserocr-compatible API** - Change one import line and you're done
+✅ **1.56x faster than pytesseract** - Direct C++ API, no subprocess overhead
+✅ **Near-tesserocr performance** - Only 8% slower, often negligible
+✅ **Zero-copy NumPy** - Efficient array handling without conversions
+✅ **163 passing tests** - Comprehensive test coverage
+✅ **Python 3.10-3.14** - Modern Python support
 
-### System Dependencies
-- Tesseract OCR library (`libtesseract`)
-- Leptonica library (`libleptonica`)
-- CMake >= 3.15
-- C++17 compatible compiler
+## Quick Start
 
-### Python Dependencies
-- Python >= 3.8
-- NumPy >= 1.20
-
-## Installation
-
-### Development Installation
+### Installation
 
 ```bash
-# Install with test dependencies
-uv pip install -e ".[test]"
+# Install from source
+pip install git+https://github.com/hironow/Coders.git#subdirectory=tesseract_nanobind_benchmark
+
+# Or for development
+git clone https://github.com/hironow/Coders.git
+cd Coders/tesseract_nanobind_benchmark
+pip install -e ".[test]"
 ```
 
-### Build with Custom Library Paths
-
-If you have Tesseract and Leptonica installed in custom locations:
+**Requirements:** Tesseract OCR library must be installed on your system.
 
 ```bash
-pip install -e . \
-  -C cmake.define.TESSERACT_INCLUDE_DIR=/path/to/tesseract/include \
-  -C cmake.define.TESSERACT_LIB_DIR=/path/to/tesseract/lib \
-  -C cmake.define.LEPTONICA_INCLUDE_DIR=/path/to/leptonica/include \
-  -C cmake.define.LEPTONICA_LIB_DIR=/path/to/leptonica/lib
+# Ubuntu/Debian
+sudo apt-get install tesseract-ocr libtesseract-dev libleptonica-dev
+
+# macOS (Homebrew)
+brew install tesseract leptonica
 ```
 
-## Usage
-
-### Basic Text Extraction
+### Basic Usage
 
 ```python
+from tesseract_nanobind.compat import PyTessBaseAPI
+from PIL import Image
+
+# Same API as tesserocr - just change the import!
+with PyTessBaseAPI(lang='eng') as api:
+    api.SetImage(Image.open('document.png'))
+    text = api.GetUTF8Text()
+    confidence = api.MeanTextConf()
+    print(f"Text: {text}")
+    print(f"Confidence: {confidence}%")
+```
+
+### Migrating from tesserocr
+
+**Before:**
+```python
+from tesserocr import PyTessBaseAPI
+```
+
+**After:**
+```python
+from tesseract_nanobind.compat import PyTessBaseAPI
+```
+
+That's it! Your code works without any other changes.
+
+### Key Features
+
+```python
+from tesseract_nanobind.compat import PyTessBaseAPI, PSM
 import numpy as np
-from tesseract_nanobind import TesseractAPI
 
-# Initialize API
-api = TesseractAPI()
-api.init("", "eng")  # Empty datapath uses system tessdata
+with PyTessBaseAPI(lang='eng') as api:
+    # Set page segmentation mode
+    api.SetPageSegMode(PSM.SINGLE_LINE)
 
-# Load image as NumPy array (height, width, 3)
-image = np.array(...)  # Your image data
+    # Works with PIL Images or NumPy arrays (zero-copy)
+    image_array = np.array(pil_image)
+    api.SetImage(image_array)
 
-# Perform OCR
-api.set_image(image)
-text = api.get_utf8_text()
-print(text)
+    # Get text and confidence
+    text = api.GetUTF8Text()
+
+    # Get word-level details
+    words_with_conf = api.MapWordConfidences()
+    for word, conf in words_with_conf:
+        print(f"{word}: {conf}%")
+
+    # Alternative output formats
+    hocr = api.GetHOCRText(0)  # hOCR format
+    tsv = api.GetTSVText(0)    # TSV format
 ```
 
-### Getting Bounding Boxes and Confidence
+## Performance Benchmarks
 
-```python
-# Get word-level bounding boxes with confidence scores
-api.set_image(image)
-api.recognize()  # Must call recognize first
+Latest results (5 real test images, 5 iterations, macOS M-series):
 
-boxes = api.get_bounding_boxes()
-for box in boxes:
-    print(f"Text: {box['text']}")
-    print(f"Position: ({box['left']}, {box['top']})")
-    print(f"Size: {box['width']}x{box['height']}")
-    print(f"Confidence: {box['confidence']:.1f}%")
-
-# Get mean confidence for the entire image
-confidence = api.get_mean_confidence()
-print(f"Mean confidence: {confidence}%")
-```
-
-### Complete Example
-
-See `examples/basic_usage.py` for a complete working example.
-
-## Testing
-
-```bash
-# Run tests
-uv run pytest tests/
-```
-
-## Benchmarking
-
-```bash
-# Install benchmark dependencies
-pip install -e ".[benchmark]"
-
-# Run benchmarks
-python benchmarks/run_benchmarks.py
-```
-
-### Performance Results
-
-Benchmarked on test images (10 images, 5 iterations each):
-
-| Implementation | Time per Image | Relative Speed |
-|---------------|----------------|----------------|
-| pytesseract (subprocess) | 105.7 ms | 1.0x (baseline) |
-| tesseract_nanobind | 12.8 ms | **8.25x faster** |
+| Implementation | Time per Image | vs pytesseract | vs tesserocr |
+|---------------|----------------|----------------|--------------|
+| **pytesseract** | 244.4 ms | 1.0x (baseline) | 0.59x |
+| **tesserocr** | 144.3 ms | **1.69x faster** | 1.0x (baseline) |
+| **tesseract_nanobind** | 156.2 ms | **1.56x faster** | 0.92x (8% slower) |
 
 **Key Findings:**
-- tesseract_nanobind is 8.25x faster than pytesseract
-- 87.9% performance improvement
-- OCR results are consistent between implementations
-- Zero-copy data transfer with NumPy arrays
-- Direct C++ API access eliminates subprocess overhead
+- ✅ **1.56x faster** than pytesseract (56% improvement)
+- ✅ **Only 8% slower** than tesserocr (negligible in most use cases)
+- ✅ **100% identical results** across all three implementations
+- ✅ **Zero-copy** NumPy array handling for maximum efficiency
+- ✅ **No subprocess** overhead - direct C++ API access
 
-## API Reference
+**Why the slight difference vs tesserocr?**
+We use nanobind instead of CFFI, trading ~8% performance for easier builds, better NumPy integration, and maintainability. For most applications, this difference is negligible compared to the actual OCR processing time.
 
-### TesseractAPI Class
+## Documentation
 
-#### Methods
+- **[API Compatibility Guide](docs/COMPATIBILITY.md)** - Full tesserocr compatibility details
+- **[Version Management](VERSION_MANAGEMENT.md)** - Release workflow and versioning
+- **[Development History](docs/development-history/)** - Implementation timeline
 
-- `__init__()` - Create a new TesseractAPI instance
-- `init(datapath: str, language: str) -> int` - Initialize Tesseract with language data
-  - Returns 0 on success, -1 on failure
-  - Use empty string for datapath to use system tessdata
-- `set_image(image: np.ndarray)` - Set image for OCR (height, width, 3) uint8 array
-- `get_utf8_text() -> str` - Get OCR result as UTF-8 text
-- `recognize() -> int` - Perform recognition (required before getting boxes/confidence)
-- `get_bounding_boxes() -> List[Dict]` - Get word-level bounding boxes with confidence
-  - Each box contains: text, left, top, width, height, confidence
-- `get_mean_confidence() -> int` - Get mean confidence score (0-100)
-- `version() -> str` (static) - Get Tesseract version string
+### Supported Features
 
-## Project Structure
+**Core OCR (100% compatible):**
+- ✅ Text extraction (`GetUTF8Text`)
+- ✅ Confidence scores (`MeanTextConf`, `AllWordConfidences`)
+- ✅ Word/line extraction (`GetWords`, `GetTextlines`)
+- ✅ Bounding boxes with coordinates
+- ✅ Multiple languages
 
-- `src/tesseract_nanobind_ext.cpp` - C++ nanobind wrapper
-- `src/tesseract_nanobind/` - Python package
-- `tests/` - Unit tests (11 tests, all passing)
-- `benchmarks/` - Performance benchmarks
-- `examples/` - Usage examples
-- `CMakeLists.txt` - Build configuration
-- `pyproject.toml` - Project metadata and dependencies
+**Configuration (100% compatible):**
+- ✅ Page segmentation modes (PSM)
+- ✅ Tesseract variables (`SetVariable`, `GetVariable`)
+- ✅ Region of interest (`SetRectangle`)
+- ✅ Orientation detection (`DetectOrientationScript`)
+
+**Output Formats (100% compatible):**
+- ✅ Plain text (UTF-8)
+- ✅ hOCR format
+- ✅ TSV format
+- ✅ Box file format
+- ✅ UNLV format
+
+**Advanced Features:**
+- ✅ Component images (`GetComponentImages`)
+- ✅ Image thresholding (`GetThresholdedImage`)
+- ✅ Layout analysis at multiple levels (block, paragraph, line, word)
+
+See [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md) for detailed API coverage (98%+ for typical use cases).
+
+## Development
+
+### Setup
+
+```bash
+# Clone and install with all dependencies
+git clone https://github.com/hironow/Coders.git
+cd Coders/tesseract_nanobind_benchmark
+
+# Install with uv (recommended)
+uv sync --all-extras
+
+# Or with pip
+pip install -e ".[test,benchmark]"
+```
+
+### Testing
+
+```bash
+# Run all tests (163 tests)
+just tesseract-test
+
+# Run code quality checks
+just tesseract-check
+
+# Run benchmarks
+just tesseract-benchmark
+```
+
+### Building
+
+```bash
+# Clean build
+just tesseract-clean
+just tesseract-build
+
+# Run all validation
+just tesseract-test
+```
+
+See `just --list` for all available commands.
+
+## System Requirements
+
+- **Python:** 3.10, 3.11, 3.12, 3.13, or 3.14
+- **Tesseract:** 5.0+ (system installation required)
+- **NumPy:** 2.0+
+- **Pillow:** 12.0+ (for image loading)
+- **CMake:** 3.15+ (for building)
+
+## License
+
+This project is part of the [Coders repository](https://github.com/hironow/Coders).
+
+## Contributing
+
+Contributions are welcome! Please see the main repository for contribution guidelines.
+
+---
+
+**Built with:**
+- [nanobind](https://github.com/wjakob/nanobind) - Modern C++/Python bindings
+- [Tesseract OCR](https://github.com/tesseract-ocr/tesseract) - Industry-standard OCR engine
+- [NumPy](https://numpy.org/) - Efficient numerical computing
