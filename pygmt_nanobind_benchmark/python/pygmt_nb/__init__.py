@@ -42,5 +42,8 @@ from pygmt_nb.binstats import binstats
 from pygmt_nb.sphinterpolate import sphinterpolate
 from pygmt_nb.sph2grd import sph2grd
 from pygmt_nb.config import config
+from pygmt_nb.which import which
+from pygmt_nb.x2sys_cross import x2sys_cross
+from pygmt_nb.x2sys_init import x2sys_init
 
-__all__ = ["Session", "Grid", "Figure", "makecpt", "info", "grdinfo", "select", "grdcut", "grd2xyz", "xyz2grd", "grdfilter", "project", "triangulate", "surface", "grdgradient", "grdsample", "nearneighbor", "grdproject", "grdtrack", "filter1d", "grdclip", "grdfill", "blockmean", "blockmedian", "blockmode", "grd2cpt", "sphdistance", "grdhisteq", "grdlandmask", "grdvolume", "dimfilter", "binstats", "sphinterpolate", "sph2grd", "config", "__version__"]
+__all__ = ["Session", "Grid", "Figure", "makecpt", "info", "grdinfo", "select", "grdcut", "grd2xyz", "xyz2grd", "grdfilter", "project", "triangulate", "surface", "grdgradient", "grdsample", "nearneighbor", "grdproject", "grdtrack", "filter1d", "grdclip", "grdfill", "blockmean", "blockmedian", "blockmode", "grd2cpt", "sphdistance", "grdhisteq", "grdlandmask", "grdvolume", "dimfilter", "binstats", "sphinterpolate", "sph2grd", "config", "which", "x2sys_cross", "x2sys_init", "__version__"]

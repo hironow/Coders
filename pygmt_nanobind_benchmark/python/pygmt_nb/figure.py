@@ -201,6 +201,8 @@ class Figure:
         ternary,
         tilemap,
         timestamp,
+        velo,
+        wiggle,
     )
 
 

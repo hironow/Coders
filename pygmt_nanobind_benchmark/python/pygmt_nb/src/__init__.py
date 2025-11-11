@@ -31,6 +31,8 @@ from pygmt_nb.src.solar import solar
 from pygmt_nb.src.ternary import ternary
 from pygmt_nb.src.tilemap import tilemap
 from pygmt_nb.src.timestamp import timestamp
+from pygmt_nb.src.velo import velo
+from pygmt_nb.src.wiggle import wiggle
 
 __all__ = [
     "basemap",
@@ -59,4 +61,6 @@ __all__ = [
     "ternary",
     "tilemap",
     "timestamp",
+    "velo",
+    "wiggle",
 ]
