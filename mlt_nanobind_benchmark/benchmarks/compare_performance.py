@@ -111,6 +111,10 @@ def benchmark_image_get(implementation, iterations=100):
         factory.init()
         profile = mlt_nb.Profile()
         producer = mlt_nb.Producer(profile, "color:green")
+        # Warmup to avoid cold start penalty
+        for _ in range(10):
+            frame = producer.get_frame()
+            image = frame.get_image()
         start = time.perf_counter()
         for _ in range(iterations):
             frame = producer.get_frame()
@@ -121,6 +125,13 @@ def benchmark_image_get(implementation, iterations=100):
         factory.init()
         profile = mlt_swig.Profile()
         producer = mlt_swig.Producer(profile, "color:green")
+        # Warmup to avoid cold start penalty
+        for _ in range(10):
+            frame = producer.get_frame()
+            image = mlt_swig.frame_get_image(
+                frame, mlt_swig.mlt_image_rgba,
+                profile.width(), profile.height()
+            )
         start = time.perf_counter()
         for _ in range(iterations):
             frame = producer.get_frame()
