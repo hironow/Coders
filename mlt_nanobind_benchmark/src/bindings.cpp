@@ -74,10 +74,10 @@ public:
     // Get image as NumPy array (zero-copy)
     nb::ndarray<nb::numpy, uint8_t, nb::ndim<3>> get_image() {
         mlt_image_format format = mlt_image_rgba;
-        int width = frame_->get_int("width");
-        int height = frame_->get_int("height");
+        int width = 0;
+        int height = 0;
 
-        // Get image data from MLT
+        // Get image data from MLT - width and height are set by reference
         uint8_t* image_data = frame_->get_image(format, width, height);
 
         if (!image_data) {
