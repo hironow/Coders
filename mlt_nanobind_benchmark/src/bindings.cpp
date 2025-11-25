@@ -24,15 +24,15 @@ static int bytes_per_pixel(mlt_image_format format) {
     }
 }
 
-// Forward declarations
-class RepositoryWrapper;
-
 // Wrapper class for Factory
 class FactoryWrapper {
 public:
     FactoryWrapper() = default;
 
-    RepositoryWrapper init(const std::string& directory = "");
+    void init(const std::string& directory = "") {
+        const char* dir = directory.empty() ? nullptr : directory.c_str();
+        Mlt::Factory::init(dir);
+    }
 
     void close() {
         Mlt::Factory::close();
@@ -295,21 +295,6 @@ public:
     int count() const { return tractor_->count(); }
 };
 
-// Wrapper class for Repository
-class RepositoryWrapper {
-private:
-    Mlt::Repository* repository_;
-
-public:
-    RepositoryWrapper(Mlt::Repository* repo) : repository_(repo) {}
-};
-
-// Implementation of FactoryWrapper::init() (must be after RepositoryWrapper definition)
-RepositoryWrapper FactoryWrapper::init(const std::string& directory) {
-    const char* dir = directory.empty() ? nullptr : directory.c_str();
-    return RepositoryWrapper(Mlt::Factory::init(dir));
-}
-
 // Wrapper class for Properties
 class PropertiesWrapper {
 private:
@@ -437,9 +422,6 @@ NB_MODULE(_mlt_nb_core, m) {
         .def(nb::init<ProfileWrapper&>())
         .def("is_valid", &TractorWrapper::is_valid)
         .def("count", &TractorWrapper::count);
-
-    // Repository
-    nb::class_<RepositoryWrapper>(m, "Repository");
 
     // Properties
     nb::class_<PropertiesWrapper>(m, "Properties")

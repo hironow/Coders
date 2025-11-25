@@ -13,7 +13,6 @@ from mlt_nb._mlt_nb_core import (
     Playlist,
     Multitrack,
     Tractor,
-    Repository,
 )
 
 __version__ = "0.1.0"
@@ -31,5 +30,4 @@ __all__ = [
     "Playlist",
     "Multitrack",
     "Tractor",
-    "Repository",
 ]
