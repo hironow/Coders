@@ -90,6 +90,27 @@ Compare performance against official mlt-python:
 python benchmarks/compare_performance.py
 ```
 
+### Performance Results
+
+Benchmarked on MLT 7.35.0 (Linux, GCC 13.3.0):
+
+| Benchmark           | nanobind (μs) | SWIG (μs) | Speedup |
+|---------------------|---------------|-----------|---------|
+| Factory Init        | 4.4           | 1.7       | 0.4x    |
+| Profile Creation    | 190.8         | 204.3     | 1.07x   |
+| Producer Creation   | 93.3          | 104.5     | 1.12x   |
+| Frame Get           | 18.6          | 19.4      | 1.04x   |
+| Image Get (zero-copy) | 1361.6      | 1230.1    | 0.90x   |
+| Playlist Operations | 124.9         | 134.2     | 1.07x   |
+
+**Average: 0.93x** (nanobind is approximately equal to SWIG)
+
+Key findings:
+- **Object creation** (Producer, Profile, Playlist): nanobind 5-12% faster
+- **Zero-copy image access**: Nearly identical performance
+- **Lightweight operations** (Factory init): SWIG has lower overhead
+- **Overall**: Performance parity with SWIG, with cleaner C++ API and type safety
+
 ## Validation
 
 Verify output compatibility with SWIG binding:

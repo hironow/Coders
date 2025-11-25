@@ -36,8 +36,6 @@ Represents MLT profile settings (resolution, frame rate, etc.).
 - **`fps() -> float`**: Get frames per second
 - **`frame_rate_num() -> int`**: Get frame rate numerator
 - **`frame_rate_den() -> int`**: Get frame rate denominator
-- **`set(name: str, value: str)`**: Set a property
-- **`get(name: str) -> str`**: Get a property value
 
 #### Example
 
@@ -45,6 +43,8 @@ Represents MLT profile settings (resolution, frame rate, etc.).
 profile = mlt_nb.Profile()
 print(f"{profile.width()}x{profile.height()} @ {profile.fps()} fps")
 ```
+
+**Note**: In MLT 7.x, Profile does not expose the Properties interface. Use Producer/Consumer/Filter properties for dynamic configuration.
 
 ---
 
@@ -244,8 +244,10 @@ Container for multiple producer tracks.
 #### Constructor
 
 ```python
-Multitrack(profile: Profile)
+Multitrack()
 ```
+
+**Note**: In MLT 7.x, Multitrack no longer requires a Profile parameter in its constructor.
 
 #### Methods
 
@@ -256,7 +258,7 @@ Multitrack(profile: Profile)
 #### Example
 
 ```python
-multitrack = mlt_nb.Multitrack(profile)
+multitrack = mlt_nb.Multitrack()
 multitrack.connect(video_track, 0)
 multitrack.connect(audio_track, 1)
 ```

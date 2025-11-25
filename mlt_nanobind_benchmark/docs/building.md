@@ -145,25 +145,60 @@ cd mlt
 # Create build directory
 mkdir build && cd build
 
-# Configure (minimal build)
+# Configure (minimal build for mlt-nb)
 cmake .. \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_INSTALL_PREFIX=/usr/local \
+  -DMOD_OPENCV=OFF \
+  -DMOD_QT=OFF \
   -DMOD_SDL2=OFF \
-  -DMOD_QT6=OFF \
+  -DMOD_RTAUDIO=OFF \
+  -DMOD_RESAMPLE=OFF \
+  -DMOD_RUBBERBAND=OFF \
   -DSWIG_PYTHON=OFF
 
 # Build and install
-cmake --build . -j$(nproc)
-sudo cmake --install .
+make -j$(nproc)
+sudo make install
+```
+
+**Note**: This project targets **MLT 7.x**. The API has changed from MLT 6.x:
+- `mlt_image_rgb24` → `mlt_image_rgb`
+- `mlt_image_opengl` → `mlt_image_opengl_texture`
+- Profile class no longer exposes Properties interface
+- Multitrack constructor no longer takes Profile parameter
+
+### Building with SWIG Python Bindings (for benchmarking)
+
+To compare performance against the official SWIG binding:
+
+```bash
+# Install SWIG (or use pip install swig)
+# Ubuntu/Debian: sudo apt-get install swig
+# macOS: brew install swig
+
+# Configure MLT with Python bindings
+cmake .. \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_INSTALL_PREFIX=/usr/local \
+  -DSWIG_PYTHON=ON \
+  -DSWIG_EXECUTABLE=$(which swig)
+
+# Build and install
+make -j$(nproc)
+sudo make install
+
+# The Python module will be installed to:
+# /usr/local/lib/python3.X/dist-packages/mlt7.py
 ```
 
 Then build mlt-nb:
 
 ```bash
 cd /path/to/mlt_nanobind_benchmark
-export MLT_INCLUDE_DIR=/usr/local/include
+export MLT_INCLUDE_DIR=/usr/local/include/mlt-7
 export MLT_LIBRARY_DIR=/usr/local/lib
+export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 pip install -e .
 ```
 
