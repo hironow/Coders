@@ -9,16 +9,15 @@ Factory for initializing the MLT framework.
 #### Methods
 
 - **`__init__()`**: Create a Factory instance
-- **`init(directory: str = "") -> Repository`**: Initialize MLT framework
+- **`init(directory: str = "")`**: Initialize MLT framework
   - `directory`: Optional path to MLT modules directory
-  - Returns: Repository instance
 - **`close()`**: Close MLT framework and free resources
 
 #### Example
 
 ```python
 factory = mlt_nb.Factory()
-repository = factory.init()
+factory.init()
 ```
 
 ---
