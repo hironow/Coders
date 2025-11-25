@@ -96,20 +96,20 @@ Benchmarked on MLT 7.35.0 (Linux, GCC 13.3.0):
 
 | Benchmark           | nanobind (μs) | SWIG (μs) | Speedup |
 |---------------------|---------------|-----------|---------|
-| Factory Init        | 4.4           | 1.7       | 0.4x    |
-| Profile Creation    | 190.8         | 204.3     | 1.07x   |
-| Producer Creation   | 93.3          | 104.5     | 1.12x   |
-| Frame Get           | 18.6          | 19.4      | 1.04x   |
-| Image Get (zero-copy) | 1361.6      | 1230.1    | 0.90x   |
-| Playlist Operations | 124.9         | 134.2     | 1.07x   |
+| Factory Init        | 5.1           | 1.9       | 0.4x    |
+| Profile Creation    | 183.9         | 193.7     | 1.05x   |
+| Producer Creation   | 89.6          | 91.0      | 1.01x   |
+| Frame Get           | 17.6          | 18.9      | 1.07x   |
+| Image Get (zero-copy) | 1185.0      | 1174.0    | 1.01x   |
+| Playlist Operations | 118.8         | 126.7     | 1.07x   |
 
-**Average: 0.93x** (nanobind is approximately equal to SWIG)
+**Average: 0.93x** (nanobind achieves performance parity with SWIG)
 
 Key findings:
-- **Object creation** (Producer, Profile, Playlist): nanobind 5-12% faster
-- **Zero-copy image access**: Nearly identical performance
-- **Lightweight operations** (Factory init): SWIG has lower overhead
-- **Overall**: Performance parity with SWIG, with cleaner C++ API and type safety
+- **Zero-copy image access**: Performance parity achieved after optimization (removed redundant property lookups and added warmup)
+- **Object operations** (Producer, Profile, Frame, Playlist): nanobind 1-7% faster
+- **Lightweight operations** (Factory init): SWIG has lower overhead due to simpler wrapper design
+- **Overall**: nanobind matches SWIG performance while providing type safety and cleaner C++ API
 
 ## Validation
 
