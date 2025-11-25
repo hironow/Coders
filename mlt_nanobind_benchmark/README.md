@@ -87,10 +87,14 @@ pytest tests/
 Compare performance against official mlt-python:
 
 ```bash
+# Micro-benchmarks
 python benchmarks/compare_performance.py
+
+# Real-world scenario benchmarks
+python benchmarks/real_world_benchmark.py
 ```
 
-### Performance Results
+### Micro-benchmark Results
 
 Benchmarked on MLT 7.35.0 (Linux, GCC 13.3.0):
 
@@ -110,6 +114,27 @@ Key findings:
 - **Object operations** (Producer, Profile, Frame, Playlist): nanobind consistently faster (1.00-1.11x)
 - **Factory init**: SWIG 2.3x faster (absolute difference: 2.2μs) due to simpler return type
 - **Overall**: nanobind achieves 0.94x average performance while providing type safety and modern C++ API
+
+### Real-World Scenario Benchmarks
+
+Realistic video editing workflows:
+
+| Scenario                    | nanobind (ms) | SWIG (ms) | Speedup |
+|-----------------------------|---------------|-----------|---------|
+| Video Editing Workflow      | 0.62          | 0.64      | 1.03x   |
+| Frame Processing Pipeline   | 20.63         | 20.37     | 0.99x   |
+| Multi-track Composition     | 1.17          | 0.97      | 0.83x   |
+| Complex Timeline (20 clips) | 2.63          | 2.81      | 1.07x   |
+
+**Average: 0.98x** (nanobind achieves performance parity in real-world scenarios)
+
+Real-world benchmarks simulate typical MLT usage patterns:
+- **Video Editing Workflow**: Creating playlists with multiple clips, applying filters, setting properties
+- **Frame Processing Pipeline**: Sequential frame extraction with NumPy array processing (calculating mean pixel values)
+- **Multi-track Composition**: Creating multiple tracks with transitions and tractor-based composition
+- **Complex Timeline**: Managing 20 clips with various properties and multiple filters
+
+The results demonstrate that nanobind maintains performance parity with SWIG in realistic usage scenarios while providing superior type safety, modern C++ integration, and zero-copy NumPy array access.
 
 ## Validation
 
