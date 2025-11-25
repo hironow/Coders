@@ -12,11 +12,10 @@ using namespace nb::literals;
 // Helper function to convert mlt_image_format to bytes per pixel
 static int bytes_per_pixel(mlt_image_format format) {
     switch (format) {
-        case mlt_image_rgb24:
-        case mlt_image_rgb24a:
+        case mlt_image_rgb:
             return 3;
         case mlt_image_rgba:
-        case mlt_image_opengl:
+        case mlt_image_opengl_texture:
             return 4;
         case mlt_image_yuv422:
             return 2;
@@ -25,15 +24,15 @@ static int bytes_per_pixel(mlt_image_format format) {
     }
 }
 
+// Forward declarations
+class RepositoryWrapper;
+
 // Wrapper class for Factory
 class FactoryWrapper {
 public:
     FactoryWrapper() = default;
 
-    Mlt::Repository* init(const std::string& directory = "") {
-        const char* dir = directory.empty() ? nullptr : directory.c_str();
-        return Mlt::Factory::init(dir);
-    }
+    RepositoryWrapper init(const std::string& directory = "");
 
     void close() {
         Mlt::Factory::close();
@@ -62,16 +61,6 @@ public:
     }
 
     Mlt::Profile* get() { return profile_.get(); }
-
-    // Properties interface
-    void set(const std::string& name, const std::string& value) {
-        profile_->set(name.c_str(), value.c_str());
-    }
-
-    std::string get(const std::string& name) const {
-        const char* value = profile_->get(name.c_str());
-        return value ? std::string(value) : "";
-    }
 };
 
 // Wrapper class for Frame with NumPy integration
@@ -282,8 +271,8 @@ private:
     std::shared_ptr<Mlt::Multitrack> multitrack_;
 
 public:
-    MultitrackWrapper(ProfileWrapper& profile)
-        : multitrack_(std::make_shared<Mlt::Multitrack>(*profile.get())) {}
+    MultitrackWrapper()
+        : multitrack_(std::make_shared<Mlt::Multitrack>(mlt_multitrack_init())) {}
 
     int count() const { return multitrack_->count(); }
 
@@ -314,6 +303,12 @@ private:
 public:
     RepositoryWrapper(Mlt::Repository* repo) : repository_(repo) {}
 };
+
+// Implementation of FactoryWrapper::init() (must be after RepositoryWrapper definition)
+RepositoryWrapper FactoryWrapper::init(const std::string& directory) {
+    const char* dir = directory.empty() ? nullptr : directory.c_str();
+    return RepositoryWrapper(Mlt::Factory::init(dir));
+}
 
 // Wrapper class for Properties
 class PropertiesWrapper {
@@ -371,9 +366,7 @@ NB_MODULE(_mlt_nb_core, m) {
         .def("height", &ProfileWrapper::height)
         .def("fps", &ProfileWrapper::fps)
         .def("frame_rate_num", &ProfileWrapper::frame_rate_num)
-        .def("frame_rate_den", &ProfileWrapper::frame_rate_den)
-        .def("set", &ProfileWrapper::set)
-        .def("get", &ProfileWrapper::get);
+        .def("frame_rate_den", &ProfileWrapper::frame_rate_den);
 
     // Frame
     nb::class_<FrameWrapper>(m, "Frame")
@@ -393,7 +386,7 @@ NB_MODULE(_mlt_nb_core, m) {
         .def("get_out", &ProducerWrapper::get_out)
         .def("set_in_and_out", &ProducerWrapper::set_in_and_out)
         .def("set", &ProducerWrapper::set)
-        .def("get", &ProducerWrapper::get);
+        .def("get", static_cast<std::string (ProducerWrapper::*)(const std::string&) const>(&ProducerWrapper::get));
 
     // Consumer
     nb::class_<ConsumerWrapper>(m, "Consumer")
@@ -435,7 +428,7 @@ NB_MODULE(_mlt_nb_core, m) {
 
     // Multitrack
     nb::class_<MultitrackWrapper>(m, "Multitrack")
-        .def(nb::init<ProfileWrapper&>())
+        .def(nb::init<>())
         .def("count", &MultitrackWrapper::count)
         .def("connect", &MultitrackWrapper::connect);
 

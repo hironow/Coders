@@ -83,16 +83,17 @@ def test_frame_get_image():
 
 def test_properties_get_set():
     """Test properties get and set."""
-    # Given: Profile with properties
+    # Given: Producer with properties
     factory = mlt_nb.Factory()
     factory.init()
     profile = mlt_nb.Profile()
+    producer = mlt_nb.Producer(profile, "color", "blue")
 
     # When: Set a property
-    profile.set("test_key", "test_value")
+    producer.set("test_key", "test_value")
 
     # Then: Should be able to get the property
-    assert profile.get("test_key") == "test_value"
+    assert producer.get("test_key") == "test_value"
 
 
 def test_playlist_creation():
