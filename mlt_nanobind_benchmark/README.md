@@ -158,6 +158,14 @@ mlt_nanobind_benchmark/
 └── pyproject.toml    # Python package metadata
 ```
 
+## Documentation
+
+- **[Usage Guide](docs/usage.md)**: Getting started, basic and advanced usage
+- **[API Reference](docs/api_reference.md)**: Complete API documentation
+- **[Building from Source](docs/building.md)**: Build instructions and troubleshooting
+- **[Examples](docs/examples.md)**: Code examples and recipes
+- **[Performance Analysis](docs/performance.md)**: Detailed performance analysis and optimization history
+
 ## License
 
 LGPL-2.1 (matching MLT Framework license)

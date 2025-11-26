@@ -250,7 +250,7 @@ factory.init()
 profile = mlt_nb.Profile()
 
 # Create multitrack
-multitrack = mlt_nb.Multitrack(profile)
+multitrack = mlt_nb.Multitrack()
 
 # Create video and audio tracks
 video_track = mlt_nb.Producer(profile, "/path/to/video.mp4")

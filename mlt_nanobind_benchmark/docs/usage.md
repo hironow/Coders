@@ -157,7 +157,7 @@ print(f"Aspect ratio: {aspect_ratio}")
 ### Working with Multitrack
 
 ```python
-multitrack = mlt_nb.Multitrack(profile)
+multitrack = mlt_nb.Multitrack()
 
 # Create tracks
 video_track = mlt_nb.Producer(profile, "color:blue")
@@ -243,7 +243,7 @@ image = frame.get_image()
 - mlt-nb returns NumPy arrays directly
 - mlt-nb uses zero-copy when possible
 - mlt-nb has a cleaner, more Pythonic API
-- mlt-nb is significantly faster for image operations
+- mlt-nb provides comparable or better performance (0.93x-1.08x SWIG in benchmarks)
 
 ## Troubleshooting
 

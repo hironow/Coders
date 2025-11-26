@@ -309,14 +309,6 @@ print(props.get("key"))
 
 ---
 
-### Repository
-
-Repository of available services (producers, filters, etc.).
-
-Created by `Factory.init()`.
-
----
-
 ### Service
 
 Base class for MLT services.
