@@ -36,6 +36,9 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
+    - name: Set up Takumi Guard (PyPI)
+      uses: flatt-security/setup-takumi-guard-pypi@v1
+
     - name: Install system dependencies (Ubuntu)
       run: |
         sudo apt-get update
@@ -75,6 +78,9 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: '3.11'
+
+    - name: Set up Takumi Guard (PyPI)
+      uses: flatt-security/setup-takumi-guard-pypi@v1
 
     - name: Install system dependencies
       run: |
@@ -121,6 +127,9 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: '3.11'
+
+    - name: Set up Takumi Guard (PyPI)
+      uses: flatt-security/setup-takumi-guard-pypi@v1
 
     - name: Install system dependencies
       run: |
@@ -175,6 +184,9 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: '3.11'
+
+    - name: Set up Takumi Guard (PyPI)
+      uses: flatt-security/setup-takumi-guard-pypi@v1
 
     - name: Install build tools (uv and just)
       run: |
