@@ -15,10 +15,14 @@ on:
       - 'justfile'
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   build-and-test:
     name: Build and Test (${{ matrix.os }}, Python ${{ matrix.python-version }})
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
@@ -27,17 +31,17 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       with:
         submodules: recursive
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
       with:
         python-version: ${{ matrix.python-version }}
 
     - name: Set up Takumi Guard (PyPI)
-      uses: flatt-security/setup-takumi-guard-pypi@v1
+      uses: flatt-security/setup-takumi-guard-pypi@733047c120b6377fa05fb77f714df8d8cd3a41a9 # v1
 
     - name: Install system dependencies (Ubuntu)
       if: runner.os == 'Linux'
@@ -68,20 +72,21 @@ jobs:
   compatibility-test:
     name: Compatibility Test (PyGMT API)
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       with:
         submodules: recursive
 
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
       with:
         python-version: '3.11'
 
     - name: Set up Takumi Guard (PyPI)
-      uses: flatt-security/setup-takumi-guard-pypi@v1
+      uses: flatt-security/setup-takumi-guard-pypi@733047c120b6377fa05fb77f714df8d8cd3a41a9 # v1
 
     - name: Install system dependencies
       run: |
@@ -117,20 +122,21 @@ jobs:
   validation:
     name: Validation (PyGMT Output Compatibility)
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       with:
         submodules: recursive
 
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
       with:
         python-version: '3.11'
 
     - name: Set up Takumi Guard (PyPI)
-      uses: flatt-security/setup-takumi-guard-pypi@v1
+      uses: flatt-security/setup-takumi-guard-pypi@733047c120b6377fa05fb77f714df8d8cd3a41a9 # v1
 
     - name: Install system dependencies
       run: |
@@ -164,7 +170,7 @@ jobs:
 
     - name: Upload validation results
       if: always()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
       with:
         name: validation-results
         path: pygmt_nanobind_benchmark/output/validation/
@@ -172,21 +178,22 @@ jobs:
   benchmark:
     name: Performance Benchmark
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       with:
         submodules: recursive
 
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
       with:
         python-version: '3.11'
 
     - name: Set up Takumi Guard (PyPI)
-      uses: flatt-security/setup-takumi-guard-pypi@v1
+      uses: flatt-security/setup-takumi-guard-pypi@733047c120b6377fa05fb77f714df8d8cd3a41a9 # v1
 
     - name: Install system dependencies
       run: |
@@ -220,7 +227,7 @@ jobs:
         cat pygmt_nanobind_benchmark/benchmark_results.txt
 
     - name: Upload benchmark results
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
       with:
         name: benchmark-results
         path: pygmt_nanobind_benchmark/benchmark_results.txt
@@ -228,18 +235,19 @@ jobs:
   code-quality:
     name: Code Quality Checks
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
       with:
         python-version: '3.11'
 
     - name: Set up Takumi Guard (PyPI)
-      uses: flatt-security/setup-takumi-guard-pypi@v1
+      uses: flatt-security/setup-takumi-guard-pypi@733047c120b6377fa05fb77f714df8d8cd3a41a9 # v1
 
     - name: Install build tools (uv and just)
       run: |
