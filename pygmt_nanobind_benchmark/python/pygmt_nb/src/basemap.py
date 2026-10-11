@@ -4,12 +4,14 @@ basemap - Plot base maps and frames for pygmt_nb.
 Modern mode implementation using nanobind for direct GMT C API access.
 """
 
+import re
+
 
 def basemap(
     self,
-    region: str | list[float] | None = None,
+    region: str | list[float] | list[int] | None = None,
     projection: str | None = None,
-    frame: bool | str | list[str] | None = None,
+    frame: bool | str | list[str | bool] | None = None,
     **kwargs,
 ):
     """
@@ -67,7 +69,6 @@ def basemap(
         """Escape spaces in GMT frame specifications."""
         if " " not in value:
             return value
-        import re
 
         pattern = r"(\+[lLS])([^+]+)"
 

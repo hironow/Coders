@@ -1,27 +1,30 @@
 """Extended tests for tesserocr compatibility layer - comprehensive API coverage."""
-import pytest
-from PIL import Image, ImageDraw, ImageFont
-from pathlib import Path
+
 import tempfile
+from pathlib import Path
+
+import pytest
+from PIL import Image, ImageDraw
+
+from tesseract_nanobind.compat import PyTessBaseAPI
+from tests.utils.fonts import load_test_font
 
 
 def create_test_image_with_text(text="Test", width=200, height=100):
     """Create a simple test image with text."""
-    image = Image.new('RGB', (width, height), color='white')
+    image = Image.new("RGB", (width, height), color="white")
     draw = ImageDraw.Draw(image)
 
-    try:
-        font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 36)
-    except Exception:
-        font = ImageFont.load_default()
+    font = load_test_font(36)
 
-    draw.text((10, 30), text, fill='black', font=font)
+    draw.text((10, 30), text, fill="black", font=font)
     return image
 
 
 # ============================================================================
 # Enum Completeness Tests
 # ============================================================================
+
 
 def test_oem_enum_all_values():
     """Test that OEM enum has all tesserocr values."""
@@ -30,10 +33,10 @@ def test_oem_enum_all_values():
     # given: OEM enum
     # when: checking all expected values
     # then: all values should be present
-    assert hasattr(OEM, 'TESSERACT_ONLY')
-    assert hasattr(OEM, 'LSTM_ONLY')
-    assert hasattr(OEM, 'TESSERACT_LSTM_COMBINED')
-    assert hasattr(OEM, 'DEFAULT')
+    assert hasattr(OEM, "TESSERACT_ONLY")
+    assert hasattr(OEM, "LSTM_ONLY")
+    assert hasattr(OEM, "TESSERACT_LSTM_COMBINED")
+    assert hasattr(OEM, "DEFAULT")
 
     assert OEM.TESSERACT_ONLY == 0
     assert OEM.LSTM_ONLY == 1
@@ -83,12 +86,13 @@ def test_ril_enum_all_values():
 # Stub Method Behavior Tests
 # ============================================================================
 
+
 def test_set_page_seg_mode_stub():
     """Test SetPageSegMode stub behavior (accepts but ignores)."""
-    from tesseract_nanobind.compat import PyTessBaseAPI, PSM
+    from tesseract_nanobind.compat import PSM, PyTessBaseAPI
 
     # given: initialized API
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         # when: calling SetPageSegMode
         result = api.SetPageSegMode(PSM.SINGLE_LINE)
 
@@ -98,10 +102,10 @@ def test_set_page_seg_mode_stub():
 
 def test_get_page_seg_mode_stub():
     """Test GetPageSegMode returns current mode."""
-    from tesseract_nanobind.compat import PyTessBaseAPI, PSM
+    from tesseract_nanobind.compat import PSM, PyTessBaseAPI
 
     # given: initialized API
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         # when: calling GetPageSegMode (default mode)
         psm = api.GetPageSegMode()
 
@@ -115,9 +119,9 @@ def test_set_variable_stub():
     from tesseract_nanobind.compat import PyTessBaseAPI
 
     # given: initialized API
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         # when: calling SetVariable with valid variable
-        result = api.SetVariable('tessedit_char_whitelist', '0123456789')
+        result = api.SetVariable("tessedit_char_whitelist", "0123456789")
 
         # then: should return True (implemented)
         assert result is True
@@ -129,7 +133,7 @@ def test_set_rectangle_stub():
 
     # given: initialized API with image
     image = create_test_image_with_text("Test")
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         api.SetImage(image)
 
         # when: calling SetRectangle
@@ -145,7 +149,7 @@ def test_get_iterator_stub():
 
     # given: initialized API with recognized image
     image = create_test_image_with_text("Test")
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         api.SetImage(image)
         api.Recognize()
 
@@ -160,19 +164,20 @@ def test_get_iterator_stub():
 # Helper Function Tests
 # ============================================================================
 
+
 def test_file_to_text_helper():
     """Test file_to_text helper function."""
     from tesseract_nanobind.compat import file_to_text
 
     # given: temporary image file
     image = create_test_image_with_text("FileTest")
-    with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as f:
+    with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as f:
         image.save(f.name)
         temp_path = f.name
 
     try:
         # when: converting file to text
-        text = file_to_text(temp_path, lang='eng')
+        text = file_to_text(temp_path, lang="eng")
 
         # then: should return text containing expected content
         assert isinstance(text, str)
@@ -193,7 +198,7 @@ def test_get_languages_helper():
     # then: should return tuple with path and language list
     assert isinstance(path, str)
     assert isinstance(languages, list)
-    assert 'eng' in languages
+    assert "eng" in languages
 
 
 def test_get_languages_with_custom_path():
@@ -201,7 +206,7 @@ def test_get_languages_with_custom_path():
     from tesseract_nanobind.compat import get_languages
 
     # given: custom path
-    custom_path = '/custom/tessdata/'
+    custom_path = "/custom/tessdata/"
 
     # when: calling get_languages with path
     path, languages = get_languages(custom_path)
@@ -215,13 +220,14 @@ def test_get_languages_with_custom_path():
 # Initialization and Configuration Tests
 # ============================================================================
 
+
 def test_init_without_auto_init():
     """Test initialization with init=False parameter."""
     from tesseract_nanobind.compat import PyTessBaseAPI
 
     # given: API created without auto-init
     # when: creating API with init=False
-    api = PyTessBaseAPI(lang='eng', init=False)
+    api = PyTessBaseAPI(lang="eng", init=False)
 
     # then: API should not be initialized
     assert api is not None
@@ -233,10 +239,10 @@ def test_manual_init():
     from tesseract_nanobind.compat import PyTessBaseAPI
 
     # given: API created without auto-init
-    api = PyTessBaseAPI(lang='eng', init=False)
+    api = PyTessBaseAPI(lang="eng", init=False)
 
     # when: manually calling Init
-    api.Init(path='', lang='eng')
+    api.Init(path="", lang="eng")
 
     # then: API should be initialized
     assert api._initialized
@@ -244,28 +250,28 @@ def test_manual_init():
 
 def test_init_with_different_oem():
     """Test initialization with different OEM values."""
-    from tesseract_nanobind.compat import PyTessBaseAPI, OEM
+    from tesseract_nanobind.compat import OEM, PyTessBaseAPI
 
     # given: different OEM values
     oem_values = [OEM.TESSERACT_ONLY, OEM.LSTM_ONLY, OEM.DEFAULT]
 
     for oem in oem_values:
         # when: initializing with OEM value
-        with PyTessBaseAPI(lang='eng', oem=oem) as api:
+        with PyTessBaseAPI(lang="eng", oem=oem) as api:
             # then: should initialize successfully (OEM is ignored but accepted)
             assert api._initialized
 
 
 def test_init_with_different_psm():
     """Test initialization with different PSM values."""
-    from tesseract_nanobind.compat import PyTessBaseAPI, PSM
+    from tesseract_nanobind.compat import PSM, PyTessBaseAPI
 
     # given: different PSM values
     psm_values = [PSM.AUTO, PSM.SINGLE_LINE, PSM.SINGLE_WORD]
 
     for psm in psm_values:
         # when: initializing with PSM value
-        with PyTessBaseAPI(lang='eng', psm=psm) as api:
+        with PyTessBaseAPI(lang="eng", psm=psm) as api:
             # then: should initialize successfully (PSM is ignored but accepted)
             assert api._initialized
 
@@ -275,7 +281,7 @@ def test_end_method():
     from tesseract_nanobind.compat import PyTessBaseAPI
 
     # given: initialized API
-    api = PyTessBaseAPI(lang='eng')
+    api = PyTessBaseAPI(lang="eng")
     assert api._initialized
 
     # when: calling End
@@ -289,19 +295,20 @@ def test_end_method():
 # Image Input Tests
 # ============================================================================
 
+
 def test_set_image_file_method():
     """Test SetImageFile method with file path."""
     from tesseract_nanobind.compat import PyTessBaseAPI
 
     # given: temporary image file
     image = create_test_image_with_text("ImageFile")
-    with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as f:
+    with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as f:
         image.save(f.name)
         temp_path = f.name
 
     try:
         # when: setting image from file
-        with PyTessBaseAPI(lang='eng') as api:
+        with PyTessBaseAPI(lang="eng") as api:
             api.SetImageFile(temp_path)
             text = api.GetUTF8Text()
 
@@ -317,12 +324,11 @@ def test_set_image_file_nonexistent():
     from tesseract_nanobind.compat import PyTessBaseAPI
 
     # given: nonexistent file path
-    nonexistent_path = '/tmp/nonexistent_image_12345.png'
+    nonexistent_path = "/tmp/nonexistent_image_12345.png"
 
     # when/then: should raise RuntimeError
-    with PyTessBaseAPI(lang='eng') as api:
-        with pytest.raises(RuntimeError):
-            api.SetImageFile(nonexistent_path)
+    with PyTessBaseAPI(lang="eng") as api, pytest.raises(RuntimeError):
+        api.SetImageFile(nonexistent_path)
 
 
 def test_set_image_grayscale_conversion():
@@ -330,16 +336,13 @@ def test_set_image_grayscale_conversion():
     from tesseract_nanobind.compat import PyTessBaseAPI
 
     # given: grayscale PIL Image
-    gray_image = Image.new('L', (200, 100), color=255)
+    gray_image = Image.new("L", (200, 100), color=255)
     draw = ImageDraw.Draw(gray_image)
-    try:
-        font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 36)
-    except Exception:
-        font = ImageFont.load_default()
+    font = load_test_font(36)
     draw.text((10, 30), "Gray", fill=0, font=font)
 
     # when: setting grayscale image
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         api.SetImage(gray_image)
         text = api.GetUTF8Text()
 
@@ -352,16 +355,13 @@ def test_set_image_rgba_conversion():
     from tesseract_nanobind.compat import PyTessBaseAPI
 
     # given: RGBA PIL Image
-    rgba_image = Image.new('RGBA', (200, 100), color=(255, 255, 255, 255))
+    rgba_image = Image.new("RGBA", (200, 100), color=(255, 255, 255, 255))
     draw = ImageDraw.Draw(rgba_image)
-    try:
-        font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 36)
-    except Exception:
-        font = ImageFont.load_default()
+    font = load_test_font(36)
     draw.text((10, 30), "RGBA", fill=(0, 0, 0, 255), font=font)
 
     # when: setting RGBA image
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         api.SetImage(rgba_image)
         text = api.GetUTF8Text()
 
@@ -377,14 +377,14 @@ def test_set_image_invalid_type():
     invalid_image = "not an image"
 
     # when/then: should raise TypeError
-    with PyTessBaseAPI(lang='eng') as api:
-        with pytest.raises(TypeError):
-            api.SetImage(invalid_image)
+    with PyTessBaseAPI(lang="eng") as api, pytest.raises(TypeError):
+        api.SetImage(invalid_image)
 
 
 # ============================================================================
 # Error Handling Tests
 # ============================================================================
+
 
 def test_init_with_invalid_language():
     """Test Init with invalid language raises RuntimeError."""
@@ -395,9 +395,9 @@ def test_init_with_invalid_language():
 
     # when/then: initializing with invalid language should raise
     with pytest.raises(RuntimeError) as exc_info:
-        api.Init(path='', lang='nonexistent_xyz')
+        api.Init(path="", lang="nonexistent_xyz")
 
-    assert 'Failed to initialize' in str(exc_info.value)
+    assert "Failed to initialize" in str(exc_info.value)
 
 
 def test_get_utf8_text_without_init():
@@ -411,7 +411,7 @@ def test_get_utf8_text_without_init():
     with pytest.raises(RuntimeError) as exc_info:
         api.GetUTF8Text()
 
-    assert 'not initialized' in str(exc_info.value).lower()
+    assert "not initialized" in str(exc_info.value).lower()
 
 
 def test_set_image_without_init():
@@ -426,7 +426,7 @@ def test_set_image_without_init():
     with pytest.raises(RuntimeError) as exc_info:
         api.SetImage(image)
 
-    assert 'not initialized' in str(exc_info.value).lower()
+    assert "not initialized" in str(exc_info.value).lower()
 
 
 def test_recognize_without_init():
@@ -494,12 +494,13 @@ def test_get_init_languages_without_init():
     lang = api.GetInitLanguagesAsString()
 
     # then: should return empty string
-    assert lang == ''
+    assert lang == ""
 
 
 # ============================================================================
 # Integration Tests
 # ============================================================================
+
 
 def test_multiple_images_same_api():
     """Test processing multiple images with the same API instance."""
@@ -510,7 +511,7 @@ def test_multiple_images_same_api():
     image2 = create_test_image_with_text("Second")
 
     # when: processing multiple images with same API
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         api.SetImage(image1)
         text1 = api.GetUTF8Text()
 
@@ -528,7 +529,7 @@ def test_context_manager_automatic_cleanup():
 
     # given: API used as context manager
     api = None
-    with PyTessBaseAPI(lang='eng') as api_instance:
+    with PyTessBaseAPI(lang="eng") as api_instance:
         api = api_instance
         assert api._initialized
 
@@ -545,7 +546,7 @@ def test_recognize_returns_true_on_success():
     image = create_test_image_with_text("Success")
 
     # when: performing recognition
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         api.SetImage(image)
         result = api.Recognize(timeout=0)
 
@@ -561,7 +562,7 @@ def test_word_confidences_match_words():
     image = create_test_image_with_text("Match Test")
 
     # when: getting words and confidences
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         api.SetImage(image)
         words = api.AllWords()
         confs = api.AllWordConfidences()
@@ -578,7 +579,7 @@ def test_map_word_confidences_completeness():
     image = create_test_image_with_text("Complete")
 
     # when: getting map of word confidences
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         api.SetImage(image)
         pairs = api.MapWordConfidences()
         words = api.AllWords()
@@ -590,3 +591,18 @@ def test_map_word_confidences_completeness():
         for word, conf in pairs:
             assert word in words
             assert 0 <= conf <= 100
+
+
+@pytest.mark.parametrize(
+    ("getter", "name", "value"),
+    [
+        ("GetIntVariable", "tessedit_pageseg_mode", 6),
+        ("GetBoolVariable", "tessedit_create_txt", True),
+        ("GetDoubleVariable", "tessedit_certainty_threshold", -2.5),
+    ],
+)
+def test_variable_getter_returns_native_value(getter, name, value):
+    with PyTessBaseAPI(lang="eng") as api:
+        assert api.SetVariable(name, str(value).lower())
+        assert getattr(api, getter)(name) == value
+        assert getattr(api, getter)("nonexistent_variable_xyz") is None

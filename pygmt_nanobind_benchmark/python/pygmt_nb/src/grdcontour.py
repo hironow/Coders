@@ -10,12 +10,12 @@ from pathlib import Path
 def grdcontour(
     self,
     grid: str | Path,
-    region: str | list[float] | None = None,
+    region: str | list[float] | list[int] | None = None,
     projection: str | None = None,
     interval: int | float | str | None = None,
     annotation: int | float | str | None = None,
     pen: str | None = None,
-    limit: list[float] | None = None,
+    limit: list[float] | list[int] | None = None,
     frame: bool | str | list[str] | None = None,
     **kwargs,
 ):
