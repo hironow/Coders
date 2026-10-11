@@ -197,6 +197,7 @@ class Figure:
             # Prepare psconvert arguments
             prefix = fname.with_suffix("").as_posix()
             fmt = fmt_map[suffix]
+            assert fmt is not None
 
             # Call psconvert (uses GMT C API, not subprocess!)
             psconvert(

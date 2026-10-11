@@ -2,6 +2,8 @@
 #include <nanobind/ndarray.h>
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/list.h>
+#include <nanobind/stl/optional.h>
+#include <optional>
 #include <tesseract/baseapi.h>
 #include <tesseract/resultiterator.h>
 #include <leptonica/allheaders.h>
@@ -382,6 +384,7 @@ NB_MODULE(_tesseract_nanobind, m) {
              "Initialize Tesseract with datapath and language")
         .def("set_image", &TesseractAPI::set_image,
              "image"_a,
+             nb::sig("def set_image(self, image: numpy.typing.NDArray, /) -> None"),
              "Set image from NumPy array (height, width, 3)")
         .def("get_utf8_text", &TesseractAPI::get_utf8_text,
              "Get OCR result as UTF-8 text")
@@ -403,12 +406,27 @@ NB_MODULE(_tesseract_nanobind, m) {
         .def("set_variable", &TesseractAPI::set_variable,
              "name"_a, "value"_a,
              "Set a Tesseract variable")
+        .def("get_int_variable", [](TesseractAPI& self, const std::string& name) -> std::optional<int> {
+             int value{};
+             if (self.get_int_variable(name, &value)) return value;
+             return std::nullopt;
+        }, "name"_a, "Get a variable value, or None if it does not exist")
         .def("get_int_variable", &TesseractAPI::get_int_variable,
              "name"_a, "value"_a,
              "Get an integer variable value")
+        .def("get_bool_variable", [](TesseractAPI& self, const std::string& name) -> std::optional<bool> {
+             bool value{};
+             if (self.get_bool_variable(name, &value)) return value;
+             return std::nullopt;
+        }, "name"_a, "Get a variable value, or None if it does not exist")
         .def("get_bool_variable", &TesseractAPI::get_bool_variable,
              "name"_a, "value"_a,
              "Get a boolean variable value")
+        .def("get_double_variable", [](TesseractAPI& self, const std::string& name) -> std::optional<double> {
+             double value{};
+             if (self.get_double_variable(name, &value)) return value;
+             return std::nullopt;
+        }, "name"_a, "Get a variable value, or None if it does not exist")
         .def("get_double_variable", &TesseractAPI::get_double_variable,
              "name"_a, "value"_a,
              "Get a double variable value")
