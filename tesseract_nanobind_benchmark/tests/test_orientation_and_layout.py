@@ -5,20 +5,20 @@ This module tests:
 - GetComponentImages for layout analysis at various levels (BLOCK, PARA, TEXTLINE, WORD, SYMBOL)
 - PolyBlockType (PT) and Orientation enumerations
 """
-from PIL import Image, ImageDraw, ImageFont
+
+from PIL import Image, ImageDraw
+
+from tests.utils.fonts import load_test_font
 
 
 def create_test_image_with_text(text="Test", width=400, height=200):
     """Create a simple test image with text."""
-    image = Image.new('RGB', (width, height), color='white')
+    image = Image.new("RGB", (width, height), color="white")
     draw = ImageDraw.Draw(image)
 
-    try:
-        font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 36)
-    except Exception:
-        font = ImageFont.load_default()
+    font = load_test_font(36)
 
-    draw.text((20, 80), text, fill='black', font=font)
+    draw.text((20, 80), text, fill="black", font=font)
     return image
 
 
@@ -26,15 +26,16 @@ def create_test_image_with_text(text="Test", width=400, height=200):
 # Enum Tests
 # ============================================================================
 
+
 def test_pt_enum_exists():
     """Test that PT enum exists and has correct values."""
     from tesseract_nanobind.compat import PT
 
-    assert hasattr(PT, 'UNKNOWN')
-    assert hasattr(PT, 'FLOWING_TEXT')
-    assert hasattr(PT, 'HEADING_TEXT')
-    assert hasattr(PT, 'TABLE')
-    assert hasattr(PT, 'COUNT')
+    assert hasattr(PT, "UNKNOWN")
+    assert hasattr(PT, "FLOWING_TEXT")
+    assert hasattr(PT, "HEADING_TEXT")
+    assert hasattr(PT, "TABLE")
+    assert hasattr(PT, "COUNT")
 
     assert PT.UNKNOWN == 0
     assert PT.FLOWING_TEXT == 1
@@ -45,10 +46,10 @@ def test_orientation_enum_exists():
     """Test that Orientation enum exists and has correct values."""
     from tesseract_nanobind.compat import Orientation
 
-    assert hasattr(Orientation, 'PAGE_UP')
-    assert hasattr(Orientation, 'PAGE_RIGHT')
-    assert hasattr(Orientation, 'PAGE_DOWN')
-    assert hasattr(Orientation, 'PAGE_LEFT')
+    assert hasattr(Orientation, "PAGE_UP")
+    assert hasattr(Orientation, "PAGE_RIGHT")
+    assert hasattr(Orientation, "PAGE_DOWN")
+    assert hasattr(Orientation, "PAGE_LEFT")
 
     assert Orientation.PAGE_UP == 0
     assert Orientation.PAGE_RIGHT == 1
@@ -60,6 +61,7 @@ def test_orientation_enum_exists():
 # DetectOrientationScript Tests
 # ============================================================================
 
+
 def test_detect_orientation_script_basic():
     """Test DetectOrientationScript method."""
     from tesseract_nanobind.compat import PyTessBaseAPI
@@ -68,11 +70,11 @@ def test_detect_orientation_script_basic():
     image = create_test_image_with_text("Hello World")
 
     # when: detecting orientation and script
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         api.SetImage(image)
         result = api.DetectOrientationScript()
 
-        # then: should return tuple of (orient_deg, orient_conf, script_name, script_conf)
+        # then: should return tuple of (orient_deg, _orient_conf, _script_name, _script_conf)
         assert isinstance(result, tuple)
         assert len(result) == 4
 
@@ -94,7 +96,7 @@ def test_detect_orientation_script_without_init():
     result = api.DetectOrientationScript()
 
     # then: should return default values
-    assert result == (0, 0.0, '', 0.0)
+    assert result == (0, 0.0, "", 0.0)
 
 
 def test_detect_orientation_upright_text():
@@ -105,9 +107,11 @@ def test_detect_orientation_upright_text():
     image = create_test_image_with_text("Test Text", width=600, height=200)
 
     # when: detecting orientation
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         api.SetImage(image)
-        orient_deg, orient_conf, script_name, script_conf = api.DetectOrientationScript()
+        orient_deg, _orient_conf, _script_name, _script_conf = (
+            api.DetectOrientationScript()
+        )
 
         # then: should detect upright (0 degrees) orientation
         # Note: orientation_deg might be 0 or 360, both represent upright
@@ -118,15 +122,16 @@ def test_detect_orientation_upright_text():
 # GetComponentImages Tests
 # ============================================================================
 
+
 def test_get_component_images_basic():
     """Test GetComponentImages method."""
-    from tesseract_nanobind.compat import PyTessBaseAPI, RIL
+    from tesseract_nanobind.compat import RIL, PyTessBaseAPI
 
     # given: image with text
     image = create_test_image_with_text("Hello World")
 
     # when: getting component images
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         api.SetImage(image)
         api.Recognize()
         components = api.GetComponentImages(RIL.WORD)
@@ -139,13 +144,13 @@ def test_get_component_images_basic():
 
 def test_get_component_images_structure():
     """Test structure of component image results."""
-    from tesseract_nanobind.compat import PyTessBaseAPI, RIL
+    from tesseract_nanobind.compat import RIL, PyTessBaseAPI
 
     # given: image with text
     image = create_test_image_with_text("Test")
 
     # when: getting component images at WORD level
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         api.SetImage(image)
         api.Recognize()
         components = api.GetComponentImages(RIL.WORD)
@@ -166,13 +171,13 @@ def test_get_component_images_structure():
 
 def test_get_component_images_different_levels():
     """Test GetComponentImages at different RIL levels."""
-    from tesseract_nanobind.compat import PyTessBaseAPI, RIL
+    from tesseract_nanobind.compat import RIL, PyTessBaseAPI
 
     # given: image with multiple words
     image = create_test_image_with_text("Word1 Word2 Word3")
 
     # when: getting components at different levels
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         api.SetImage(image)
         api.Recognize()
 
@@ -193,13 +198,13 @@ def test_get_component_images_different_levels():
 
 def test_get_component_images_without_recognize():
     """Test GetComponentImages without calling Recognize first."""
-    from tesseract_nanobind.compat import PyTessBaseAPI, RIL
+    from tesseract_nanobind.compat import RIL, PyTessBaseAPI
 
     # given: image set but not recognized
     image = create_test_image_with_text("Test")
 
     # when: getting components without Recognize
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         api.SetImage(image)
         # Note: Some implementations auto-recognize, some don't
         components = api.GetComponentImages(RIL.WORD)
@@ -210,7 +215,7 @@ def test_get_component_images_without_recognize():
 
 def test_get_component_images_without_init():
     """Test GetComponentImages without initialization."""
-    from tesseract_nanobind.compat import PyTessBaseAPI, RIL
+    from tesseract_nanobind.compat import RIL, PyTessBaseAPI
 
     # given: uninitialized API
     api = PyTessBaseAPI(init=False)
@@ -224,13 +229,13 @@ def test_get_component_images_without_init():
 
 def test_get_component_images_text_only():
     """Test GetComponentImages with text_only parameter."""
-    from tesseract_nanobind.compat import PyTessBaseAPI, RIL
+    from tesseract_nanobind.compat import RIL, PyTessBaseAPI
 
     # given: image with text
     image = create_test_image_with_text("Hello")
 
     # when: getting components with text_only=True and False
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         api.SetImage(image)
         api.Recognize()
 
@@ -248,15 +253,16 @@ def test_get_component_images_text_only():
 # Integration Tests
 # ============================================================================
 
+
 def test_all_orientation_and_layout_features():
     """Integration test for all orientation detection and layout analysis features."""
-    from tesseract_nanobind.compat import PyTessBaseAPI, RIL, PT, Orientation
+    from tesseract_nanobind.compat import PT, RIL, Orientation, PyTessBaseAPI
 
     # given: image with text
     image = create_test_image_with_text("Integration Test")
 
     # when: using all orientation and layout features
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         api.SetImage(image)
 
         # Test 1: Detect orientation
@@ -275,13 +281,13 @@ def test_all_orientation_and_layout_features():
 
 def test_component_images_with_psm():
     """Test GetComponentImages with different PSM settings."""
-    from tesseract_nanobind.compat import PyTessBaseAPI, RIL, PSM
+    from tesseract_nanobind.compat import PSM, RIL, PyTessBaseAPI
 
     # given: single line text
     image = create_test_image_with_text("Single Line")
 
     # when: using SINGLE_LINE PSM
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         api.SetPageSegMode(PSM.SINGLE_LINE)
         api.SetImage(image)
         api.Recognize()

@@ -12,16 +12,16 @@ from PIL import Image
 
 from tesseract_nanobind.compat import PyTessBaseAPI
 
-
 # ============================================================================
 # GetThresholdedImage Tests
 # ============================================================================
 
+
 def test_get_thresholded_image_basic():
     """Test that GetThresholdedImage returns a numpy array."""
-    img = Image.new('RGB', (200, 100), color='white')
+    img = Image.new("RGB", (200, 100), color="white")
 
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         api.SetImage(img)
         api.Recognize()
         thresholded = api.GetThresholdedImage()
@@ -32,9 +32,9 @@ def test_get_thresholded_image_basic():
 def test_get_thresholded_image_shape():
     """Test that GetThresholdedImage returns correct shape."""
     width, height = 300, 150
-    img = Image.new('RGB', (width, height), color='white')
+    img = Image.new("RGB", (width, height), color="white")
 
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         api.SetImage(img)
         api.Recognize()
         thresholded = api.GetThresholdedImage()
@@ -47,9 +47,9 @@ def test_get_thresholded_image_shape():
 
 def test_get_thresholded_image_dtype():
     """Test that GetThresholdedImage returns uint8 array."""
-    img = Image.new('RGB', (200, 100), color='white')
+    img = Image.new("RGB", (200, 100), color="white")
 
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         api.SetImage(img)
         api.Recognize()
         thresholded = api.GetThresholdedImage()
@@ -59,9 +59,9 @@ def test_get_thresholded_image_dtype():
 
 def test_get_thresholded_image_values():
     """Test that GetThresholdedImage returns binary values."""
-    img = Image.new('RGB', (200, 100), color='white')
+    img = Image.new("RGB", (200, 100), color="white")
 
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         api.SetImage(img)
         api.Recognize()
         thresholded = api.GetThresholdedImage()
@@ -76,9 +76,9 @@ def test_get_thresholded_image_values():
 def test_get_thresholded_image_white_background():
     """Test GetThresholdedImage with white background."""
     # Create white image
-    img = Image.new('RGB', (200, 100), color='white')
+    img = Image.new("RGB", (200, 100), color="white")
 
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         api.SetImage(img)
         api.Recognize()
         thresholded = api.GetThresholdedImage()
@@ -92,9 +92,9 @@ def test_get_thresholded_image_white_background():
 def test_get_thresholded_image_black_background():
     """Test GetThresholdedImage with black background."""
     # Create black image
-    img = Image.new('RGB', (200, 100), color='black')
+    img = Image.new("RGB", (200, 100), color="black")
 
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         api.SetImage(img)
         api.Recognize()
         thresholded = api.GetThresholdedImage()
@@ -106,9 +106,9 @@ def test_get_thresholded_image_black_background():
 
 def test_get_thresholded_image_without_recognize():
     """Test GetThresholdedImage when Recognize() is not called."""
-    img = Image.new('RGB', (200, 100), color='white')
+    img = Image.new("RGB", (200, 100), color="white")
 
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         api.SetImage(img)
         # Don't call Recognize()
         thresholded = api.GetThresholdedImage()
@@ -132,7 +132,7 @@ def test_get_thresholded_image_without_init():
 
 def test_get_thresholded_image_without_set_image():
     """Test GetThresholdedImage when no image has been set."""
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         # Don't set image
         thresholded = api.GetThresholdedImage()
 
@@ -143,9 +143,9 @@ def test_get_thresholded_image_without_set_image():
 
 def test_get_thresholded_image_with_roi():
     """Test GetThresholdedImage with SetRectangle (ROI)."""
-    img = Image.new('RGB', (400, 200), color='white')
+    img = Image.new("RGB", (400, 200), color="white")
 
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         api.SetImage(img)
         # Set ROI
         api.SetRectangle(50, 50, 200, 100)
@@ -160,9 +160,9 @@ def test_get_thresholded_image_with_roi():
 
 def test_get_thresholded_image_multiple_calls():
     """Test multiple calls to GetThresholdedImage."""
-    img = Image.new('RGB', (200, 100), color='white')
+    img = Image.new("RGB", (200, 100), color="white")
 
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         api.SetImage(img)
         api.Recognize()
 
@@ -182,15 +182,15 @@ def test_get_thresholded_image_multiple_calls():
 
 def test_get_thresholded_image_different_images():
     """Test GetThresholdedImage with different input images."""
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         # First image (white)
-        img1 = Image.new('RGB', (200, 100), color='white')
+        img1 = Image.new("RGB", (200, 100), color="white")
         api.SetImage(img1)
         api.Recognize()
         thresholded1 = api.GetThresholdedImage()
 
         # Second image (black)
-        img2 = Image.new('RGB', (200, 100), color='black')
+        img2 = Image.new("RGB", (200, 100), color="black")
         api.SetImage(img2)
         api.Recognize()
         thresholded2 = api.GetThresholdedImage()
@@ -210,11 +210,12 @@ def test_get_thresholded_image_different_images():
 # Integration Tests
 # ============================================================================
 
+
 def test_all_thresholding_features():
     """Integration test using all image thresholding features."""
-    img = Image.new('RGB', (300, 150), color='white')
+    img = Image.new("RGB", (300, 150), color="white")
 
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         api.SetImage(img)
         api.Recognize()
 
@@ -233,9 +234,9 @@ def test_all_thresholding_features():
 
 def test_thresholded_image_with_layout_analysis():
     """Test GetThresholdedImage combined with layout analysis methods."""
-    img = Image.new('RGB', (300, 150), color='white')
+    img = Image.new("RGB", (300, 150), color="white")
 
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         api.SetImage(img)
         api.Recognize()
 
@@ -252,5 +253,5 @@ def test_thresholded_image_with_layout_analysis():
         assert isinstance(lines, list)
 
 
-if __name__ == '__main__':
-    pytest.main([__file__, '-v'])
+if __name__ == "__main__":
+    pytest.main([__file__, "-v"])

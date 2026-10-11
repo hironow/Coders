@@ -19,8 +19,8 @@ def binstats(
     z: np.ndarray | None = None,
     output: str | Path | None = None,
     outgrid: str | Path | None = None,
-    region: str | list[float] = None,
-    spacing: str | list[float] = None,
+    region: str | list[float] | None = None,
+    spacing: str | list[float] | None = None,
     statistic: str | None = None,
     **kwargs,
 ):

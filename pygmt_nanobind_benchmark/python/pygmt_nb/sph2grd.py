@@ -12,8 +12,8 @@ from pygmt_nb.clib import Session
 def sph2grd(
     data: str | Path,
     outgrid: str | Path,
-    region: str | list[float] = None,
-    spacing: str | list[float] = None,
+    region: str | list[float] | None = None,
+    spacing: str | list[float] | None = None,
     normalize: str | None = None,
     **kwargs,
 ):

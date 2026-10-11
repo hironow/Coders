@@ -7,20 +7,20 @@ This module tests:
 - Alternative output formats (hOCR, TSV, Box, UNLV)
 - Clear methods and data path access
 """
-from PIL import Image, ImageDraw, ImageFont
+
+from PIL import Image, ImageDraw
+
+from tests.utils.fonts import load_test_font
 
 
 def create_test_image_with_text(text="Test", width=200, height=100):
     """Create a simple test image with text."""
-    image = Image.new('RGB', (width, height), color='white')
+    image = Image.new("RGB", (width, height), color="white")
     draw = ImageDraw.Draw(image)
 
-    try:
-        font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 36)
-    except Exception:
-        font = ImageFont.load_default()
+    font = load_test_font(36)
 
-    draw.text((10, 30), text, fill='black', font=font)
+    draw.text((10, 30), text, fill="black", font=font)
     return image
 
 
@@ -28,12 +28,13 @@ def create_test_image_with_text(text="Test", width=200, height=100):
 # Page Segmentation Mode Tests
 # ============================================================================
 
+
 def test_set_get_page_seg_mode():
     """Test SetPageSegMode and GetPageSegMode."""
-    from tesseract_nanobind.compat import PyTessBaseAPI, PSM
+    from tesseract_nanobind.compat import PSM, PyTessBaseAPI
 
     # given: initialized API
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         # when: setting different PSM modes
         api.SetPageSegMode(PSM.SINGLE_LINE)
         mode1 = api.GetPageSegMode()
@@ -52,13 +53,13 @@ def test_set_get_page_seg_mode():
 
 def test_page_seg_mode_affects_ocr():
     """Test that PSM actually affects OCR results."""
-    from tesseract_nanobind.compat import PyTessBaseAPI, PSM
+    from tesseract_nanobind.compat import PSM, PyTessBaseAPI
 
     # given: image with text
     image = create_test_image_with_text("Hello World")
 
     # when: using different PSM modes
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         # Single line mode
         api.SetPageSegMode(PSM.SINGLE_LINE)
         api.SetImage(image)
@@ -78,14 +79,15 @@ def test_page_seg_mode_affects_ocr():
 # Variable Setting/Getting Tests
 # ============================================================================
 
+
 def test_set_variable():
     """Test SetVariable method."""
     from tesseract_nanobind.compat import PyTessBaseAPI
 
     # given: initialized API
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         # when: setting a variable
-        result = api.SetVariable('tessedit_char_whitelist', '0123456789')
+        result = api.SetVariable("tessedit_char_whitelist", "0123456789")
 
         # then: should return True
         assert result is True
@@ -96,9 +98,9 @@ def test_set_variable_returns_false_for_invalid():
     from tesseract_nanobind.compat import PyTessBaseAPI
 
     # given: initialized API
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         # when: setting an invalid variable
-        result = api.SetVariable('invalid_var_name_xyz', 'value')
+        result = api.SetVariable("invalid_var_name_xyz", "value")
 
         # then: should return False
         assert result is False
@@ -109,9 +111,9 @@ def test_get_string_variable():
     from tesseract_nanobind.compat import PyTessBaseAPI
 
     # given: initialized API
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         # when: getting a string variable
-        lang = api.GetStringVariable('tessedit_char_blacklist')
+        lang = api.GetStringVariable("tessedit_char_blacklist")
 
         # then: should return a string (empty or with value)
         assert isinstance(lang, str)
@@ -122,18 +124,19 @@ def test_set_and_get_variable():
     from tesseract_nanobind.compat import PyTessBaseAPI
 
     # given: initialized API
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         # when: setting a whitelist
-        api.SetVariable('tessedit_char_whitelist', 'ABC')
-        whitelist = api.GetStringVariable('tessedit_char_whitelist')
+        api.SetVariable("tessedit_char_whitelist", "ABC")
+        whitelist = api.GetStringVariable("tessedit_char_whitelist")
 
         # then: should retrieve the set value
-        assert whitelist == 'ABC'
+        assert whitelist == "ABC"
 
 
 # ============================================================================
 # Rectangle (ROI) Tests
 # ============================================================================
+
 
 def test_set_rectangle():
     """Test SetRectangle method."""
@@ -142,7 +145,7 @@ def test_set_rectangle():
     # given: initialized API with image
     image = create_test_image_with_text("Full Image Text")
 
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         api.SetImage(image)
 
         # when: setting rectangle (should not raise error)
@@ -158,19 +161,16 @@ def test_rectangle_restricts_ocr():
     from tesseract_nanobind.compat import PyTessBaseAPI
 
     # given: image with text in different regions
-    image = Image.new('RGB', (400, 200), color='white')
+    image = Image.new("RGB", (400, 200), color="white")
     draw = ImageDraw.Draw(image)
-    try:
-        font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 36)
-    except Exception:
-        font = ImageFont.load_default()
+    font = load_test_font(36)
 
     # Left text
-    draw.text((10, 80), "LEFT", fill='black', font=font)
+    draw.text((10, 80), "LEFT", fill="black", font=font)
     # Right text
-    draw.text((250, 80), "RIGHT", fill='black', font=font)
+    draw.text((250, 80), "RIGHT", fill="black", font=font)
 
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         # when: OCR on left half only
         api.SetImage(image)
         api.SetRectangle(0, 0, 200, 200)
@@ -191,6 +191,7 @@ def test_rectangle_restricts_ocr():
 # Alternative Output Format Tests
 # ============================================================================
 
+
 def test_get_hocr_text():
     """Test GetHOCRText method."""
     from tesseract_nanobind.compat import PyTessBaseAPI
@@ -199,7 +200,7 @@ def test_get_hocr_text():
     image = create_test_image_with_text("Test")
 
     # when: getting hOCR output
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         api.SetImage(image)
         hocr = api.GetHOCRText(0)
 
@@ -207,7 +208,7 @@ def test_get_hocr_text():
         assert isinstance(hocr, str)
         assert len(hocr) > 0
         # hOCR should contain HTML-like tags
-        assert 'ocr' in hocr.lower() or 'div' in hocr.lower() or 'span' in hocr.lower()
+        assert "ocr" in hocr.lower() or "div" in hocr.lower() or "span" in hocr.lower()
 
 
 def test_get_tsv_text():
@@ -218,7 +219,7 @@ def test_get_tsv_text():
     image = create_test_image_with_text("Test")
 
     # when: getting TSV output
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         api.SetImage(image)
         tsv = api.GetTSVText(0)
 
@@ -226,7 +227,7 @@ def test_get_tsv_text():
         assert isinstance(tsv, str)
         assert len(tsv) > 0
         # TSV should have tab characters
-        assert '\t' in tsv
+        assert "\t" in tsv
 
 
 def test_get_box_text():
@@ -237,7 +238,7 @@ def test_get_box_text():
     image = create_test_image_with_text("A")
 
     # when: getting box file output
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         api.SetImage(image)
         box = api.GetBoxText(0)
 
@@ -254,7 +255,7 @@ def test_get_unlv_text():
     image = create_test_image_with_text("Test")
 
     # when: getting UNLV output
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         api.SetImage(image)
         unlv = api.GetUNLVText()
 
@@ -267,6 +268,7 @@ def test_get_unlv_text():
 # Clear Methods Tests
 # ============================================================================
 
+
 def test_clear_method():
     """Test Clear method."""
     from tesseract_nanobind.compat import PyTessBaseAPI
@@ -274,7 +276,7 @@ def test_clear_method():
     # given: API with recognized image
     image = create_test_image_with_text("Test")
 
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         api.SetImage(image)
         api.Recognize()
 
@@ -295,7 +297,7 @@ def test_clear_adaptive_classifier():
     # given: API with recognized image
     image = create_test_image_with_text("Test")
 
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         api.SetImage(image)
         api.Recognize()
 
@@ -311,12 +313,13 @@ def test_clear_adaptive_classifier():
 # Metadata Methods Tests
 # ============================================================================
 
+
 def test_get_datapath():
     """Test GetDatapath method."""
     from tesseract_nanobind.compat import PyTessBaseAPI
 
     # given: initialized API
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         # when: getting datapath
         datapath = api.GetDatapath()
 
@@ -324,7 +327,7 @@ def test_get_datapath():
         assert isinstance(datapath, str)
         assert len(datapath) > 0
         # Should end with / or be a valid path
-        assert '/' in datapath or '\\' in datapath or datapath == ''
+        assert "/" in datapath or "\\" in datapath or datapath == ""
 
 
 def test_get_init_languages_updated():
@@ -332,30 +335,31 @@ def test_get_init_languages_updated():
     from tesseract_nanobind.compat import PyTessBaseAPI
 
     # given: API initialized with specific language
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         # when: getting languages
         langs = api.GetInitLanguagesAsString()
 
         # then: should return initialized language
         assert isinstance(langs, str)
-        assert 'eng' in langs
+        assert "eng" in langs
 
 
 # ============================================================================
 # Integration Tests
 # ============================================================================
 
+
 def test_psm_with_whitelist():
     """Test combining PSM and variable setting."""
-    from tesseract_nanobind.compat import PyTessBaseAPI, PSM
+    from tesseract_nanobind.compat import PSM, PyTessBaseAPI
 
     # given: image with numbers
     image = create_test_image_with_text("12345")
 
     # when: using single line PSM with digit whitelist
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         api.SetPageSegMode(PSM.SINGLE_LINE)
-        api.SetVariable('tessedit_char_whitelist', '0123456789')
+        api.SetVariable("tessedit_char_whitelist", "0123456789")
         api.SetImage(image)
         text = api.GetUTF8Text()
 
@@ -371,7 +375,7 @@ def test_rectangle_with_hocr():
     image = create_test_image_with_text("Test")
 
     # when: using rectangle with hOCR output
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         api.SetImage(image)
         api.SetRectangle(0, 0, 150, 100)
         hocr = api.GetHOCRText(0)
@@ -389,7 +393,7 @@ def test_all_output_formats():
     image = create_test_image_with_text("ABC")
 
     # when: getting all output formats
-    with PyTessBaseAPI(lang='eng') as api:
+    with PyTessBaseAPI(lang="eng") as api:
         api.SetImage(image)
 
         utf8 = api.GetUTF8Text()

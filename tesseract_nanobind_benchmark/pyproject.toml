@@ -19,6 +19,7 @@ test = [
 ]
 benchmark = [
     "pytesseract>=0.3.10",
+    "tesserocr",
 ]
 
 [tool.scikit-build]
@@ -29,3 +30,16 @@ wheel.packages = ["src/tesseract_nanobind"]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_functions = ["test_*"]
+
+[tool.uv]
+exclude-newer = "7 days"
+exclude-newer-package = { ruff = false, ty = false }
+
+[tool.ty.terminal]
+error-on-warning = true
+
+[dependency-groups]
+lint = [
+    "ruff==0.17.0",
+    "ty==0.0.86",
+]

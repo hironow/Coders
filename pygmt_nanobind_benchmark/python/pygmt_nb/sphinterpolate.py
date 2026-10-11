@@ -17,8 +17,8 @@ def sphinterpolate(
     y: np.ndarray | None = None,
     z: np.ndarray | None = None,
     outgrid: str | Path = "sphinterpolate_output.nc",
-    region: str | list[float] = None,
-    spacing: str | list[float] = None,
+    region: str | list[float] | None = None,
+    spacing: str | list[float] | None = None,
     tension: float | None = None,
     **kwargs,
 ):

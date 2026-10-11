@@ -12,7 +12,7 @@ def plot(
     x=None,
     y=None,
     data=None,
-    region: str | list[float] | None = None,
+    region: str | list[float] | list[int] | None = None,
     projection: str | None = None,
     style: str | None = None,
     color: str | None = None,

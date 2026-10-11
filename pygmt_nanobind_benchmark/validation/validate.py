@@ -234,6 +234,7 @@ def compare_info_operation():
     print("\n[pygmt_nb]")
     start = time.perf_counter()
     result_nb = pygmt_nb.info(data_file)
+    assert isinstance(result_nb, str)
     time_nb = (time.perf_counter() - start) * 1000
 
     print(f"  Time: {time_nb:.2f} ms")

@@ -8,6 +8,7 @@ on:
       - '.github/workflows/pygmt-nanobind-ci.yaml'
       - 'justfile'
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     branches: [ main, develop ]
     paths:
       - 'pygmt_nanobind_benchmark/**'
@@ -15,11 +16,15 @@ on:
       - 'justfile'
   workflow_dispatch:
 
+env:
+  GMT_INCLUDE_DIR: /usr/include/gmt
+
 permissions:
   contents: read
 
 jobs:
   build-and-test:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     name: Build and Test (${{ matrix.os }}, Python ${{ matrix.python-version }})
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
@@ -40,8 +45,10 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Set up Takumi Guard (PyPI)
-      uses: flatt-security/setup-takumi-guard-pypi@733047c120b6377fa05fb77f714df8d8cd3a41a9 # v1
+    - name: Set up uv
+      uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
+      with:
+        python-version: ${{ matrix.python-version }}
 
     - name: Install system dependencies (Ubuntu)
       if: runner.os == 'Linux'
@@ -53,13 +60,11 @@ jobs:
           gmt-dcw \
           gmt-gshhg \
           cmake \
-          ninja-build
+          ninja-build \
+          ghostscript
 
-    - name: Install build tools (uv and just)
-      run: |
-        python -m pip install --upgrade pip
-        pip install uv
-        pipx install rust-just
+    - name: Set up just
+      uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # v4
 
     - name: Build package
       run: |
@@ -70,6 +75,7 @@ jobs:
         just gmt-test
 
   compatibility-test:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     name: Compatibility Test (PyGMT API)
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -85,8 +91,10 @@ jobs:
       with:
         python-version: '3.11'
 
-    - name: Set up Takumi Guard (PyPI)
-      uses: flatt-security/setup-takumi-guard-pypi@733047c120b6377fa05fb77f714df8d8cd3a41a9 # v1
+    - name: Set up uv
+      uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
+      with:
+        python-version: '3.11'
 
     - name: Install system dependencies
       run: |
@@ -100,15 +108,8 @@ jobs:
           ninja-build \
           ghostscript
 
-    - name: Install build tools (uv and just)
-      run: |
-        python -m pip install --upgrade pip
-        pip install uv
-        pipx install rust-just
-
-    - name: Install PyGMT for compatibility testing
-      run: |
-        pip install pygmt pytest
+    - name: Set up just
+      uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # v4
 
     - name: Build package
       run: |
@@ -117,9 +118,10 @@ jobs:
     - name: Run compatibility tests
       working-directory: pygmt_nanobind_benchmark
       run: |
-        python -m pytest tests/ -v -k "not benchmark"
+        uv run --locked --all-extras --group lint pytest tests/ -v -k "not benchmark"
 
   validation:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     name: Validation (PyGMT Output Compatibility)
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -135,8 +137,10 @@ jobs:
       with:
         python-version: '3.11'
 
-    - name: Set up Takumi Guard (PyPI)
-      uses: flatt-security/setup-takumi-guard-pypi@733047c120b6377fa05fb77f714df8d8cd3a41a9 # v1
+    - name: Set up uv
+      uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
+      with:
+        python-version: '3.11'
 
     - name: Install system dependencies
       run: |
@@ -150,15 +154,8 @@ jobs:
           ninja-build \
           ghostscript
 
-    - name: Install build tools (uv and just)
-      run: |
-        python -m pip install --upgrade pip
-        pip install uv
-        pipx install rust-just
-
-    - name: Install validation dependencies
-      run: |
-        pip install pygmt
+    - name: Set up just
+      uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # v4
 
     - name: Build package
       run: |
@@ -176,10 +173,10 @@ jobs:
         path: pygmt_nanobind_benchmark/output/validation/
 
   benchmark:
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)
     name: Performance Benchmark
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
 
     steps:
     - name: Checkout repository
@@ -192,8 +189,10 @@ jobs:
       with:
         python-version: '3.11'
 
-    - name: Set up Takumi Guard (PyPI)
-      uses: flatt-security/setup-takumi-guard-pypi@733047c120b6377fa05fb77f714df8d8cd3a41a9 # v1
+    - name: Set up uv
+      uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
+      with:
+        python-version: '3.11'
 
     - name: Install system dependencies
       run: |
@@ -207,15 +206,8 @@ jobs:
           ninja-build \
           ghostscript
 
-    - name: Install build tools (uv and just)
-      run: |
-        python -m pip install --upgrade pip
-        pip install uv
-        pipx install rust-just
-
-    - name: Install benchmark dependencies
-      run: |
-        pip install pygmt pytest numpy
+    - name: Set up just
+      uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # v4
 
     - name: Build package
       run: |
@@ -233,6 +225,7 @@ jobs:
         path: pygmt_nanobind_benchmark/benchmark_results.txt
 
   code-quality:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     name: Code Quality Checks
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -246,14 +239,21 @@ jobs:
       with:
         python-version: '3.11'
 
-    - name: Set up Takumi Guard (PyPI)
-      uses: flatt-security/setup-takumi-guard-pypi@733047c120b6377fa05fb77f714df8d8cd3a41a9 # v1
+    - name: Set up uv
+      uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
+      with:
+        python-version: '3.11'
 
-    - name: Install build tools (uv and just)
+    - name: Set up just
+      uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # v4
+
+    - name: Install native build dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install uv
-        pipx install rust-just
+        sudo apt-get update
+        sudo apt-get install -y libgmt-dev gmt gmt-dcw gmt-gshhg ghostscript cmake ninja-build
+
+    - name: Build package
+      run: just gmt-build
 
     - name: Run code quality checks
       run: |

@@ -11,12 +11,14 @@ Most common tesserocr operations are supported.
 
 import numpy as np
 from PIL import Image
+
 from ._tesseract_nanobind import TesseractAPI as _TesseractAPI
 
 
 # Enum classes matching tesserocr
 class OEM:
     """OCR Engine Mode enumeration."""
+
     TESSERACT_ONLY = 0
     LSTM_ONLY = 1
     TESSERACT_LSTM_COMBINED = 2
@@ -25,6 +27,7 @@ class OEM:
 
 class PSM:
     """Page Segmentation Mode enumeration."""
+
     OSD_ONLY = 0
     AUTO_OSD = 1
     AUTO_ONLY = 2
@@ -44,6 +47,7 @@ class PSM:
 
 class RIL:
     """Page Iterator Level enumeration."""
+
     BLOCK = 0
     PARA = 1
     TEXTLINE = 2
@@ -53,6 +57,7 @@ class RIL:
 
 class PT:
     """PolyBlockType enumeration for layout analysis."""
+
     UNKNOWN = 0
     FLOWING_TEXT = 1
     HEADING_TEXT = 2
@@ -73,6 +78,7 @@ class PT:
 
 class Orientation:
     """Page orientation enumeration."""
+
     PAGE_UP = 0
     PAGE_RIGHT = 1
     PAGE_DOWN = 2
@@ -81,6 +87,7 @@ class Orientation:
 
 class WritingDirection:
     """Writing direction enumeration."""
+
     LEFT_TO_RIGHT = 0
     RIGHT_TO_LEFT = 1
     TOP_TO_BOTTOM = 2
@@ -89,6 +96,7 @@ class WritingDirection:
 
 class TextlineOrder:
     """Textline order enumeration."""
+
     LEFT_TO_RIGHT = 0
     RIGHT_TO_LEFT = 1
     TOP_TO_BOTTOM = 2
@@ -97,27 +105,35 @@ class TextlineOrder:
 
 class PyTessBaseAPI:
     """Tesserocr-compatible wrapper around TesseractAPI.
-    
+
     This class provides API compatibility with tesserocr's PyTessBaseAPI,
     allowing existing tesserocr code to work with minimal changes.
-    
+
     Usage:
         >>> api = PyTessBaseAPI(lang='eng')
         >>> api.SetImage(image)
         >>> text = api.GetUTF8Text()
         >>> api.End()
-    
+
     Or as context manager:
         >>> with PyTessBaseAPI(lang='eng') as api:
         ...     api.SetImage(image)
         ...     text = api.GetUTF8Text()
     """
-    
-    def __init__(self, path='', lang='eng', oem=OEM.DEFAULT, psm=PSM.AUTO,
-                 configs=None, variables=None, set_only_non_debug_params=False,
-                 init=True):
+
+    def __init__(
+        self,
+        path="",
+        lang="eng",
+        oem=OEM.DEFAULT,
+        psm=PSM.AUTO,
+        configs=None,
+        variables=None,
+        set_only_non_debug_params=False,
+        init=True,
+    ):
         """Initialize the API.
-        
+
         Args:
             path: Data path for tessdata (empty string uses system default)
             lang: Language code (default: 'eng')
@@ -132,32 +148,32 @@ class PyTessBaseAPI:
         self._lang = lang
         self._path = path
         self._initialized = False
-        
+
         if init:
             self.Init(path, lang, oem, psm)
-    
+
     def __enter__(self):
         """Context manager entry."""
         return self
-    
+
     def __exit__(self, exc_type, exc_val, exc_tb):
         """Context manager exit."""
         self.End()
-    
+
     @staticmethod
     def Version():
         """Get Tesseract version string."""
         return _TesseractAPI.version()
-    
-    def Init(self, path='', lang='eng', oem=OEM.DEFAULT, psm=PSM.AUTO):
+
+    def Init(self, path="", lang="eng", oem=OEM.DEFAULT, psm=PSM.AUTO):
         """Initialize the API with language and data path.
-        
+
         Args:
             path: Data path for tessdata (empty string uses system default)
             lang: Language code
             oem: OCR Engine Mode (ignored)
             psm: Page Segmentation Mode (not fully implemented)
-        
+
         Raises:
             RuntimeError: If initialization fails
         """
@@ -167,66 +183,68 @@ class PyTessBaseAPI:
         self._initialized = True
         self._lang = lang
         self._path = path
-    
+
     def End(self):
         """End API session and free resources."""
         # Our API handles cleanup automatically
         self._initialized = False
-    
+
     def SetImage(self, image):
         """Set image for OCR.
-        
+
         Args:
             image: PIL Image object
-        
+
         Raises:
             RuntimeError: If image cannot be set
         """
         if not self._initialized:
             raise RuntimeError("API not initialized. Call Init() first.")
-        
+
         # Convert PIL Image to NumPy array
         if isinstance(image, Image.Image):
             # Ensure RGB mode
-            if image.mode != 'RGB':
-                image = image.convert('RGB')
+            if image.mode != "RGB":
+                image = image.convert("RGB")
             image_array = np.array(image)
         elif isinstance(image, np.ndarray):
             image_array = image
         else:
-            raise TypeError(f"Image must be PIL.Image or numpy.ndarray, got {type(image)}")
-        
+            raise TypeError(
+                f"Image must be PIL.Image or numpy.ndarray, got {type(image)}"
+            )
+
         self._api.set_image(image_array)
-    
+
     def SetImageFile(self, filename):
         """Set image from file.
-        
+
         Args:
             filename: Path to image file
-        
+
         Raises:
             RuntimeError: If file cannot be loaded
         """
         try:
             image = Image.open(filename)
             self.SetImage(image)
-        except Exception as e:
-            raise RuntimeError(f"Failed to load image from {filename}: {e}")
-    
+        except (OSError, ValueError) as e:
+            raise RuntimeError(f"Failed to load image from {filename}: {e}") from e
+
     def GetUTF8Text(self):
         """Get recognized text as UTF-8 string.
-        
+
         Returns:
             str: Recognized text
-        
+
         Raises:
             RuntimeError: If no image set or recognition fails
         """
         if not self._initialized:
             raise RuntimeError("API not initialized. Call Init() first.")
-        
+
         return self._api.get_utf8_text()
-    
+
     def Recognize(self, timeout=0):
         """Recognize the image.
 
@@ -246,67 +264,67 @@ class PyTessBaseAPI:
         if result != 0:
             raise RuntimeError(f"Recognition failed with error code: {result}")
         return True
-    
+
     def GetIterator(self):
         """Get result iterator (not fully implemented).
-        
+
         Returns:
             None (not implemented)
         """
         # Not implemented - would require wrapping the iterator
-        return None
-    
+        return
+
     def MeanTextConf(self):
         """Get mean text confidence.
-        
+
         Returns:
             int: Confidence score 0-100
         """
         if not self._initialized:
             return 0
-        
+
         return self._api.get_mean_confidence()
-    
+
     def AllWordConfidences(self):
         """Get confidence for all words.
-        
+
         Returns:
             list: List of confidence scores
         """
         if not self._initialized:
             return []
-        
+
         # Get bounding boxes which include confidence
         self._api.recognize()
         boxes = self._api.get_bounding_boxes()
-        return [int(box['confidence']) for box in boxes]
-    
+        return [int(box["confidence"]) for box in boxes]
+
     def AllWords(self):
         """Get all detected words.
-        
+
         Returns:
             list: List of words
         """
         if not self._initialized:
             return []
-        
+
         self._api.recognize()
         boxes = self._api.get_bounding_boxes()
-        return [box['text'] for box in boxes]
-    
+        return [box["text"] for box in boxes]
+
     def MapWordConfidences(self):
         """Get word and confidence pairs.
-        
+
         Returns:
             list: List of (word, confidence) tuples
         """
         if not self._initialized:
             return []
-        
+
         self._api.recognize()
         boxes = self._api.get_bounding_boxes()
-        return [(box['text'], int(box['confidence'])) for box in boxes]
-    
+        return [(box["text"], int(box["confidence"])) for box in boxes]
+
     def SetPageSegMode(self, psm):
         """Set page segmentation mode.
 
@@ -340,7 +358,7 @@ class PyTessBaseAPI:
         if not self._initialized:
             return False
         return self._api.set_variable(name, str(value))
-    
+
     def GetInitLanguagesAsString(self):
         """Get initialized languages.
 
@@ -348,7 +366,7 @@ class PyTessBaseAPI:
             str: Language string
         """
         if not self._initialized:
-            return ''
+            return ""
         return self._api.get_init_languages_as_string()
 
     def DetectOrientationScript(self):
@@ -362,7 +380,7 @@ class PyTessBaseAPI:
                 script_conf: Confidence for script (0-100)
         """
         if not self._initialized:
-            return (0, 0.0, '', 0.0)
+            return (0, 0.0, "", 0.0)
         return self._api.detect_orientation_script()
 
     def GetComponentImages(self, level, text_only=True):
@@ -526,10 +544,7 @@ class PyTessBaseAPI:
         """
         if not self._initialized:
             return None
-        value = [0]  # mutable container for output parameter
-        if self._api.get_int_variable(name, value):
-            return value[0]
-        return None
+        return self._api.get_int_variable(name)
 
     def GetBoolVariable(self, name):
         """Get a boolean Tesseract variable.
@@ -542,10 +557,7 @@ class PyTessBaseAPI:
         """
         if not self._initialized:
             return None
-        value = [False]  # mutable container for output parameter
-        if self._api.get_bool_variable(name, value):
-            return value[0]
-        return None
+        return self._api.get_bool_variable(name)
 
     def GetDoubleVariable(self, name):
         """Get a double Tesseract variable.
@@ -558,10 +570,7 @@ class PyTessBaseAPI:
         """
         if not self._initialized:
             return None
-        value = [0.0]  # mutable container for output parameter
-        if self._api.get_double_variable(name, value):
-            return value[0]
-        return None
+        return self._api.get_double_variable(name)
 
     def GetStringVariable(self, name):
         """Get a string Tesseract variable.
@@ -578,14 +587,14 @@ class PyTessBaseAPI:
 
 
 # Helper functions matching tesserocr
-def image_to_text(image, lang='eng', psm=PSM.AUTO):
+def image_to_text(image, lang="eng", psm=PSM.AUTO):
     """Convert image to text (tesserocr-compatible helper).
-    
+
     Args:
         image: PIL Image object
         lang: Language code
         psm: Page segmentation mode
-    
+
     Returns:
         str: Recognized text
     """
@@ -594,14 +603,14 @@ def image_to_text(image, lang='eng', psm=PSM.AUTO):
         return api.GetUTF8Text()
 
 
-def file_to_text(filename, lang='eng', psm=PSM.AUTO):
+def file_to_text(filename, lang="eng", psm=PSM.AUTO):
     """Convert file to text (tesserocr-compatible helper).
-    
+
     Args:
         filename: Path to image file
         lang: Language code
         psm: Page segmentation mode
-    
+
     Returns:
         str: Recognized text
     """
@@ -610,23 +619,23 @@ def file_to_text(filename, lang='eng', psm=PSM.AUTO):
         return api.GetUTF8Text()
 
 
-def get_languages(path=''):
+def get_languages(path=""):
     """Get available languages (simplified version).
-    
+
     Args:
         path: Tessdata path
-    
+
     Returns:
         tuple: (path, list of languages)
     """
     # Simplified - just return common languages
     # In a full implementation, this would scan the tessdata directory
-    return (path or '/usr/share/tesseract-ocr/tessdata/', ['eng'])
+    return (path or "/usr/share/tesseract-ocr/tessdata/", ["eng"])
 
 
 def tesseract_version():
     """Get Tesseract version string.
-    
+
     Returns:
         str: Version string
     """
@@ -634,8 +643,16 @@ def tesseract_version():
 
 
 __all__ = [
-    'PyTessBaseAPI',
-    'OEM', 'PSM', 'RIL', 'PT', 'Orientation', 'WritingDirection', 'TextlineOrder',
-    'image_to_text', 'file_to_text',
-    'get_languages', 'tesseract_version',
+    "OEM",
+    "PSM",
+    "PT",
+    "RIL",
+    "Orientation",
+    "PyTessBaseAPI",
+    "TextlineOrder",
+    "WritingDirection",
+    "file_to_text",
+    "get_languages",
+    "image_to_text",
+    "tesseract_version",
 ]
