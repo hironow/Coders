@@ -46,7 +46,6 @@ test = [
 ]
 dev = [
     "ruff",
-    "mypy",
     "build",
 ]
 benchmark = [
@@ -55,7 +54,7 @@ benchmark = [
 ]
 
 [tool.scikit-build]
-cmake.minimum-version = "3.16"
+cmake.version = ">=3.16"
 cmake.build-type = "Release"
 wheel.packages = ["python/pygmt_nb"]
 
@@ -87,9 +86,15 @@ ignore = [
     "E501", # line too long (handled by formatter)
 ]
 
-[tool.mypy]
-python_version = "3.11"
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = true
-check_untyped_defs = true
+[tool.uv]
+exclude-newer = "7 days"
+exclude-newer-package = { ruff = false, ty = false }
+
+[tool.ty.terminal]
+error-on-warning = true
+
+[dependency-groups]
+lint = [
+    "ruff==0.17.0",
+    "ty==0.0.86",
+]

@@ -69,14 +69,11 @@ endif()
 
 message(STATUS "Found GMT library: ${GMT_LIBRARY}")
 
-# Fetch nanobind
-include(FetchContent)
-FetchContent_Declare(
-    nanobind
-    GIT_REPOSITORY https://github.com/wjakob/nanobind
-    GIT_TAG v2.0.0
-)
-FetchContent_MakeAvailable(nanobind)
+# Use the nanobind dependency supplied by the isolated Python build environment.
+execute_process(
+    COMMAND "${Python_EXECUTABLE}" -m nanobind --cmake_dir
+    OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE nanobind_ROOT)
+find_package(nanobind CONFIG REQUIRED)
 
 # Create the Python extension module with real GMT implementation
 nanobind_add_module(
