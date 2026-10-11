@@ -50,8 +50,7 @@ jobs:
         CIBW_SKIP: "*-musllinux_* *-manylinux_i686 *-win32"
         CIBW_ARCHS_LINUX: x86_64
         CIBW_BEFORE_ALL_LINUX: |
-          dnf install -y epel-release
-          dnf install -y tesseract-devel leptonica-devel tesseract-langpack-eng
+          dnf install -y tesseract-devel leptonica-devel
         CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28
         CIBW_TEST_REQUIRES: pytest>=9.0 pillow>=12.0 numpy>=2.0
         CIBW_TEST_COMMAND: pytest {project}/tests/test_basic.py -v
