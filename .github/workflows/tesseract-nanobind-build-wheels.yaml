@@ -29,8 +29,8 @@ jobs:
       with:
         python-version: '3.11'
     
-    - name: Set up Takumi Guard (PyPI)
-      uses: flatt-security/setup-takumi-guard-pypi@733047c120b6377fa05fb77f714df8d8cd3a41a9 # v1
+    - name: Set up uv
+      uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
     
     - name: Install system dependencies (Ubuntu)
       run: |
@@ -44,16 +44,17 @@ jobs:
           ninja-build
     
     - name: Build wheels
-      uses: pypa/cibuildwheel@ce3fb7832089eb3e723a0a99cab7f3eaccf074fd # v2.16.5
+      uses: pypa/cibuildwheel@e090b81e30c4d855ea63bf4b6e59204c09a101ae # v4.2.1
       env:
         CIBW_BUILD: cp310-* cp311-* cp312-* cp313-* cp314-*
         CIBW_SKIP: "*-musllinux_* *-manylinux_i686 *-win32"
         CIBW_ARCHS_LINUX: x86_64
-        CIBW_BEFORE_BUILD_LINUX: |
-          yum install -y tesseract-devel leptonica-devel || \
-          apt-get update && apt-get install -y libtesseract-dev libleptonica-dev
+        CIBW_BEFORE_ALL_LINUX: |
+          dnf install -y epel-release
+          dnf install -y tesseract-devel leptonica-devel tesseract-langpack-eng
+        CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_28
         CIBW_TEST_REQUIRES: pytest>=9.0 pillow>=12.0 numpy>=2.0
-        CIBW_TEST_COMMAND: pytest {project}/tesseract_nanobind_benchmark/tests/test_basic.py -v
+        CIBW_TEST_COMMAND: pytest {project}/tests/test_basic.py -v
       with:
         package-dir: ./tesseract_nanobind_benchmark
     
@@ -78,14 +79,13 @@ jobs:
       with:
         python-version: '3.11'
     
-    - name: Set up Takumi Guard (PyPI)
-      uses: flatt-security/setup-takumi-guard-pypi@733047c120b6377fa05fb77f714df8d8cd3a41a9 # v1
+    - name: Set up uv
+      uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
     
     - name: Build sdist
       working-directory: tesseract_nanobind_benchmark
       run: |
-        python -m pip install --upgrade pip build
-        python -m build --sdist
+        uv build --sdist
     
     - name: Upload sdist
       uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2

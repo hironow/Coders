@@ -5,6 +5,23 @@ default: help
 help:
     @just --list
 
+# Validate the workflow and both CI-tested native packages
+check: lint-workflows tesseract-build gmt-build tesseract-check gmt-check tesseract-test gmt-test
+
+verify: check
+
+# Create isolated local environments for the CI-tested packages
+init-test-envs python="3.11":
+    uv venv --python {{python}} tesseract_nanobind_benchmark/.venv
+    uv venv --python {{python}} pygmt_nanobind_benchmark/.venv
+
+lint-fix:
+    cd tesseract_nanobind_benchmark && uv run --locked --only-group lint ruff check --fix .
+    cd pygmt_nanobind_benchmark && uv run --locked --only-group lint ruff check --fix .
+
+lint-workflows:
+    actionlint .github/workflows/*.yaml
+
 
 UV := "uv"
 PYTHON := "uv run python"
@@ -15,48 +32,22 @@ PYTEST := "uv run --all-extras pytest"
 
 [group('tesseract')]
 tesseract-build:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    cd tesseract_nanobind_benchmark
-    # Use --system flag if not in a virtual environment (for CI compatibility)
-    if [ -n "${VIRTUAL_ENV:-}" ] || [ -d ".venv" ]; then
-        {{PIP}} install -e .[test]
-    else
-        {{PIP}} install --system -e .[test]
-    fi
+    cd tesseract_nanobind_benchmark && uv sync --locked --all-extras --group lint --reinstall-package tesseract-nanobind
 
 [group('tesseract')]
 tesseract-check:
-    {{UV}} tool install ruff
-    {{UV}} tool install semgrep
-    @echo "Installed tools:"
-    @{{UV}} tool list
-    {{UV}} tool run ruff check tesseract_nanobind_benchmark/
-    {{UV}} tool run semgrep --config=auto tesseract_nanobind_benchmark/
+    cd tesseract_nanobind_benchmark && uv run --locked --only-group lint ruff check .
+    cd tesseract_nanobind_benchmark && uv run --locked --only-group lint ruff format --check src tests benchmarks examples
+    cd tesseract_nanobind_benchmark && uv run --locked --all-extras --group lint ty check
+    uv tool run --from semgrep==1.179.0 semgrep --config=auto tesseract_nanobind_benchmark/
 
 [group('tesseract')]
 tesseract-test:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    cd tesseract_nanobind_benchmark
-    # Use system python if not in a virtual environment (for CI compatibility)
-    if [ -n "${VIRTUAL_ENV:-}" ] || [ -d ".venv" ]; then
-        {{PYTEST}} tests/ -v
-    else
-        python -m pytest tests/ -v
-    fi
+    cd tesseract_nanobind_benchmark && uv run --locked --all-extras --group lint pytest tests/ -v
 
 [group('tesseract')]
 tesseract-benchmark:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    cd tesseract_nanobind_benchmark
-    # Use system python if not in a virtual environment (for CI compatibility)
-    if [ -n "${VIRTUAL_ENV:-}" ] || [ -d ".venv" ]; then
-        uv run --all-extras python benchmarks/benchmark.py
-    else
-        python benchmarks/benchmark.py
-    fi
+    cd tesseract_nanobind_benchmark && uv run --locked --all-extras --group lint python benchmarks/benchmark.py
 
 [group('tesseract')]
 tesseract-clean:
@@ -145,64 +136,28 @@ tesseract-release:
 # Build the nanobind extension
 [group('gmt')]
 gmt-build:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    cd pygmt_nanobind_benchmark
-    # Use --system flag if not in a virtual environment (for CI compatibility)
-    if [ -n "${VIRTUAL_ENV:-}" ] || [ -d ".venv" ]; then
-        {{PIP}} install -e .[test]
-    else
-        {{PIP}} install --system -e .[test]
-    fi
+    cd pygmt_nanobind_benchmark && uv sync --locked --all-extras --group lint --reinstall-package pygmt-nb
 
-# Run code quality checks
 [group('gmt')]
 gmt-check:
-    {{UV}} tool install ruff
-    {{UV}} tool install semgrep
-    @echo "Installed tools:"
-    @{{UV}} tool list
-    {{UV}} tool run ruff check pygmt_nanobind_benchmark/
-    {{UV}} tool run semgrep --config=auto pygmt_nanobind_benchmark/
+    cd pygmt_nanobind_benchmark && uv run --locked --only-group lint ruff check .
+    cd pygmt_nanobind_benchmark && uv run --locked --only-group lint ruff format --check python tests benchmarks validation
+    cd pygmt_nanobind_benchmark && uv run --locked --all-extras --group lint ty check
+    uv tool run --from semgrep==1.179.0 semgrep --config=auto pygmt_nanobind_benchmark/
 
-# Run all tests
 [group('gmt')]
 gmt-test:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    cd pygmt_nanobind_benchmark
-    # Use system python if not in a virtual environment (for CI compatibility)
-    if [ -n "${VIRTUAL_ENV:-}" ] || [ -d ".venv" ]; then
-        {{PYTEST}} tests/ -v
-    else
-        python -m pytest tests/ -v
-    fi
+    cd pygmt_nanobind_benchmark && uv run --locked --all-extras --group lint pytest tests/ -v
 
 # Run all benchmarks
 [group('gmt')]
 gmt-benchmark:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    cd pygmt_nanobind_benchmark
-    # Use system python if not in a virtual environment (for CI compatibility)
-    if [ -n "${VIRTUAL_ENV:-}" ] || [ -d ".venv" ]; then
-        uv run --all-extras python benchmarks/benchmark.py
-    else
-        python benchmarks/benchmark.py
-    fi
+    cd pygmt_nanobind_benchmark && uv run --locked --all-extras --group lint python benchmarks/benchmark.py
 
 # Run validation suite
 [group('gmt')]
 gmt-validate:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    cd pygmt_nanobind_benchmark
-    # Use system python if not in a virtual environment (for CI compatibility)
-    if [ -n "${VIRTUAL_ENV:-}" ] || [ -d ".venv" ]; then
-        uv run --all-extras python validation/validate.py
-    else
-        python validation/validate.py
-    fi
+    cd pygmt_nanobind_benchmark && uv run --locked --all-extras --group lint python validation/validate.py
 
 # Clean build artifacts
 [group('gmt')]
@@ -213,3 +168,19 @@ gmt-clean:
     rm -rf pygmt_nanobind_benchmark/tests/__pycache__/
     find . -name "*.so" -delete
     find . -name "*.pyc" -delete
+
+fmt:
+    cd tesseract_nanobind_benchmark && uv run --locked --only-group lint ruff format src tests benchmarks examples
+    cd pygmt_nanobind_benchmark && uv run --locked --only-group lint ruff format python tests benchmarks validation
+
+lint: tesseract-check gmt-check
+
+# Generate signatures from the real compiled native extensions.
+native-stubs:
+    cd tesseract_nanobind_benchmark && uv run --with nanobind --all-extras python -m nanobind.stubgen -m tesseract_nanobind._tesseract_nanobind -o src/tesseract_nanobind/_tesseract_nanobind.pyi
+    cd pygmt_nanobind_benchmark && uv run --with nanobind --all-extras python -m nanobind.stubgen -m pygmt_nb.clib._pygmt_nb_core -o python/pygmt_nb/clib/_pygmt_nb_core.pyi
+    cd pygmt_nanobind_benchmark && uv run --locked --only-group lint ruff check --fix --unsafe-fixes python/pygmt_nb/clib/_pygmt_nb_core.pyi
+    just fmt
+
+regression-variable-getters:
+    cd tesseract_nanobind_benchmark && uv run --locked --all-extras --group lint pytest tests/test_compat_extended.py -k variable_getter -v

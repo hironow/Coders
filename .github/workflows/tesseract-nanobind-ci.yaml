@@ -8,6 +8,7 @@ on:
       - '.github/workflows/tesseract-nanobind-ci.yaml'
       - 'justfile'
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     branches: [ main, develop ]
     paths:
       - 'tesseract_nanobind_benchmark/**'
@@ -20,6 +21,7 @@ permissions:
 
 jobs:
   build-and-test:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     name: Build and Test (${{ matrix.os }}, Python ${{ matrix.python-version }})
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
@@ -40,8 +42,10 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Set up Takumi Guard (PyPI)
-      uses: flatt-security/setup-takumi-guard-pypi@733047c120b6377fa05fb77f714df8d8cd3a41a9 # v1
+    - name: Set up uv
+      uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
+      with:
+        python-version: ${{ matrix.python-version }}
 
     - name: Install system dependencies (Ubuntu)
       run: |
@@ -54,11 +58,8 @@ jobs:
           cmake \
           ninja-build
 
-    - name: Install build tools (uv and just)
-      run: |
-        python -m pip install --upgrade pip
-        pip install uv
-        pipx install rust-just
+    - name: Set up just
+      uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # v4
 
     - name: Build package
       run: |
@@ -69,6 +70,7 @@ jobs:
         just tesseract-test
 
   compatibility-test:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     name: Compatibility Test (tesserocr API)
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -84,8 +86,10 @@ jobs:
       with:
         python-version: '3.11'
 
-    - name: Set up Takumi Guard (PyPI)
-      uses: flatt-security/setup-takumi-guard-pypi@733047c120b6377fa05fb77f714df8d8cd3a41a9 # v1
+    - name: Set up uv
+      uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
+      with:
+        python-version: '3.11'
 
     - name: Install system dependencies
       run: |
@@ -98,15 +102,8 @@ jobs:
           cmake \
           ninja-build
 
-    - name: Install build tools (uv and just)
-      run: |
-        python -m pip install --upgrade pip
-        pip install uv
-        pipx install rust-just
-
-    - name: Install tesserocr for compatibility testing
-      run: |
-        pip install tesserocr pillow>=12.0 numpy>=2.0 pytest>=9.0
+    - name: Set up just
+      uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # v4
 
     - name: Build package
       run: |
@@ -115,13 +112,13 @@ jobs:
     - name: Run compatibility tests
       working-directory: tesseract_nanobind_benchmark
       run: |
-        python -m pytest tests/test_compat.py -v
+        uv run --locked --all-extras --group lint pytest tests/test_compat.py -v
 
   benchmark:
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)
     name: Performance Benchmark
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
 
     steps:
     - name: Checkout repository
@@ -134,8 +131,10 @@ jobs:
       with:
         python-version: '3.11'
 
-    - name: Set up Takumi Guard (PyPI)
-      uses: flatt-security/setup-takumi-guard-pypi@733047c120b6377fa05fb77f714df8d8cd3a41a9 # v1
+    - name: Set up uv
+      uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
+      with:
+        python-version: '3.11'
 
     - name: Install system dependencies
       run: |
@@ -148,15 +147,8 @@ jobs:
           cmake \
           ninja-build
 
-    - name: Install build tools (uv and just)
-      run: |
-        python -m pip install --upgrade pip
-        pip install uv
-        pipx install rust-just
-
-    - name: Install benchmark dependencies
-      run: |
-        pip install pytesseract tesserocr pillow>=12.0 numpy>=2.0
+    - name: Set up just
+      uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # v4
 
     - name: Build package
       run: |
@@ -179,6 +171,7 @@ jobs:
         path: tesseract_nanobind_benchmark/benchmark_results.txt
 
   code-quality:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     name: Code Quality Checks
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -192,14 +185,21 @@ jobs:
       with:
         python-version: '3.11'
 
-    - name: Set up Takumi Guard (PyPI)
-      uses: flatt-security/setup-takumi-guard-pypi@733047c120b6377fa05fb77f714df8d8cd3a41a9 # v1
+    - name: Set up uv
+      uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
+      with:
+        python-version: '3.11'
 
-    - name: Install build tools (uv and just)
+    - name: Set up just
+      uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # v4
+
+    - name: Install native build dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install uv
-        pipx install rust-just
+        sudo apt-get update
+        sudo apt-get install -y tesseract-ocr libtesseract-dev libleptonica-dev pkg-config cmake ninja-build
+
+    - name: Build package
+      run: just tesseract-build
 
     - name: Run code quality checks
       run: |
