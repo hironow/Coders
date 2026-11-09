@@ -1,0 +1,68 @@
+# Dependabot version updates.
+#
+# hironow house style (amadeus/tablecodec/dotfiles/firepact): a 7-day cooldown for
+# supply-chain hardening -- a routine bump is not proposed until the release has been
+# public for a week, so a compromised-then-yanked version is not pulled in on day zero.
+# Cooldown applies to version updates only; Dependabot SECURITY updates bypass it.
+#
+# Each ecosystem is grouped into a single pull request so a week's bumps land together.
+#
+# Ecosystems in this repository: three independent uv benchmark projects plus the
+# workflows themselves.
+version: 2
+updates:
+
+  - package-ecosystem: "uv"
+    directory: "/mlt_nanobind_benchmark"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 7
+    labels: ["dependencies", "python"]
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    groups:
+      uv-mlt:
+        patterns: ["*"]
+
+  - package-ecosystem: "uv"
+    directory: "/pygmt_nanobind_benchmark"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 7
+    labels: ["dependencies", "python"]
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    groups:
+      uv-pygmt:
+        patterns: ["*"]
+
+  - package-ecosystem: "uv"
+    directory: "/tesseract_nanobind_benchmark"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 7
+    labels: ["dependencies", "python"]
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    groups:
+      uv-tesseract:
+        patterns: ["*"]
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 7
+    labels: ["dependencies", "github-actions"]
+    commit-message:
+      prefix: "ci"
+    groups:
+      github-actions:
+        patterns: ["*"]
