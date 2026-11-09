@@ -31,7 +31,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-24.04]
         python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
 
     steps:
@@ -77,7 +77,7 @@ jobs:
   compatibility-test:
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     name: Compatibility Test (PyGMT API)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
 
     steps:
@@ -123,7 +123,7 @@ jobs:
   validation:
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     name: Validation (PyGMT Output Compatibility)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
 
     steps:
@@ -175,7 +175,7 @@ jobs:
   benchmark:
     if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.draft == false)
     name: Performance Benchmark
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
 
     steps:
@@ -227,7 +227,7 @@ jobs:
   code-quality:
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     name: Code Quality Checks
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
 
     steps:
