@@ -95,6 +95,6 @@ error-on-warning = true
 
 [dependency-groups]
 lint = [
-    "ruff==0.17.0",
-    "ty==0.0.86",
+    "ruff==0.17.3",
+    "ty==0.0.95",
 ]
